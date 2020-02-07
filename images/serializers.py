@@ -3,4 +3,4 @@ from django.core.validators import FileExtensionValidator
 
 
 class ImageSerializer(serializers.Serializer):
-    image = serializers.FileField(required=True, validators=[FileExtensionValidator(['png', 'jpeg', 'gif'])])
+    image = serializers.FileField(required=True, validators=[FileExtensionValidator(['png', 'jpeg', 'jpg', 'gif'])])

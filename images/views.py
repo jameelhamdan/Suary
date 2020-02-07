@@ -1,7 +1,7 @@
 from django.urls import path
-from django.http.response import StreamingHttpResponse, Http404
-from rest_framework import views, parsers, status, response
-from . import serializers, db_client
+from django.http.response import StreamingHttpResponse, Http404, HttpResponse
+from rest_framework import generics, views, parsers, status, response
+from . import serializers, models
 
 
 class UploadImageView(views.APIView):
@@ -15,28 +15,29 @@ class UploadImageView(views.APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         else:
-            image_data = serializer.validated_data.get('image')
-            client = db_client.ImageCollection()
-            image_uuid = client.save(image_data)
+            uploaded_image = serializer.validated_data.get('image')
+            imageDocument = models.Image()
+
+            imageDocument.image.put(uploaded_image, content_type=uploaded_image.content_type)
+            imageDocument.save()
 
             return response.Response(
                 data={
-                    'uuid': image_uuid
+                    'uuid': imageDocument.uuid
                 },
                 status=status.HTTP_200_OK
             )
 
 
-class GetImageView(views.APIView):
-
+class GetImageView(generics.RetrieveAPIView):
     def get(self, *args, **kwargs):
         image_uuid = kwargs['uuid']
-        client = db_client.ImageCollection()
-        result, content_type = client.get_image(image_uuid)
-        if not content_type:
-            return Http404()
+        imageDocument = models.Image.objects(uuid=image_uuid).first()
+        if not imageDocument:
+            raise Http404()
 
-        return StreamingHttpResponse(result, content_type=content_type)
+        image = imageDocument.image
+        return StreamingHttpResponse(imageDocument.stream_image_bytes(), content_type=image.content_type)
 
 
 urlpatterns = (
