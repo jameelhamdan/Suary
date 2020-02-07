@@ -119,3 +119,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# DATABASE
+
+MONGO_DB_IMAGE_DATABASE_HOST = 'localhost'
+MONGO_DB_IMAGE_DATABASE_PORT = 27017
+MONGO_DB_IMAGE_DATABASE_NAME = 'image_storage'
