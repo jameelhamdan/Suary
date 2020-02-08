@@ -1,5 +1,5 @@
-from django.urls import path
 from django.http.response import Http404
+from django.urls import path
 from rest_framework import generics, views, parsers, status, response
 from . import serializers, models
 
@@ -16,14 +16,14 @@ class UploadMediaView(views.APIView):
             )
         else:
             uploaded_media = serializer.validated_data.get('media')
-            mediaDocument = models.MediaDocument()
+            media_document = models.MediaDocument()
 
-            mediaDocument.media.put(uploaded_media, content_type=uploaded_media.content_type)
-            mediaDocument.save()
+            media_document.upload(uploaded_media)
+            media_document.save()
 
             return response.Response(
                 data={
-                    'uuid': mediaDocument.uuid
+                    'uuid': media_document.uuid
                 },
                 status=status.HTTP_200_OK
             )
@@ -32,11 +32,11 @@ class UploadMediaView(views.APIView):
 class GetMediaView(generics.RetrieveAPIView):
     def get(self, *args, **kwargs):
         media_uuid = kwargs['uuid']
-        mediaDocument = models.MediaDocument.objects(uuid=media_uuid).first()
-        if not mediaDocument:
+        media_document = models.MediaDocument.objects(uuid=media_uuid).first()
+        if not media_document:
             raise Http404()
 
-        return mediaDocument.stream_media()
+        return media_document.stream_media(request=self.request)
 
 
 urlpatterns = (
