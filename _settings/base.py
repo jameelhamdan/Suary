@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'images',
+    'rest_framework',
+    'media',
 ]
 
 MIDDLEWARE = [
@@ -45,8 +46,7 @@ ROOT_URLCONF = '_settings.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,8 +119,8 @@ STATIC_URL = '/static/'
 MONGO_DEFAULT_DATABASE_URL = os.environ.get('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
 MONGO_DEFAULT_DATABASE_NAME = os.environ.get('MONGO_DEFAULT_DATABASE_NAME', 'default_storage')
 
-MONGO_IMAGE_DATABASE_URL = os.environ.get('MONGO_IMAGE_DATABASE_URL', 'localhost:27017')
-MONGO_IMAGE_DATABASE_NAME = os.environ.get('MONGO_IMAGE_DATABASE_NAME', 'image_storage')
+MONGO_MEDIA_DATABASE_URL = os.environ.get('MONGO_MEDIA_DATABASE_URL', 'localhost:27017')
+MONGO_MEDIA_DATABASE_NAME = os.environ.get('MONGO_MEDIA_DATABASE_NAME', 'media_storage')
 
-mongoengine.connect(MONGO_IMAGE_DATABASE_NAME, host=MONGO_IMAGE_DATABASE_URL, alias='default', maxpoolsize=500)
-mongoengine.connect(MONGO_IMAGE_DATABASE_NAME, host=MONGO_IMAGE_DATABASE_URL, alias='image_database', maxpoolsize=500)
+mongoengine.connect(MONGO_MEDIA_DATABASE_NAME, host=MONGO_MEDIA_DATABASE_URL, alias='default', maxpoolsize=500)
+mongoengine.connect(MONGO_MEDIA_DATABASE_NAME, host=MONGO_MEDIA_DATABASE_URL, alias='media_database', maxpoolsize=500)
