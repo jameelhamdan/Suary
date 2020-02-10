@@ -1,13 +1,15 @@
 from django.http.response import Http404
-from django.urls import path
+from auth.backend.decorators import view_allow_any, view_authenticate
 from rest_framework import generics, views, parsers, status, response
+from _common.mixins import APIViewMixin
 from . import serializers, models
 
 
-class UploadMediaView(views.APIView):
+@view_authenticate()
+class UploadMediaView(APIViewMixin, views.APIView):
     parser_classes = (parsers.MultiPartParser, )
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = serializers.MediaSerializer(data=request.data)
         if not serializer.is_valid():
             return response.Response(
@@ -29,17 +31,12 @@ class UploadMediaView(views.APIView):
             )
 
 
+@view_allow_any()
 class GetMediaView(generics.RetrieveAPIView):
     def get(self, *args, **kwargs):
-        media_uuid = kwargs['uuid']
+        media_uuid = self.kwargs['uuid']
         media_document = models.MediaDocument.objects(uuid=media_uuid).first()
         if not media_document:
             raise Http404()
 
         return media_document.stream_media(request=self.request)
-
-
-urlpatterns = (
-    path('upload/', UploadMediaView.as_view()),
-    path('<str:uuid>', GetMediaView.as_view(), name='view_media'),
-)

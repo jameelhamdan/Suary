@@ -1,7 +1,7 @@
 from django.http.response import FileResponse, StreamingHttpResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-from _common.utils import generate_uuid
+import uuid
 import mongoengine as mongo
 import gridfs
 from gridfs import GridIn
@@ -9,7 +9,7 @@ from _common import utils
 
 
 class MediaDocument(mongo.Document):
-    uuid = mongo.StringField(unique=True, max_length=36, default=generate_uuid)
+    uuid = mongo.UUIDField(unique=True, binary=False, default=uuid.uuid4)
     created_on = mongo.DateTimeField(default=timezone.now())
     media = mongo.FileField(collection_name='media')
 
