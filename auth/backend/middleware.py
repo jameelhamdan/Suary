@@ -1,7 +1,7 @@
 from ..backend.settings import api_settings
 from ..backend.jwt import verify_auth_token, verify_refresh_token
-from ..backend.utils import AuthException, get_auth_header
-from _common.errors import handler401
+from ..backend.utils import AuthException, ForbiddenException, get_auth_header
+from _common.errors import handler401, handler403
 
 VERIFY_TYPES = api_settings.VERIFY_TYPES
 
@@ -17,16 +17,25 @@ class AuthMiddleware(object):
     @staticmethod
     def process_view(request, view_func, view_args, view_kwargs):
         try:
-            auth_type = getattr(view_func, 'auth_type', None)
-            if auth_type in VERIFY_TYPES:
-                user = _http_auth_helper(request, auth_type)
-                setattr(request, 'current_user', user)
-                return view_func(request, *view_args, **view_kwargs)
-            else:
+            auth_type = getattr(view_func, '_auth_type', None)
+            if auth_type not in VERIFY_TYPES:
                 raise AuthException()
 
-        except AuthException as e:
+            user = _http_auth_helper(request, auth_type)
+            setattr(request, 'current_user', user)
+            setattr(request, 'user', user)
+
+            custom_method = getattr(view_func, '_custom_auth_method', None)
+            if custom_method and not custom_method():
+                raise ForbiddenException()
+
+        except AuthException:
             return handler401(request, *view_args, **view_kwargs)
+
+        except ForbiddenException:
+            return handler403(request, *view_args, **view_kwargs)
+
+        return view_func(request, *view_args, **view_kwargs)
 
     def __call__(self, request):
         response = self.get_response(request)

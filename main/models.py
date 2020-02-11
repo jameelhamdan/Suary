@@ -5,7 +5,7 @@ import uuid
 
 class AbstractDocument(mongo.Document):
     uuid = mongo.UUIDField(unique=True, binary=False, default=uuid.uuid4)
-    created_by = mongo.UUIDField(binary=False, required=True)
+    created_by = mongo.StringField(required=True)
     created_on = mongo.DateTimeField(default=timezone.now())
     updated_on = mongo.DateTimeField(default=timezone.now())
 
@@ -22,7 +22,7 @@ class AbstractDocument(mongo.Document):
 
 class Post(AbstractDocument):
     content = mongo.StringField(min_length=3, required=True)
-    image_uuid = mongo.ListField(mongo.StringField())
+    media_uuid = mongo.ListField(mongo.StringField())
 
     meta = {
         'collection': 'posts'
@@ -33,7 +33,7 @@ class Comment(AbstractDocument):
     content = mongo.StringField(min_length=3, required=True)
 
     meta = {
-        'collection': 'posts'
+        'collection': 'comments'
     }
 
 

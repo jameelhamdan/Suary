@@ -16,6 +16,14 @@ class AuthException(exceptions.AuthenticationFailed):
     status_code = status.HTTP_401_UNAUTHORIZED
 
 
+class ForbiddenException(exceptions.PermissionDenied):
+    status_code = status.HTTP_401_UNAUTHORIZED
+
+
+class AuthErrorException(exceptions.AuthenticationFailed):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
 def get_auth_header(request):
     try:
         header = request.META.get(META_TYPE, None)

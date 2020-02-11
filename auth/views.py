@@ -1,12 +1,12 @@
 from rest_framework import generics
-from .serializers import LoginSerializer, RegisterSerializer, ResetPasswordSerializer, RenewAuthTokenSerializer, RenewRefreshTokenSerializer
+from . import serializers
 from .backend.decorators import view_allow_any, view_authenticate, view_authenticate_refresh
 from _common.mixins import APIViewMixin
 
 
 @view_allow_any()
 class LoginView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = LoginSerializer
+    serializer_class = serializers.LoginSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -24,7 +24,7 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
 
 @view_allow_any()
 class RegisterView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = RegisterSerializer
+    serializer_class = serializers.RegisterSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -39,7 +39,7 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
 
 @view_authenticate()
 class ResetPasswordView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = ResetPasswordSerializer
+    serializer_class = serializers.ResetPasswordSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={'request': self.request})
@@ -56,7 +56,7 @@ class ResetPasswordView(APIViewMixin, generics.CreateAPIView):
 
 @view_authenticate_refresh()
 class RenewAuthTokenView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = RenewAuthTokenSerializer
+    serializer_class = serializers.RenewAuthTokenSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -72,7 +72,7 @@ class RenewAuthTokenView(APIViewMixin, generics.CreateAPIView):
 
 @view_authenticate_refresh()
 class RenewRefreshTokenView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = RenewRefreshTokenSerializer
+    serializer_class = serializers.RenewRefreshTokenSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
