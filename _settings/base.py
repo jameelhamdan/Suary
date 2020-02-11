@@ -17,8 +17,9 @@ ADMINS = [('Jameel Hamdan', 'jameelhamdan99@yahoo.com')]
 # Application definition
 INSTALLED_APPS = [
     'rest_framework',
-    'auth.apps.CustomAuthConfig',
-    'media.apps.MediasConfig',
+    'auth',
+    'media',
+    'main',
 ]
 
 MIDDLEWARE = [
@@ -78,5 +79,5 @@ MONGO_DEFAULT_DATABASE_NAME = os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'default_
 MONGO_MEDIA_DATABASE_URL = os.getenv('MONGO_MEDIA_DATABASE_URL', 'localhost:27017')
 MONGO_MEDIA_DATABASE_NAME = os.getenv('MONGO_MEDIA_DATABASE_NAME', 'media_storage')
 
-mongoengine.connect(MONGO_MEDIA_DATABASE_NAME, host=MONGO_MEDIA_DATABASE_URL, alias='default', maxpoolsize=500)
+mongoengine.connect(MONGO_DEFAULT_DATABASE_URL, host=MONGO_DEFAULT_DATABASE_URL, alias='default', maxpoolsize=500)
 mongoengine.connect(MONGO_MEDIA_DATABASE_NAME, host=MONGO_MEDIA_DATABASE_URL, alias='media_database', maxpoolsize=500)
