@@ -27,5 +27,7 @@ class AddPostView(APIViewMixin, generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk
         queryset = models.Post.objects.filter(created_by=user_pk).only('content', 'created_by', 'created_on')
+        serializer = serializers.ListPostSerializer(list(queryset), many=True)
 
-        return self.get_response(message='Successfully Returned My Posts', result=list(queryset))
+        json_data = serializer.data
+        return self.get_response(message='Successfully Returned My Posts', result=json_data)

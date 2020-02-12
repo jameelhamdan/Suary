@@ -8,13 +8,16 @@ from _common.mixins import APIViewMixin
 class LoginView(APIViewMixin, generics.CreateAPIView):
     serializer_class = serializers.LoginSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, auth_token, refresh_token = serializer.validated_data
 
+        user_data = user.get_data()
         result = {
             'uuid': user.pk,
+            'username': user.username,
+            'full_name': user_data.full_name,
             'auth_token': auth_token,
             'refresh_token': refresh_token,
         }

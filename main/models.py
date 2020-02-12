@@ -1,21 +1,21 @@
 from django.utils import timezone
 import mongoengine as mongo
-import uuid
+from _common import utils
+import auth.models
 
 
 class AbstractDocument(mongo.Document):
-    uuid = mongo.UUIDField(unique=True, binary=False, default=uuid.uuid4)
-    created_by = mongo.StringField(required=True)
-    created_on = mongo.DateTimeField(default=timezone.now())
-    updated_on = mongo.DateTimeField(default=timezone.now())
+    uuid = mongo.StringField(primary_key=True, default=utils.generate_uuid)
+    created_by = mongo.ReferenceField(auth.models.UserData, required=True)
+    created_on = mongo.DateTimeField(default=timezone.now)
+    updated_on = mongo.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
         self.updated_on = timezone.now()
         return super(AbstractDocument, self).save(*args, **kwargs)
 
     meta = {
-        'allow_inheritance': True,
-        'indexes': ['uuid'],
+        'abstract': True,
         'db_alias': 'default',
     }
 
@@ -42,6 +42,6 @@ class Like(AbstractDocument):
 
     meta = {
         'collection': 'likes',
-        'indexes': ['uuid', 'parent'],
+        'indexes': ['parent'],
 
     }

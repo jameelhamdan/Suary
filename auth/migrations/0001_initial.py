@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='User',
             fields=[
                 ('uuid', models.CharField(db_index=True, default=uuid.uuid4, editable=False, max_length=36, primary_key=True, serialize=False)),
-                ('user_name', models.CharField(db_index=True, max_length=128, unique=True)),
+                ('username', models.CharField(db_index=True, max_length=128, unique=True)),
                 ('email', models.EmailField(db_index=True, max_length=128, unique=True)),
                 ('avatar_url', models.TextField(null=True)),
                 ('password_hash', models.CharField(max_length=512)),
