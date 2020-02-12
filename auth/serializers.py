@@ -32,7 +32,7 @@ class LoginSerializer(serializers.Serializer):
 
         user.update_last_login()
         auth_token = create_auth_token(user.pk)
-        refresh_token = create_refresh_token(user.pk, user.secret_key)
+        refresh_token = create_refresh_token(user.pk, user.get_secret_key())
 
         return user, auth_token, refresh_token
 
@@ -92,7 +92,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         user.reset_secret_key()
         user.update_last_login()
         auth_token = create_auth_token(user.pk)
-        refresh_token = create_refresh_token(user.pk, user.secret_key)
+        refresh_token = create_refresh_token(user.pk, user.get_secret_key())
 
         return user, auth_token, refresh_token
 
@@ -102,7 +102,7 @@ class RenewAuthTokenSerializer(serializers.Serializer):
         user = self.context['request'].current_user
 
         old_token = utils.get_auth_header(self.context['request'])
-        new_token = jwt.renew_auth_token(old_token, user.secret_key)
+        new_token = jwt.renew_auth_token(old_token, user.get_secret_key())
         return new_token
 
 
@@ -111,7 +111,7 @@ class RenewRefreshTokenSerializer(serializers.Serializer):
         user = self.context['request'].current_user
         
         old_token = utils.get_auth_header(self.context['request'])
-        new_refresh_token = jwt.renew_refresh_token(old_token, user.secret_key)
-        new_auth_token = jwt.renew_auth_token(old_token, user.secret_key)
+        new_refresh_token = jwt.renew_refresh_token(old_token, user.get_secret_key())
+        new_auth_token = jwt.renew_auth_token(old_token, user.get_secret_key())
 
         return new_refresh_token, new_auth_token

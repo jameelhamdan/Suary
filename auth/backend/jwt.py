@@ -89,7 +89,7 @@ def verify_refresh_token(token):
             raise Exception('Invalid Token')
         user = get_user_by_uuid(user_uuid)
 
-        decode_refresh_token(token, user.secret_key)
+        decode_refresh_token(token, user.get_secret_key())
 
         return user
 

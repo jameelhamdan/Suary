@@ -22,6 +22,9 @@ class User(models.Model):
     def get_data(self):
         return UserData.objects.get(uuid=self.pk)
 
+    def get_secret_key(self):
+        return hash_password(self.secret_key)
+
     def set_password(self, new_password):
         self.password_hash = hash_password(new_password)
         self.save()
@@ -46,6 +49,7 @@ class User(models.Model):
         new_user = User(username=username, email=email)
         # this is a postgre only transaction, it will *only* revert postgre changes.
         with transaction.atomic():
+            new_user.secret_key = generate_uuid(3)
             new_user.save()
             new_user.set_password(password)
 
