@@ -22,10 +22,10 @@ class AbstractDocument(mongo.Document):
 
 class Post(AbstractDocument):
     content = mongo.StringField(min_length=3, required=True)
-    media_uuid = mongo.ListField(mongo.StringField())
+    media_list = mongo.ListField(mongo.StringField(), default=[])
 
     meta = {
-        'collection': 'posts'
+        'collection': 'main_posts'
     }
 
 
@@ -33,7 +33,7 @@ class Comment(AbstractDocument):
     content = mongo.StringField(min_length=3, required=True)
 
     meta = {
-        'collection': 'comments'
+        'collection': 'main_comments'
     }
 
 
@@ -41,7 +41,6 @@ class Like(AbstractDocument):
     parent = mongo.GenericLazyReferenceField(choices=(Post, Comment))
 
     meta = {
-        'collection': 'likes',
+        'collection': 'main_likes',
         'indexes': ['parent'],
-
     }

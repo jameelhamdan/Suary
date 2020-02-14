@@ -5,12 +5,18 @@ import mongoengine as mongo
 import gridfs
 from gridfs import GridIn
 from _common import utils
+import main.models
+import auth.models
 
 
 class MediaDocument(mongo.Document):
+    collection_name = 'media'
+    db_alias = 'media_database'
+
     uuid = mongo.StringField(primary_key=True, default=utils.generate_uuid)
+    media = mongo.FileField(collection_name=collection_name, db_alias=db_alias)
     created_on = mongo.DateTimeField(default=timezone.now)
-    media = mongo.FileField(collection_name='media')
+    parent = mongo.GenericReferenceField(choices=(main.models.Post, auth.models.UserData))
 
     def get_url(self):
         return reverse_lazy('view_media', kwargs={'uuid': self.uuid})
@@ -43,7 +49,8 @@ class MediaDocument(mongo.Document):
 
     def upload(self, upload_stream):
         self.media.put(upload_stream, content_type=upload_stream.content_type)
-        return
+        self.save()
+        return self
 
         # TODO fix this code
         # fs_bucket = gridfs.GridFSBucket(self._get_db(), self._get_collection_name())
