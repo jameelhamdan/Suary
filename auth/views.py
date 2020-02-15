@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, parsers
 from . import serializers
 from .backend.decorators import view_allow_any, view_authenticate, view_authenticate_refresh
 from _common.mixins import APIViewMixin
@@ -18,6 +18,7 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
             'uuid': user.pk,
             'username': user.username,
             'full_name': user_data.full_name,
+            'avatar_uuid': user_data.avatar_uuid,
             'auth_token': auth_token,
             'refresh_token': refresh_token,
         }
@@ -88,3 +89,22 @@ class RenewRefreshTokenView(APIViewMixin, generics.CreateAPIView):
         }
 
         return self.get_response(message='Successfully Refreshed Token', result=result)
+
+
+@view_authenticate()
+class UpdateAvatarView(APIViewMixin, generics.UpdateAPIView):
+    parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
+    serializer_class = serializers.UpdateAvatarSerializer
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={'request': self.request})
+        serializer.is_valid(raise_exception=True)
+        cleaned_data = serializer.validated_data
+
+        uploaded_avatar_uuid = self.request.current_user.update_avatar(cleaned_data['avatar'])
+
+        result = {
+            'avatar_uuid': uploaded_avatar_uuid,
+        }
+
+        return self.get_response(message='Successfully Updated Avatar', result=result)

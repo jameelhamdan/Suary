@@ -19,7 +19,7 @@ class MediaDocument(mongo.Document):
     parent = mongo.GenericReferenceField(choices=(main.models.Post, auth.models.UserData))
 
     def get_url(self):
-        return reverse_lazy('view_media', kwargs={'uuid': self.uuid})
+        return reverse_lazy('view_media', kwargs={'uuid': self.pk})
 
     def stream_image(self, *args, **kwargs):
         fs_bucket = gridfs.GridFSBucket(self._get_db(), self._get_collection_name())

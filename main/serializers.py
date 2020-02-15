@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.core.validators import FileExtensionValidator
-
-MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm']
+from django.conf import settings
 
 
 class UserSerializer(serializers.Serializer):
     uuid = serializers.CharField()
     full_name = serializers.CharField()
+    avatar_uuid = serializers.CharField()
 
 
 class ListPostSerializer(serializers.Serializer):
@@ -21,6 +21,6 @@ class PostSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
     # All Files must be sent under the same name 'media_list' they will get parsed individually as a list.
     media_list = serializers.ListField(
-        child=serializers.FileField(validators=[FileExtensionValidator(MEDIA_FORMATS)], allow_empty_file=False, use_url=False),
+        child=serializers.FileField(validators=[FileExtensionValidator(settings.MEDIA_FORMATS)], allow_empty_file=False, use_url=False),
         required=True
     )

@@ -3,14 +3,14 @@ from django.utils import timezone
 from django.db import models, transaction
 from django.db.models import Q
 import mongoengine as mongo
-from _common import utils
+from _common import utils, validators
 
 
 class User(models.Model):
     uuid = models.CharField(max_length=36, primary_key=True, db_index=True, default=utils.generate_uuid, editable=False)
-    username = models.CharField(max_length=128, unique=True, db_index=True, null=False)
+    username = models.CharField(max_length=128, unique=True, db_index=True, null=False, editable=False, validators=[validators.UsernameValidator])
     email = models.EmailField(max_length=128, unique=True, db_index=True, null=False)
-    avatar_url = models.TextField(null=True)
+    avatar_uuid = models.CharField(max_length=36, null=True)
 
     password_hash = models.CharField(max_length=512)
     secret_key = models.CharField(max_length=108, db_index=True, default='')
@@ -54,7 +54,7 @@ class User(models.Model):
             new_user.set_password(password)
 
             user_data = UserData(
-                uuid=new_user.uuid,
+                uuid=new_user.pk,
                 username=new_user.username,
                 email=new_user.email,
                 **kwargs
@@ -63,7 +63,31 @@ class User(models.Model):
             user_data.save()
         return new_user
 
-    def save(self, extra_data=None, *args, **kwargs):
+    def update_avatar(self, new_avatar):
+        import media.models
+
+        # Delete Old avatar
+        avatar_uuid = self.avatar_uuid
+        if avatar_uuid:
+            old_avatar = media.models.MediaDocument.objects.filter(uuid=avatar_uuid).first()
+            if old_avatar:
+                old_avatar.delete()
+
+        # Upload new avatar
+        media_document = media.models.MediaDocument(parent=self.get_data())
+        media_document.upload(new_avatar)
+        media_document.save()
+
+        self.avatar_uuid = media_document.pk
+        self.save()
+
+        user_data = self.get_data()
+        user_data.avatar_uuid = media_document.pk
+        user_data.save()
+
+        return media_document.pk
+
+    def save(self, *args, **kwargs):
         if not self.pk:
             self.uuid = generate_uuid()
             self.secret_key = generate_uuid(3)
@@ -81,6 +105,7 @@ class UserData(mongo.Document):
     username = mongo.StringField(required=True)
     email = mongo.EmailField(required=True)
 
+    avatar_uuid = mongo.StringField()
     full_name = mongo.StringField(required=True)
     birth_date = mongo.DateField(required=True)
 

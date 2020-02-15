@@ -17,7 +17,7 @@ class AuthException(exceptions.AuthenticationFailed):
 
 
 class ForbiddenException(exceptions.PermissionDenied):
-    status_code = status.HTTP_401_UNAUTHORIZED
+    status_code = status.HTTP_403_FORBIDDEN
 
 
 class AuthErrorException(exceptions.AuthenticationFailed):

@@ -81,3 +81,8 @@ MONGO_MEDIA_DATABASE_NAME = os.getenv('MONGO_MEDIA_DATABASE_NAME', 'media_storag
 
 mongoengine.connect(MONGO_DEFAULT_DATABASE_NAME, host=MONGO_DEFAULT_DATABASE_URL, alias='default', maxpoolsize=500)
 mongoengine.connect(MONGO_MEDIA_DATABASE_NAME, host=MONGO_MEDIA_DATABASE_URL, alias='media_database', maxpoolsize=500)
+
+
+# Custom
+MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm']
+AVATAR_FORMATS = ['png', 'jpeg', 'jpg']

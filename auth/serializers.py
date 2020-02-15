@@ -1,7 +1,10 @@
+from django.core.validators import FileExtensionValidator
+from django.conf import settings
 from rest_framework import serializers
 from .models import User
 from .backend import jwt, utils
 from .backend.jwt import create_auth_token, create_refresh_token
+from _common import validators
 
 
 class LoginSerializer(serializers.Serializer):
@@ -38,7 +41,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class RegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
+    username = serializers.CharField(required=True, validators=[validators.UsernameValidator()])
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
     password_confirm = serializers.CharField(required=True)
@@ -47,6 +50,7 @@ class RegisterSerializer(serializers.Serializer):
     birth_date = serializers.DateField(required=True)
 
     def validate(self, data):
+        super(RegisterSerializer, self).validate(data)
         # Validate Password
 
         if not data['password'] == data['password_confirm']:
@@ -115,3 +119,7 @@ class RenewRefreshTokenSerializer(serializers.Serializer):
         new_auth_token = jwt.renew_auth_token(old_token, user.get_secret_key())
 
         return new_refresh_token, new_auth_token
+
+
+class UpdateAvatarSerializer(serializers.Serializer):
+    avatar = serializers.FileField(validators=[FileExtensionValidator(settings.AVATAR_FORMATS)], allow_empty_file=False, use_url=False, required=True)
