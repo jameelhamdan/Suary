@@ -1,5 +1,3 @@
-from django.core.validators import FileExtensionValidator
-from django.conf import settings
 from rest_framework import serializers
 from .models import User
 from .backend import jwt, utils
@@ -119,7 +117,3 @@ class RenewRefreshTokenSerializer(serializers.Serializer):
         new_auth_token = jwt.renew_auth_token(old_token, user.get_secret_key())
 
         return new_refresh_token, new_auth_token
-
-
-class UpdateAvatarSerializer(serializers.Serializer):
-    avatar = serializers.FileField(validators=[FileExtensionValidator(settings.AVATAR_FORMATS)], allow_empty_file=False, use_url=False, required=True)

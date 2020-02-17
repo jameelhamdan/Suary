@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'auth',
     'media',
+    'users',
     'main',
 ]
 
