@@ -1,7 +1,7 @@
-from _common.utils import hash_password, verify_password, generate_uuid
 from django.utils import timezone
 from django.db import models, transaction
 from django.db.models import Q
+from rest_framework.exceptions import ValidationError
 import mongoengine as mongo
 from _common import utils, validators
 
@@ -23,17 +23,17 @@ class User(models.Model):
         return UserData.objects.get(uuid=self.pk)
 
     def get_secret_key(self):
-        return hash_password(self.secret_key)
+        return utils.hash_password(self.secret_key)
 
     def set_password(self, new_password):
-        self.password_hash = hash_password(new_password)
+        self.password_hash = utils.hash_password(new_password)
         self.save()
 
     def validate_password(self, password):
-        return verify_password(self.password_hash, password)
+        return utils.verify_password(self.password_hash, password)
 
     def reset_secret_key(self):
-        self.secret_key = generate_uuid(3)
+        self.secret_key = utils.generate_uuid(3)
         self.save()
 
     @staticmethod
@@ -49,7 +49,7 @@ class User(models.Model):
         new_user = User(username=username, email=email)
         # this is a postgre only transaction, it will *only* revert postgre changes.
         with transaction.atomic():
-            new_user.secret_key = generate_uuid(3)
+            new_user.secret_key = utils.generate_uuid(3)
             new_user.save()
             new_user.set_password(password)
 
@@ -92,12 +92,12 @@ class User(models.Model):
         user_exists = User.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
-            raise Exception('User doesn\'t exist')
+            raise ValidationError('User doesn\'t exist')
 
         follow = Follow.objects.filter(follower=self.pk, following=user_pk).first()
 
         if follow and follow.is_active:
-            raise Exception('Already following this user')
+            raise ValidationError('Already following this user')
 
         if follow:
             follow.is_active = True
@@ -118,12 +118,12 @@ class User(models.Model):
         user_exists = User.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
-            raise Exception('User doesn\'t exist')
+            raise ValidationError('User doesn\'t exist')
 
         follow = Follow.objects.filter(follower=self.pk, following=user_pk).first()
 
         if not follow or not follow.is_active:
-            raise Exception('Already unfollowed this user')
+            raise ValidationError('Already unfollowed this user')
 
         if follow:
             follow.is_active = False
@@ -133,8 +133,8 @@ class User(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.uuid = generate_uuid()
-            self.secret_key = generate_uuid(3)
+            self.uuid = utils.generate_uuid()
+            self.secret_key = utils.generate_uuid(3)
 
         return super(User, self).save(*args, **kwargs)
 
