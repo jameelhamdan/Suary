@@ -6,7 +6,7 @@ import media.models
 
 
 @view_authenticate()
-class AddPostView(APIViewMixin, generics.ListCreateAPIView):
+class ListCreatePostView(APIViewMixin, generics.ListCreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
     serializer_class = serializers.PostSerializer
 
@@ -33,10 +33,29 @@ class AddPostView(APIViewMixin, generics.ListCreateAPIView):
         json_data = serializer.data
         return self.get_response(message='Successfully Added Post', result=json_data)
 
+    def paginate_queryset(self, queryset):
+        page = self.request.GET.get('page', 0)
+        limit = self.request.GET.get('limit', 10)
+
+        records_per_page = limit
+        offset = (page - 1) * records_per_page
+
+        queryset = list(queryset.skip(offset).limit(records_per_page + 1))
+
+        serializer = serializers.ListPostSerializer(queryset[:records_per_page], many=True)
+
+        json_data = serializer.data
+        request_data = {
+            'page': page,
+            'first': page == 1,
+            'last': len(queryset) == records_per_page + 1,
+            'list': json_data,
+        }
+        return request_data
+
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk
         queryset = models.Post.objects.filter(created_by=user_pk).only('content', 'media_list', 'created_by', 'created_on')
-        serializer = serializers.ListPostSerializer(list(queryset), many=True)
 
-        json_data = serializer.data
+        json_data = self.paginate_queryset(queryset)
         return self.get_response(message='Successfully Returned My Posts', result=json_data)
