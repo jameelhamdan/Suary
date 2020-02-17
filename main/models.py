@@ -17,6 +17,7 @@ class AbstractDocument(mongo.Document):
     meta = {
         'abstract': True,
         'db_alias': 'default',
+        'auto_create_index': True,
     }
 
 

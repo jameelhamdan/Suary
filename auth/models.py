@@ -87,6 +87,50 @@ class User(models.Model):
 
         return media_document.pk
 
+    def follow(self, user_pk):
+        from users.models import Follow
+        user_exists = User.objects.filter(pk=user_pk).exists()
+
+        if not user_exists:
+            raise Exception('User doesn\'t exist')
+
+        follow = Follow.objects.filter(follower=self.pk, following=user_pk).first()
+
+        if follow and follow.is_active:
+            raise Exception('Already following this user')
+
+        if follow:
+            follow.is_active = True
+            follow.save()
+
+        else:
+            follow = Follow(
+                follower=self.pk,
+                following=user_pk,
+            )
+
+            follow.save()
+
+        return follow
+
+    def unfollow(self, user_pk):
+        from users.models import Follow
+        user_exists = User.objects.filter(pk=user_pk).exists()
+
+        if not user_exists:
+            raise Exception('User doesn\'t exist')
+
+        follow = Follow.objects.filter(follower=self.pk, following=user_pk).first()
+
+        if not follow or not follow.is_active:
+            raise Exception('Already unfollowed this user')
+
+        if follow:
+            follow.is_active = False
+            follow.save()
+
+        return follow
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.uuid = generate_uuid()
