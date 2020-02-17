@@ -1,14 +1,19 @@
 from rest_framework import generics, parsers
 from . import serializers, models
 from auth.backend.decorators import view_authenticate
-from _common.mixins import APIViewMixin
+from _common.mixins import APIViewMixin, PaginationMixin
 import media.models
 
 
 @view_authenticate()
-class ListCreatePostView(APIViewMixin, generics.ListCreateAPIView):
+class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
-    serializer_class = serializers.PostSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return serializers.ListPostSerializer
+        else:
+            return serializers.PostSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -32,26 +37,6 @@ class ListCreatePostView(APIViewMixin, generics.ListCreateAPIView):
         serializer = serializers.ListPostSerializer(post, many=False)
         json_data = serializer.data
         return self.get_response(message='Successfully Added Post', result=json_data)
-
-    def paginate_queryset(self, queryset):
-        page = self.request.GET.get('page', 0)
-        limit = self.request.GET.get('limit', 10)
-
-        records_per_page = limit
-        offset = (page - 1) * records_per_page
-
-        queryset = list(queryset.skip(offset).limit(records_per_page + 1))
-
-        serializer = serializers.ListPostSerializer(queryset[:records_per_page], many=True)
-
-        json_data = serializer.data
-        request_data = {
-            'page': page,
-            'first': page == 1,
-            'last': len(queryset) == records_per_page + 1,
-            'list': json_data,
-        }
-        return request_data
 
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk

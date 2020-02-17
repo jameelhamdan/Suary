@@ -40,3 +40,50 @@ class APIViewMixin(views.APIView):
 
     def get_response(self, success=True, message='Success', result=None, detail_code='success', status_code=status.HTTP_200_OK):
         return get_response(success=success, message=message, result=result, detail_code=detail_code, status_code=status_code)
+
+
+class PaginationMixin(views.APIView):
+    pagination_default_page = 1
+    pagination_default_limit = 16
+
+    def paginate_queryset(self, queryset):
+        page = self.request.data.get('page', self.pagination_default_page)
+        limit = self.request.data.get('limit', self.pagination_default_limit)
+
+        try:
+            page = int(page)
+            if page < 1:
+                raise ValueError('Value Cannot be less than one')
+
+        except ValueError:
+            page = self.pagination_default_page
+
+        try:
+            limit = int(limit)
+            if limit < 1:
+                raise ValueError('Value Cannot be less than one')
+
+        except ValueError:
+            limit = self.pagination_default_limit
+
+        records_per_page = limit
+        offset = (page - 1) * records_per_page
+
+        queryset = list(queryset.skip(offset).limit(records_per_page + 1))
+
+        result_count = len(queryset)
+        queryset = queryset[:records_per_page]
+        last_page = result_count == len(queryset)
+        result_count = len(queryset)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        json_data = serializer.data
+        request_data = {
+            'page': page,
+            'count': result_count,
+            'next': page + 1 if not last_page else None,
+            'prev': page - 1 if page > 1 else None,
+            'list': json_data,
+        }
+        return request_data
