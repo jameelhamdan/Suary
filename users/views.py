@@ -1,7 +1,7 @@
 from rest_framework import generics, parsers
-from . import serializers
+from . import serializers, models
 from auth.backend.decorators import view_authenticate
-from _common.mixins import APIViewMixin
+from _common.mixins import APIViewMixin, PaginationMixin
 
 
 @view_authenticate()
@@ -23,8 +23,14 @@ class UpdateAvatarView(APIViewMixin, generics.UpdateAPIView):
         return self.get_response(message='Successfully Updated Avatar', result=result)
 
 
-class FollowView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = serializers.SwitchFollowSerializer
+@view_authenticate()
+class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return serializers.ListFollowingSerializer
+        else:
+            return serializers.SwitchFollowSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -32,7 +38,11 @@ class FollowView(APIViewMixin, generics.CreateAPIView):
         cleaned_data = serializer.validated_data
 
         user_pk = cleaned_data['user']
-        follow = self.request.user.follow(user_pk)
+
+        if cleaned_data['follow']:
+            follow = self.request.current_user.follow(user_pk)
+        else:
+            follow = self.request.current_user.unfollow(user_pk)
 
         result = {
             'uuid': user_pk,
@@ -40,20 +50,9 @@ class FollowView(APIViewMixin, generics.CreateAPIView):
 
         return self.get_response(message='Successfully Followed User', result=result)
 
+    def list(self, request, *args, **kwargs):
+        user_pk = self.request.current_user.pk
+        queryset = models.Follow.objects.filter(follower=user_pk).only('following', 'updated_on')
 
-class UnFollowView(FollowView):
-    serializer_class = serializers.SwitchFollowSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        cleaned_data = serializer.validated_data
-
-        user_pk = cleaned_data['user']
-        follow = self.request.user.follow(user_pk)
-
-        result = {
-            'uuid': user_pk,
-        }
-
-        return self.get_response(message='Successfully Unfollowed User', result=result)
+        json_data = self.paginate_queryset(queryset)
+        return self.get_response(message='Successfully Returned Users i follow.', result=json_data)

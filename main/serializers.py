@@ -1,12 +1,7 @@
 from rest_framework import serializers
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
-
-
-class UserSerializer(serializers.Serializer):
-    uuid = serializers.CharField()
-    full_name = serializers.CharField()
-    avatar_uuid = serializers.CharField()
+import users.serializers
 
 
 class ListPostSerializer(serializers.Serializer):
@@ -14,7 +9,7 @@ class ListPostSerializer(serializers.Serializer):
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
     media_list = serializers.ListField()
-    created_by = UserSerializer()
+    created_by = users.serializers.UserSerializer()
 
 
 class PostSerializer(serializers.Serializer):

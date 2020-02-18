@@ -10,8 +10,8 @@ class Follow(mongo.Document):
     updated_on = mongo.DateTimeField(default=timezone.now)
     is_blocked = mongo.BooleanField(default=False)
     is_active = mongo.BooleanField(default=True)
-    follower = mongo.LazyReferenceField(auth.models.UserData, required=True)
-    following = mongo.LazyReferenceField(auth.models.UserData, required=True)
+    follower = mongo.ReferenceField(auth.models.UserData, required=True)
+    following = mongo.ReferenceField(auth.models.UserData, required=True)
 
     def save(self, *args, **kwargs):
         self.updated_on = timezone.now()
