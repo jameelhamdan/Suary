@@ -4,7 +4,6 @@ import uuid
 import hashlib
 import binascii
 import os
-from django.utils.functional import lazy
 
 
 def generate_uuid(repeat=1):

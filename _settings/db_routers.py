@@ -19,9 +19,8 @@ class Router:
     def db_for_write(self, model, **hints):
         return self.get_database_name(model)
 
-    def allow_syncdb(self, db, model):
-        return db == DEFAULT_DATABASE
+    def allow_relation(self, obj1, obj2, **hints):
+        return self.get_database_name(obj1) == self.get_database_name(obj2)
 
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
         return db == DEFAULT_DATABASE
-

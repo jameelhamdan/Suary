@@ -5,7 +5,7 @@ import auth.models
 
 
 class UserSerializer(serializers.Serializer):
-    uuid = serializers.CharField()
+    id = serializers.CharField()
     full_name = serializers.CharField()
     avatar_uuid = serializers.CharField()
 

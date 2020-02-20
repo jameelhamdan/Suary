@@ -6,7 +6,7 @@ import users.serializers
 
 
 class ListPostSerializer(serializers.Serializer):
-    uuid = serializers.CharField()
+    id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
     media_list = serializers.ListField()
@@ -23,7 +23,7 @@ class PostSerializer(serializers.Serializer):
 
 
 class ListCommentSerializer(serializers.Serializer):
-    uuid = serializers.CharField()
+    id = serializers.CharField()
     post = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()

@@ -1,8 +1,7 @@
 import os
-import _settings.db_routers
-import django.db.models.options as options
+import django.db.models.options
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('db',)
+django.db.models.options.DEFAULT_NAMES = django.db.models.options.DEFAULT_NAMES + ('db',)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -80,17 +79,20 @@ DATABASES = {
     },
     MONGO_DATABASE: {
         'ENGINE': 'djongo',
+        'ENFORCE_SCHEMA': False,
         'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'default_storage'),
         'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
     },
     MEDIA_DATABASE: {
         'ENGINE': 'djongo',
+        'ENFORCE_SCHEMA': False,
         'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'media_storage'),
         'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
     }
 }
 
-DATABASE_ROUTERS = ["_settings.db_routers.Router"]
+DATABASE_ROUTERS = ['_settings.db_routers.Router', ]
+
 # Custom
 MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm']
 AVATAR_FORMATS = ['png', 'jpeg', 'jpg']

@@ -52,7 +52,7 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk
-        queryset = models.Follow.objects.filter(follower=user_pk).only('following', 'updated_on')
+        queryset = models.Follow.objects.filter(follower_id=user_pk).only('following', 'updated_on')
 
         json_data = self.paginate_queryset(queryset)
         return self.get_response(message='Successfully Returned Users i follow.', result=json_data)
