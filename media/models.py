@@ -1,22 +1,22 @@
 from django.http.response import FileResponse, StreamingHttpResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
-import mongoengine as mongo
+from django.conf import settings
+import djongo.models as mongo
+import djongo.storage
 import gridfs
 from gridfs import GridIn
 from _common import utils
-import main.models
-import auth.models
 
 
-class MediaDocument(mongo.Document):
+class MediaDocument(mongo.Model):
     collection_name = 'media'
-    db_alias = 'media_database'
+    db_alias = 'media'
 
-    uuid = mongo.StringField(primary_key=True, default=utils.generate_uuid)
-    media = mongo.FileField(collection_name=collection_name, db_alias=db_alias)
+    id = mongo.CharField(max_length=36, primary_key=True, default=utils.generate_uuid)
+    media = mongo.FileField(storage=djongo.storage.GridFSStorage(collection=collection_name, database='media'))
     created_on = mongo.DateTimeField(default=timezone.now)
-    parent = mongo.GenericReferenceField(choices=(main.models.Post, auth.models.UserData))
+    parent_id = mongo.CharField(max_length=36, null=True)
 
     def get_url(self):
         return reverse_lazy('view_media', kwargs={'uuid': self.pk})
@@ -70,7 +70,6 @@ class MediaDocument(mongo.Document):
         # self.media = self.media.grid_id
         # return self.media.grid_id
 
-    meta = {
-        'db_alias': 'media_database',
-        'collection': 'media',
-    }
+    class Meta:
+        db_table = 'media'
+        db = settings.MEDIA_DATABASE

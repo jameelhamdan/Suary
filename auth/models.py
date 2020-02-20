@@ -1,8 +1,9 @@
 from django.utils import timezone
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
-import mongoengine as mongo
+import djongo.models as mongo
 from _common import utils, validators
 
 
@@ -11,10 +12,8 @@ class User(models.Model):
     username = models.CharField(max_length=128, unique=True, db_index=True, null=False, editable=False, validators=[validators.UsernameValidator])
     email = models.EmailField(max_length=128, unique=True, db_index=True, null=False)
     avatar_uuid = models.CharField(max_length=36, null=True)
-
     password_hash = models.CharField(max_length=512)
     secret_key = models.CharField(max_length=108, db_index=True, default='')
-
     last_login = models.DateTimeField(auto_now=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -74,7 +73,7 @@ class User(models.Model):
                 old_avatar.delete()
 
         # Upload new avatar
-        media_document = media.models.MediaDocument(parent=self.get_data())
+        media_document = media.models.MediaDocument(parent_id=self.get_data())
         media_document.upload(new_avatar)
         media_document.save()
 
@@ -141,22 +140,26 @@ class User(models.Model):
     def __str__(self):
         return self.username
 
+    class Meta:
+        db = settings.DEFAULT_DATABASE
 
-class UserData(mongo.Document):
-    uuid = mongo.StringField(primary_key=True)
-    created_on = mongo.DateTimeField(default=timezone.now)
-    updated_on = mongo.DateTimeField(default=timezone.now)
-    username = mongo.StringField(required=True)
-    email = mongo.EmailField(required=True)
 
-    avatar_uuid = mongo.StringField()
-    full_name = mongo.StringField(required=True)
-    birth_date = mongo.DateField(required=True)
+class UserData(mongo.Model):
+    id = mongo.CharField(max_length=36, primary_key=True)
+    created_on = mongo.DateTimeField(auto_now_add=True)
+    updated_on = mongo.DateTimeField(auto_now=True)
+    username = mongo.CharField(max_length=36, db_index=True, unique=True, null=False)
+    email = mongo.EmailField(max_length=36, db_index=True, unique=True, null=False)
+
+    avatar_uuid = mongo.CharField(max_length=36,)
+    full_name = mongo.CharField(max_length=256, null=False)
+    birth_date = mongo.DateField(null=False)
 
     def save(self, *args, **kwargs):
         self.updated_on = timezone.now()
         return super(UserData, self).save(*args, **kwargs)
 
-    meta = {
-        'db_alias': 'default',
-    }
+    class Meta:
+        db_table = 'user_data'
+        db = settings.MONGO_DATABASE
+        unique_together = ['username', 'email']

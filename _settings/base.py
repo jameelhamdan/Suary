@@ -1,9 +1,12 @@
 import os
-import mongoengine
+import _settings.db_routers
+import django.db.models.options as options
+
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('db',)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'y#(a2(nm=98!xe48ozi-81o7r7#&8s68x6j0@323ciq&3yq%^#')
+SECRET_KEY = 'y#(a2(nm=98!xe48ozi-81o7r7#&8s68x6j0@323ciq&3yq%^#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -56,34 +59,38 @@ REST_FRAMEWORK = {
 }
 
 # Authentication settings
-REFRESH_TOKEN_EXPIRATION_PERIOD = 60 * 24 * 14
-AUTH_TOKEN_EXPIRATION_PERIOD = 60
+REFRESH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24 * 14)
+AUTH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24)
 
 
 # Databases
 
+DEFAULT_DATABASE = 'default'
+MONGO_DATABASE = 'mongo'
+MEDIA_DATABASE = 'media'
+
 DATABASES = {
-    'default': {
+    DEFAULT_DATABASE: {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DEFAULT_DATABASE_NAME', 'main'),
         'USER': os.getenv('DEFAULT_DATABASE_USER', 'postgres'),
         'PASSWORD': os.getenv('DEFAULT_DATABASE_PASS', '1234'),
         'HOST': os.getenv('DEFAULT_DATABASE_HOST', '127.0.0.1'),
         'PORT': os.getenv('DEFAULT_DATABASE_PORT', ''),
+    },
+    MONGO_DATABASE: {
+        'ENGINE': 'djongo',
+        'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'default_storage'),
+        'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
+    },
+    MEDIA_DATABASE: {
+        'ENGINE': 'djongo',
+        'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'media_storage'),
+        'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
     }
 }
 
-# mongodb database connection
-MONGO_DEFAULT_DATABASE_URL = os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
-MONGO_DEFAULT_DATABASE_NAME = os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'default_storage')
-
-MONGO_MEDIA_DATABASE_URL = os.getenv('MONGO_MEDIA_DATABASE_URL', 'localhost:27017')
-MONGO_MEDIA_DATABASE_NAME = os.getenv('MONGO_MEDIA_DATABASE_NAME', 'media_storage')
-
-mongoengine.connect(MONGO_DEFAULT_DATABASE_NAME, host=MONGO_DEFAULT_DATABASE_URL, alias='default', maxpoolsize=500)
-mongoengine.connect(MONGO_MEDIA_DATABASE_NAME, host=MONGO_MEDIA_DATABASE_URL, alias='media_database', maxpoolsize=500)
-
-
+DATABASE_ROUTERS = ["_settings.db_routers.Router"]
 # Custom
 MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm']
 AVATAR_FORMATS = ['png', 'jpeg', 'jpg']

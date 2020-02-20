@@ -27,7 +27,7 @@ class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIVi
         post.save()
 
         for uploaded_media in media_list:
-            media_document = media.models.MediaDocument(parent=post)
+            media_document = media.models.MediaDocument(parent_id=post)
             media_document.upload(uploaded_media)
 
             post.media_list.append(media_document.pk)
@@ -44,3 +44,34 @@ class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIVi
 
         json_data = self.paginate_queryset(queryset)
         return self.get_response(message='Successfully Returned My Posts', result=json_data)
+
+
+@view_authenticate()
+class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return serializers.ListCommentSerializer
+        else:
+            return serializers.CommentSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cleaned_data = serializer.validated_data
+
+        user_pk = self.request.current_user.pk
+
+        post = cleaned_data['post']
+        comment = post.add_comment(cleaned_data['content'], user_pk)
+
+        serializer = serializers.ListCommentSerializer(comment, many=False)
+        json_data = serializer.data
+        return self.get_response(message='Successfully Added Comment', result=json_data)
+
+    def list(self, request, *args, **kwargs):
+        user_pk = self.request.current_user.pk
+        post_pk = self.kwargs['post']
+        queryset = models.Comment.objects.filter(post=post_pk).only('content', 'post', 'created_by', 'created_on')
+
+        json_data = self.paginate_queryset(queryset)
+        return self.get_response(message='Successfully Returned Post Comments', result=json_data)

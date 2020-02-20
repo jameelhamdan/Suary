@@ -1,47 +1,50 @@
 from django.utils import timezone
-import mongoengine as mongo
+from django.conf import settings
+import djongo.models as mongo
 from _common import utils
 import auth.models
 
 
-class AbstractDocument(mongo.Document):
-    uuid = mongo.StringField(primary_key=True, default=utils.generate_uuid)
-    created_by = mongo.ReferenceField(auth.models.UserData, required=True)
-    created_on = mongo.DateTimeField(default=timezone.now)
-    updated_on = mongo.DateTimeField(default=timezone.now)
+class AbstractDocument(mongo.Model):
+    id = mongo.CharField(max_length=36, primary_key=True, default=utils.generate_uuid)
+    created_by = mongo.ForeignKey(auth.models.UserData, on_delete=mongo.CASCADE, null=False)
+    created_on = mongo.DateTimeField(auto_now_add=True)
+    updated_on = mongo.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         self.updated_on = timezone.now()
         return super(AbstractDocument, self).save(*args, **kwargs)
 
-    meta = {
-        'abstract': True,
-        'db_alias': 'default',
-        'auto_create_index': True,
-    }
+    class Meta:
+        abstract = True
+        db = settings.MONGO_DATABASE
 
 
 class Post(AbstractDocument):
-    content = mongo.StringField(min_length=3, required=True)
-    media_list = mongo.ListField(mongo.StringField(), default=[])
+    content = mongo.TextField(null=False)
+    media_list = mongo.ListField(mongo.CharField(), default=[])
 
-    meta = {
-        'collection': 'main_posts'
-    }
+    def add_comment(self, content, created_by):
+        comment = Comment(post_id=self.pk, content=content, created_by=created_by)
+        comment.save()
+
+        return comment
+
+    class Meta:
+        db_table = 'main_posts'
 
 
 class Comment(AbstractDocument):
-    content = mongo.StringField(min_length=3, required=True)
+    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, null=False)
+    content = mongo.TextField(null=False)
 
-    meta = {
-        'collection': 'main_comments'
-    }
+    class Meta:
+        db_table = 'main_comments'
 
 
 class Like(AbstractDocument):
-    parent = mongo.GenericLazyReferenceField(choices=(Post, Comment))
+    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, null=True)
+    comment = mongo.ForeignKey(Comment, on_delete=mongo.CASCADE, null=True)
 
-    meta = {
-        'collection': 'main_likes',
-        'indexes': ['parent'],
-    }
+    class Meta:
+        db_table = 'main_likes'

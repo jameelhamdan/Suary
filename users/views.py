@@ -37,15 +37,15 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        user_pk = cleaned_data['user']
+        user = cleaned_data['user']
 
         if cleaned_data['follow']:
-            follow = self.request.current_user.follow(user_pk)
+            follow = self.request.current_user.follow(user.pk)
         else:
-            follow = self.request.current_user.unfollow(user_pk)
+            follow = self.request.current_user.unfollow(user.pk)
 
         result = {
-            'uuid': user_pk,
+            'uuid': user.pk,
         }
 
         return self.get_response(message='Successfully Followed User', result=result)
