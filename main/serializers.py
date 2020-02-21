@@ -24,18 +24,18 @@ class PostSerializer(serializers.Serializer):
 
 class ListCommentSerializer(serializers.Serializer):
     id = serializers.CharField()
-    post = serializers.CharField()
+    post_id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
     created_by = users.serializers.UserSerializer()
 
 
 class CommentSerializer(serializers.Serializer):
-    post = serializers.CharField(max_length=36, required=True)
+    post_id = serializers.CharField(max_length=36, required=True)
     content = serializers.CharField(required=True)
 
     def validate(self, data):
-        post = models.Post.objects.filter(pk=data['post']).first()
+        post = models.Post.objects.filter(pk=data['post_id']).first()
         if not post:
             raise serializers.ValidationError({'post': 'Post doesn\'t exist!'})
 

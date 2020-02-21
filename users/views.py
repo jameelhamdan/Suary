@@ -41,14 +41,16 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
 
         if cleaned_data['follow']:
             follow = self.request.current_user.follow(user.pk)
+            message = 'Successfully Followed User'
         else:
             follow = self.request.current_user.unfollow(user.pk)
+            message = 'Successfully Unfollowed User'
 
         result = {
             'uuid': user.pk,
         }
 
-        return self.get_response(message='Successfully Followed User', result=result)
+        return self.get_response(message=message, result=result)
 
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk

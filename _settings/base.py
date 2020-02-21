@@ -15,7 +15,6 @@ APPEND_SLASH = False
 
 ADMINS = [('Jameel Hamdan', 'jameelhamdan99@yahoo.com')]
 
-
 # Application definition
 INSTALLED_APPS = [
     'rest_framework',
@@ -34,7 +33,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = '_settings.urls'
 
-
 WSGI_APPLICATION = '_settings.wsgi.application'
 
 # Internationalization
@@ -50,7 +48,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
@@ -60,7 +57,6 @@ REST_FRAMEWORK = {
 # Authentication settings
 REFRESH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24 * 14)
 AUTH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24)
-
 
 # Databases
 
@@ -80,12 +76,44 @@ DATABASES = {
     MONGO_DATABASE: {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': False,
+        'LOGGING': {
+            'version': 1,
+            'loggers': {
+                'djongo': {
+                    'level': 'DEBUG',
+                    'propogate': False,
+                    'handlers': ['console']
+                }
+            },
+            'handlers': {
+                'console': {
+                    'class': 'logging.StreamHandler',
+                    'level': 'DEBUG'
+                }
+            }
+        },
         'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'default_storage'),
         'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
     },
     MEDIA_DATABASE: {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': False,
+        'LOGGING': {
+            'version': 1,
+            'loggers': {
+                'djongo': {
+                    'level': 'DEBUG',
+                    'propogate': False,
+                    'handlers': ['console']
+                }
+            },
+            'handlers': {
+                'console': {
+                    'class': 'logging.StreamHandler',
+                    'level': 'DEBUG'
+                }
+            }
+        },
         'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'media_storage'),
         'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
     }

@@ -1,4 +1,5 @@
 from rest_framework import generics, parsers
+from rest_framework.exceptions import NotFound
 from . import serializers, models
 from auth.backend.decorators import view_authenticate
 from _common.mixins import APIViewMixin, PaginationMixin
@@ -59,10 +60,10 @@ class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAP
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        user_pk = self.request.current_user.pk
+        user = self.request.current_user
 
         post = cleaned_data['post']
-        comment = post.add_comment(cleaned_data['content'], user_pk)
+        comment = post.add_comment(cleaned_data['content'], user)
 
         serializer = serializers.ListCommentSerializer(comment, many=False)
         json_data = serializer.data
@@ -70,8 +71,14 @@ class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAP
 
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk
-        post_pk = self.kwargs['post']
-        queryset = models.Comment.objects.filter(post=post_pk).only('content', 'post', 'created_by', 'created_on')
+
+        # TODO: get a better way of doing this
+        post_pk = self.request.POST.get('post_id', None)
+
+        if not post_pk:
+            raise NotFound()
+
+        queryset = models.Comment.objects.filter(post_id=post_pk).select_related('created_by').only('content', 'post_id', 'created_by', 'created_on')
 
         json_data = self.paginate_queryset(queryset)
         return self.get_response(message='Successfully Returned Post Comments', result=json_data)

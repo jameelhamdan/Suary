@@ -5,7 +5,6 @@ from django.conf import settings
 import djongo.models as mongo
 from djongo import storage
 from _common import utils
-import gridfs
 
 
 class MediaDocument(mongo.Model):
