@@ -1,8 +1,9 @@
 from django.utils import timezone
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from rest_framework.exceptions import ValidationError
-import mongoengine as mongo
+import users.models
 from _common import utils, validators
 
 
@@ -11,16 +12,14 @@ class User(models.Model):
     username = models.CharField(max_length=128, unique=True, db_index=True, null=False, editable=False, validators=[validators.UsernameValidator])
     email = models.EmailField(max_length=128, unique=True, db_index=True, null=False)
     avatar_uuid = models.CharField(max_length=36, null=True)
-
     password_hash = models.CharField(max_length=512)
     secret_key = models.CharField(max_length=108, db_index=True, default='')
-
     last_login = models.DateTimeField(auto_now=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def get_data(self):
-        return UserData.objects.get(uuid=self.pk)
+        return users.models.UserData.objects.get(pk=self.pk)
 
     def get_secret_key(self):
         return utils.hash_password(self.secret_key)
@@ -53,8 +52,8 @@ class User(models.Model):
             new_user.save()
             new_user.set_password(password)
 
-            user_data = UserData(
-                uuid=new_user.pk,
+            user_data = users.models.UserData(
+                pk=new_user.pk,
                 username=new_user.username,
                 email=new_user.email,
                 **kwargs
@@ -69,12 +68,12 @@ class User(models.Model):
         # Delete Old avatar
         avatar_uuid = self.avatar_uuid
         if avatar_uuid:
-            old_avatar = media.models.MediaDocument.objects.filter(uuid=avatar_uuid).first()
+            old_avatar = media.models.MediaDocument.objects.filter(pk=avatar_uuid).first()
             if old_avatar:
                 old_avatar.delete()
 
         # Upload new avatar
-        media_document = media.models.MediaDocument(parent=self.get_data())
+        media_document = media.models.MediaDocument(parent_id=self.pk)
         media_document.upload(new_avatar)
         media_document.save()
 
@@ -94,7 +93,7 @@ class User(models.Model):
         if not user_exists:
             raise ValidationError('User doesn\'t exist')
 
-        follow = Follow.objects.filter(follower=self.pk, following=user_pk).first()
+        follow = Follow.objects.filter(follower_id=self.pk, following_id=user_pk).first()
 
         if follow and follow.is_active:
             raise ValidationError('Already following this user')
@@ -105,8 +104,8 @@ class User(models.Model):
 
         else:
             follow = Follow(
-                follower=self.pk,
-                following=user_pk,
+                follower_id=self.pk,
+                following_id=user_pk,
             )
 
             follow.save()
@@ -120,7 +119,7 @@ class User(models.Model):
         if not user_exists:
             raise ValidationError('User doesn\'t exist')
 
-        follow = Follow.objects.filter(follower=self.pk, following=user_pk).first()
+        follow = Follow.objects.filter(follower_id=self.pk, following_id=user_pk).first()
 
         if not follow or not follow.is_active:
             raise ValidationError('Already unfollowed this user')
@@ -141,22 +140,5 @@ class User(models.Model):
     def __str__(self):
         return self.username
 
-
-class UserData(mongo.Document):
-    uuid = mongo.StringField(primary_key=True)
-    created_on = mongo.DateTimeField(default=timezone.now)
-    updated_on = mongo.DateTimeField(default=timezone.now)
-    username = mongo.StringField(required=True)
-    email = mongo.EmailField(required=True)
-
-    avatar_uuid = mongo.StringField()
-    full_name = mongo.StringField(required=True)
-    birth_date = mongo.DateField(required=True)
-
-    def save(self, *args, **kwargs):
-        self.updated_on = timezone.now()
-        return super(UserData, self).save(*args, **kwargs)
-
-    meta = {
-        'db_alias': 'default',
-    }
+    class Meta:
+        db = settings.DEFAULT_DATABASE

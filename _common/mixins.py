@@ -69,7 +69,8 @@ class PaginationMixin(views.APIView):
         records_per_page = limit
         offset = (page - 1) * records_per_page
 
-        queryset = list(queryset.skip(offset).limit(records_per_page + 1))
+
+        queryset = list(queryset[offset:records_per_page + 1])
 
         result_count = len(queryset)
         queryset = queryset[:records_per_page]

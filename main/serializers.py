@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
+from . import models
 import users.serializers
 
 
 class ListPostSerializer(serializers.Serializer):
-    uuid = serializers.CharField()
+    id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
     media_list = serializers.ListField()
@@ -19,3 +20,24 @@ class PostSerializer(serializers.Serializer):
         child=serializers.FileField(validators=[FileExtensionValidator(settings.MEDIA_FORMATS)], allow_empty_file=False, use_url=False),
         required=True
     )
+
+
+class ListCommentSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    post_id = serializers.CharField()
+    content = serializers.CharField()
+    created_on = serializers.DateTimeField()
+    created_by = users.serializers.UserSerializer()
+
+
+class CommentSerializer(serializers.Serializer):
+    post_id = serializers.CharField(max_length=36, required=True)
+    content = serializers.CharField(required=True)
+
+    def validate(self, data):
+        post = models.Post.objects.filter(pk=data['post_id']).first()
+        if not post:
+            raise serializers.ValidationError({'post': 'Post doesn\'t exist!'})
+
+        data['post'] = post
+        return data
