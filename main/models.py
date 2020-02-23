@@ -16,6 +16,7 @@ class AbstractDocument(mongo.Model):
 
 class Post(AbstractDocument):
     content = mongo.TextField(null=False)
+    tags = mongo.ListField(mongo.CharField(), default=[])
     media_list = mongo.ListField(mongo.CharField(), default=[])
 
     def add_comment(self, content, created_by):
@@ -23,6 +24,12 @@ class Post(AbstractDocument):
         comment.save()
 
         return comment
+
+    def save(self, *args, **kwargs):
+        if self.content:
+            self.tags = [i for i in self.content.split() if i.startswith("#")]
+
+        super(Post, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'main_posts'

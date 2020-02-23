@@ -22,7 +22,7 @@ class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIVi
         cleaned_data = serializer.validated_data
 
         user_pk = self.request.current_user.pk
-        media_list = cleaned_data.pop('media_list')
+        media_list = cleaned_data.pop('media_list', [])
 
         post = models.Post(created_by_id=user_pk, **cleaned_data)
         post.save()
@@ -41,7 +41,7 @@ class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIVi
 
     def list(self, request, *args, **kwargs):
         user_pk = self.request.current_user.pk
-        queryset = models.Post.objects.filter(created_by_id=user_pk).only('content', 'media_list', 'created_by', 'created_on')
+        queryset = models.Post.objects.filter(created_by_id=user_pk).select_related('created_by').only('content', 'media_list', 'created_by', 'created_on')
 
         json_data = self.paginate_queryset(queryset)
         return self.get_response(message='Successfully Returned My Posts', result=json_data)

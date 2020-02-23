@@ -9,6 +9,7 @@ class ListPostSerializer(serializers.Serializer):
     id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
+    tags = serializers.ListField()
     media_list = serializers.ListField()
     created_by = users.serializers.UserSerializer()
 
@@ -18,7 +19,7 @@ class PostSerializer(serializers.Serializer):
     # All Files must be sent under the same name 'media_list' they will get parsed individually as a list.
     media_list = serializers.ListField(
         child=serializers.FileField(validators=[FileExtensionValidator(settings.MEDIA_FORMATS)], allow_empty_file=False, use_url=False),
-        required=True
+        required=False
     )
 
 
