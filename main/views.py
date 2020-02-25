@@ -82,3 +82,29 @@ class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAP
 
         json_data = self.paginate_queryset(queryset)
         return self.get_response(message='Successfully Returned Post Comments', result=json_data)
+
+
+@view_authenticate()
+class LikePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+    serializer_class = serializers.SwitchPostLikeSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cleaned_data = serializer.validated_data
+
+        post = cleaned_data['post']
+        user_pk = self.request.current_user.pk
+
+        if cleaned_data['like']:
+            like = post.add_like(user_pk)
+            message = 'Successfully Liked Post'
+        else:
+            like = post.remove_like(user_pk)
+            message = 'Successfully Unliked Post'
+
+        result = {
+            'uuid': post.pk,
+        }
+
+        return self.get_response(message=message, result=result)

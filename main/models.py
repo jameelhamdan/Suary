@@ -1,7 +1,9 @@
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
 import djongo.models as mongo
 from _common import utils
 import users.models
+import auth.models
 
 
 class AbstractDocument(mongo.Model):
@@ -24,6 +26,42 @@ class Post(AbstractDocument):
         comment.save()
 
         return comment
+
+    def add_like(self, user_pk):
+        user_exists = auth.models.User.objects.filter(pk=user_pk).exists()
+
+        if not user_exists:
+            raise ValidationError('User doesn\'t exist')
+
+        like = Like.objects.filter(post_id=self.pk, created_by_id=user_pk).first()
+
+        if like:
+            raise ValidationError('Already liked this post')
+
+        else:
+            like = Like(
+                post_id=self.pk,
+                created_by_id=user_pk,
+            )
+            like.save()
+
+        return like
+
+    def remove_like(self, user_pk):
+        user_exists = auth.models.User.objects.filter(pk=user_pk).exists()
+
+        if not user_exists:
+            raise ValidationError('User doesn\'t exist')
+
+        like = Like.objects.filter(post_id=self.pk, created_by_id=user_pk).first()
+
+        if not like:
+            raise ValidationError('Already not liking this post')
+
+        else:
+            like.delete()
+
+        return None
 
     def save(self, *args, **kwargs):
         if self.content:

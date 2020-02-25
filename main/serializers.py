@@ -42,3 +42,16 @@ class CommentSerializer(serializers.Serializer):
 
         data['post'] = post
         return data
+
+
+class SwitchPostLikeSerializer(serializers.Serializer):
+    post_id = serializers.CharField(max_length=36, required=True)
+    like = serializers.BooleanField(default=True)
+
+    def validate(self, data):
+        post = models.Post.objects.filter(pk=data['post_id']).first()
+        if not post:
+            raise serializers.ValidationError({'post': 'Post doesn\'t exist!'})
+
+        data['post'] = post
+        return data
