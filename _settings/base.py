@@ -92,8 +92,10 @@ DATABASES = {
                 }
             }
         },
-        'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'default_storage'),
-        'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
+        'NAME': os.getenv('MONGO_DATABASE_NAME', 'default_storage'),
+        'HOST': os.getenv('MONGO_DATABASE_URL', 'localhost:27017'),
+        'USER': os.getenv('MONGO_DATABASE_USER', ''),
+        'PASSWORD': os.getenv('MONGO_DATABASE_PASS', '')
     },
     MEDIA_DATABASE: {
         'ENGINE': 'djongo',
@@ -114,8 +116,10 @@ DATABASES = {
                 }
             }
         },
-        'NAME': os.getenv('MONGO_DEFAULT_DATABASE_NAME', 'media_storage'),
-        'HOST': os.getenv('MONGO_DEFAULT_DATABASE_URL', 'localhost:27017')
+        'NAME': os.getenv('MEDIA_DATABASE_NAME', 'media_storage'),
+        'HOST': os.getenv('MEDIA_DATABASE_URL', 'localhost:27017'),
+        'USER': os.getenv('MEDIA_DATABASE_USER', ''),
+        'PASSWORD': os.getenv('MEDIA_DATABASE_PASS', '')
     }
 }
 
