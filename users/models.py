@@ -12,6 +12,8 @@ class Follow(mongo.Model):
     follower = mongo.ForeignKey('UserData', related_name='following', on_delete=mongo.CASCADE, null=False)
     following = mongo.ForeignKey('UserData', related_name='followers', on_delete=mongo.CASCADE, null=False)
 
+    objects = mongo.DjongoManager()
+
     class Meta:
         db_table = 'users_follow'
         db = settings.MONGO_DATABASE
@@ -28,6 +30,8 @@ class UserData(mongo.Model):
     avatar_uuid = mongo.CharField(max_length=36)
     full_name = mongo.CharField(max_length=256, null=False)
     birth_date = mongo.DateField(null=False)
+
+    objects = mongo.DjongoManager()
 
     class Meta:
         db_table = 'user_data'

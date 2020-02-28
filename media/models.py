@@ -10,6 +10,7 @@ from _common import utils
 class MediaDocument(mongo.Model):
     collection_name = 'media'
     database_name = 'media'
+    objects = mongo.DjongoManager()
 
     id = mongo.CharField(max_length=36, db_column='_id', primary_key=True, default=utils.generate_uuid)
     media = mongo.FileField(storage=storage.GridFSStorage(collection=collection_name, database=database_name))

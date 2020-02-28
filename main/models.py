@@ -3,7 +3,6 @@ from rest_framework.exceptions import ValidationError
 import djongo.models as mongo
 from _common import utils
 import users.models
-import auth.models
 
 
 class AbstractDocument(mongo.Model):
@@ -11,6 +10,8 @@ class AbstractDocument(mongo.Model):
     created_by = mongo.ForeignKey(users.models.UserData, on_delete=mongo.CASCADE, null=False)
     created_on = mongo.DateTimeField(auto_now_add=True)
     updated_on = mongo.DateTimeField(auto_now=True)
+
+    objects = mongo.DjongoManager()
 
     class Meta:
         abstract = True
@@ -28,7 +29,7 @@ class Post(AbstractDocument):
         return comment
 
     def add_like(self, user_pk):
-        user_exists = auth.models.User.objects.filter(pk=user_pk).exists()
+        user_exists = users.models.UserData.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
             raise ValidationError('User doesn\'t exist')
@@ -48,7 +49,7 @@ class Post(AbstractDocument):
         return like
 
     def remove_like(self, user_pk):
-        user_exists = auth.models.User.objects.filter(pk=user_pk).exists()
+        user_exists = users.models.UserData.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
             raise ValidationError('User doesn\'t exist')

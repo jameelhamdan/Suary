@@ -92,10 +92,13 @@ DATABASES = {
                 }
             }
         },
-        'NAME': os.getenv('MONGO_DATABASE_NAME', 'default_storage'),
-        'HOST': os.getenv('MONGO_DATABASE_URL', 'localhost:27017'),
-        'USER': os.getenv('MONGO_DATABASE_USER', ''),
-        'PASSWORD': os.getenv('MONGO_DATABASE_PASS', '')
+        'NAME': 'default',
+        'CONN_MAX_AGE': 600,
+        'CLIENT': {
+            'host': os.getenv('MONGO_DATABASE_URL', 'mongodb://localhost:27017'),
+            'minPoolSize': 1,
+            'maxPoolSize': 100,
+        }
     },
     MEDIA_DATABASE: {
         'ENGINE': 'djongo',
@@ -116,10 +119,13 @@ DATABASES = {
                 }
             }
         },
-        'NAME': os.getenv('MEDIA_DATABASE_NAME', 'media_storage'),
-        'HOST': os.getenv('MEDIA_DATABASE_URL', 'localhost:27017'),
-        'USER': os.getenv('MEDIA_DATABASE_USER', ''),
-        'PASSWORD': os.getenv('MEDIA_DATABASE_PASS', '')
+        'NAME': 'media',
+        'CONN_MAX_AGE': 600,
+        'CLIENT': {
+            'host': os.getenv('MEDIA_DATABASE_URL', 'mongodb://localhost:27017'),
+            'minPoolSize': 1,
+            'maxPoolSize': 100,
+        }
     }
 }
 
