@@ -81,7 +81,7 @@ class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAP
 
 
 @view_authenticate()
-class LikePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+class LikePostView(APIViewMixin, generics.CreateAPIView):
     serializer_class = serializers.SwitchPostLikeSerializer
 
     def create(self, request, *args, **kwargs):

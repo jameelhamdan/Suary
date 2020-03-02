@@ -25,6 +25,7 @@ class UpdateAvatarView(APIViewMixin, generics.UpdateAPIView):
 
 @view_authenticate()
 class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+    pagination_kwarg_message = 'Successfully Returned Users i follow.'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -52,9 +53,6 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
 
         return self.get_response(message=message, result=result)
 
-    def list(self, request, *args, **kwargs):
+    def get_queryset(self):
         user_pk = self.request.current_user.pk
-        queryset = models.Follow.objects.filter(follower_id=user_pk).only('following', 'updated_on')
-
-        json_data = self.paginate_queryset(queryset)
-        return self.get_response(message='Successfully Returned Users i follow.', result=json_data)
+        return models.Follow.objects.filter(follower_id=user_pk).only('following', 'updated_on')
