@@ -1,5 +1,6 @@
 from rest_framework import exceptions, status, views, response
 from _common.utils import get_response
+from _common import pagination
 
 
 class APIViewMixin(views.APIView):
@@ -43,48 +44,14 @@ class APIViewMixin(views.APIView):
 
 
 class PaginationMixin(views.APIView):
-    pagination_default_page = 1
-    pagination_default_limit = 16
+    overridable_attrs = pagination.CustomPagination.overridable_attrs
+    prefix = 'pagination_kwarg'
 
-    def paginate_queryset(self, queryset):
-        page = self.request.data.get('page', self.pagination_default_page)
-        limit = self.request.data.get('limit', self.pagination_default_limit)
+    def __init__(self, *args, **kwargs):
+        super(PaginationMixin, self).__init__(*args, **kwargs)
+        for attr in self.overridable_attrs:
+            attr_value = getattr(self, '%s_%s' % (self.prefix, attr, ), None)
+            if attr_value is not None:
+                kwargs[attr] = attr_value
 
-        try:
-            page = int(page)
-            if page < 1:
-                raise ValueError('Value Cannot be less than one')
-
-        except ValueError:
-            page = self.pagination_default_page
-
-        try:
-            limit = int(limit)
-            if limit < 1:
-                raise ValueError('Value Cannot be less than one')
-
-        except ValueError:
-            limit = self.pagination_default_limit
-
-        records_per_page = limit
-        offset = (page - 1) * records_per_page
-
-
-        queryset = list(queryset[offset:records_per_page + 1])
-
-        result_count = len(queryset)
-        queryset = queryset[:records_per_page]
-        last_page = result_count == len(queryset)
-        result_count = len(queryset)
-
-        serializer = self.get_serializer(queryset, many=True)
-
-        json_data = serializer.data
-        request_data = {
-            'page': page,
-            'count': result_count,
-            'next': page + 1 if not last_page else None,
-            'prev': page - 1 if page > 1 else None,
-            'list': json_data,
-        }
-        return request_data
+        self.pagination_class = pagination.CustomPagination(**kwargs)

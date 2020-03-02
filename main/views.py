@@ -9,6 +9,7 @@ import media.models
 @view_authenticate()
 class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
+    pagination_kwarg_message = 'Successfully listed my posts!'
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -39,16 +40,16 @@ class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIVi
         json_data = serializer.data
         return self.get_response(message='Successfully Added Post', result=json_data)
 
-    def list(self, request, *args, **kwargs):
+    def get_queryset(self):
         user_pk = self.request.current_user.pk
-        queryset = models.Post.objects.filter(created_by_id=user_pk).select_related('created_by').only('content', 'media_list', 'created_by', 'created_on')
-
-        json_data = self.paginate_queryset(queryset)
-        return self.get_response(message='Successfully Returned My Posts', result=json_data)
+        queryset = models.Post.objects.filter(created_by_id=user_pk).select_related('created_by').only('content', 'media_list', 'created_by', 'created_on', 'tags')
+        return queryset
 
 
 @view_authenticate()
 class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+    pagination_kwarg_message = 'Successfully Returned Post Comments'
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return serializers.ListCommentSerializer
@@ -69,19 +70,14 @@ class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAP
         json_data = serializer.data
         return self.get_response(message='Successfully Added Comment', result=json_data)
 
-    def list(self, request, *args, **kwargs):
-        user_pk = self.request.current_user.pk
-
+    def get_queryset(self):
         # TODO: get a better way of doing this
         post_pk = self.request.POST.get('post_id', None)
 
         if not post_pk:
             raise NotFound()
 
-        queryset = models.Comment.objects.filter(post_id=post_pk).select_related('created_by').only('content', 'post_id', 'created_by', 'created_on')
-
-        json_data = self.paginate_queryset(queryset)
-        return self.get_response(message='Successfully Returned Post Comments', result=json_data)
+        return models.Comment.objects.filter(post_id=post_pk).select_related('created_by').only('content', 'post_id', 'created_by', 'created_on')
 
 
 @view_authenticate()
