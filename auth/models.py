@@ -2,9 +2,25 @@ from django.utils import timezone
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
+from django.contrib.postgres.fields import JSONField
 from rest_framework.exceptions import ValidationError
 import users.models
 from _common import utils, validators
+
+
+LOG_ACTION_LOGIN = 'login'
+LOG_ACTION_REGISTER = 'register'
+LOG_ACTION_LOGIN_FAIL = 'fail'
+LOG_ACTION_LOGOUT_ALL = 'logout_all'
+LOG_ACTION_UNAUTHORIZED = 'Forbidden'
+
+LOG_ACTIONS = (
+    (LOG_ACTION_LOGIN, 'Login'),
+    (LOG_ACTION_REGISTER, 'Register'),
+    (LOG_ACTION_LOGIN_FAIL, 'Login Failed'),
+    (LOG_ACTION_LOGOUT_ALL, 'Logout all sessions'),
+    (LOG_ACTION_UNAUTHORIZED, 'Forbidden'),
+)
 
 
 class User(models.Model):
@@ -91,12 +107,12 @@ class User(models.Model):
         user_exists = User.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
-            raise ValidationError('User doesn\'t exist')
+            raise ValidationError(u'User doesn\'t exist')
 
         follow = Follow.objects.filter(follower_id=self.pk, following_id=user_pk).first()
 
         if follow and follow.is_active:
-            raise ValidationError('Already following this user')
+            raise ValidationError(u'Already following this user')
 
         if follow:
             follow.is_active = True
@@ -117,12 +133,12 @@ class User(models.Model):
         user_exists = User.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
-            raise ValidationError('User doesn\'t exist')
+            raise ValidationError(u'User doesn\'t exist')
 
         follow = Follow.objects.filter(follower_id=self.pk, following_id=user_pk).first()
 
         if not follow or not follow.is_active:
-            raise ValidationError('Already unfollowed this user')
+            raise ValidationError(u'Already unfollowed this user')
 
         if follow:
             follow.is_active = False
@@ -139,6 +155,22 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+
+    class Meta:
+        db = settings.DEFAULT_DATABASE
+
+
+class AccessLog(models.Model):
+    action = models.CharField(max_length=16, choices=LOG_ACTIONS, default=LOG_ACTION_LOGIN)
+    ip = models.GenericIPAddressField(db_index=True, null=True)
+    agent = models.CharField(max_length=128, null=True)
+    http_accept = models.CharField(max_length=1025)
+    path_info = models.CharField(max_length=255)
+    data = JSONField(null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '%s %s' % (self.ip, self.agent)
 
     class Meta:
         db = settings.DEFAULT_DATABASE

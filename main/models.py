@@ -32,12 +32,12 @@ class Post(AbstractDocument):
         user_exists = users.models.UserData.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
-            raise ValidationError('User doesn\'t exist')
+            raise ValidationError(u'User doesn\'t exist')
 
         like = Like.objects.filter(post_id=self.pk, created_by_id=user_pk).first()
 
         if like:
-            raise ValidationError('Already liked this post')
+            raise ValidationError(u'Already liked this post')
 
         else:
             like = Like(
@@ -52,12 +52,12 @@ class Post(AbstractDocument):
         user_exists = users.models.UserData.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
-            raise ValidationError('User doesn\'t exist')
+            raise ValidationError(u'User doesn\'t exist')
 
         like = Like.objects.filter(post_id=self.pk, created_by_id=user_pk).first()
 
         if not like:
-            raise ValidationError('Already not liking this post')
+            raise ValidationError(u'Already not liking this post')
 
         else:
             like.delete()

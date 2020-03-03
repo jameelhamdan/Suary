@@ -1,7 +1,8 @@
-from rest_framework import generics
+from rest_framework import generics, exceptions
 from . import serializers
 from .backend.decorators import view_allow_any, view_authenticate, view_authenticate_refresh
 from _common.mixins import APIViewMixin
+from _common import access_log
 
 
 @view_allow_any()
@@ -10,7 +11,16 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            # Login Success
+            access_log.log_action(request, access_log.LOG_ACTION_LOGIN)
+        except exceptions.ValidationError as e:
+            # Login Failed
+            access_log.log_action(request, access_log.LOG_ACTION_LOGIN_FAIL)
+            raise e
+
         user, auth_token, refresh_token = serializer.validated_data
 
         user_data = user.get_data()
@@ -34,6 +44,7 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
+        access_log.log_action(request, access_log.LOG_ACTION_REGISTER)
 
         result = {
             'uuid': user.pk,
@@ -49,6 +60,7 @@ class ResetPasswordView(APIViewMixin, generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data, context={'request': self.request})
         serializer.is_valid(raise_exception=True)
         user, auth_token, refresh_token = serializer.validated_data
+        access_log.log_action(request, access_log.LOG_ACTION_LOGOUT_ALL)
 
         result = {
             'uuid': user.pk,
