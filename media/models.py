@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 import djongo.models as mongo
 from djongo import storage
-from _common import utils
+from _common import utils, images
 
 
 class MediaDocument(mongo.Model):
@@ -42,12 +42,13 @@ class MediaDocument(mongo.Model):
 
         if content_type == 'image':
             return self.stream_image(*args, **kwargs)
-        if content_type == 'video':
+        elif content_type == 'video':
             return self.stream_video(*args, **kwargs)
         else:
             raise Exception('Media type not supported')
 
     def upload(self, upload_stream):
+        #upload_stream = images.optimize_media(upload_stream)
         self.media = upload_stream
         self.content_type = upload_stream.content_type
         self.length = upload_stream.size

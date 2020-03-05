@@ -1,5 +1,6 @@
 import os
 import django.db.models.options
+import dj_database_url
 
 django.db.models.options.DEFAULT_NAMES = django.db.models.options.DEFAULT_NAMES + ('db',)
 
@@ -51,6 +52,7 @@ USE_TZ = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
+    'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
     'UNAUTHENTICATED_USER': None,
 }
 
@@ -65,14 +67,7 @@ MONGO_DATABASE = 'mongo'
 MEDIA_DATABASE = 'media'
 
 DATABASES = {
-    DEFAULT_DATABASE: {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DEFAULT_DATABASE_NAME', 'main'),
-        'USER': os.getenv('DEFAULT_DATABASE_USER', 'postgres'),
-        'PASSWORD': os.getenv('DEFAULT_DATABASE_PASS', '1234'),
-        'HOST': os.getenv('DEFAULT_DATABASE_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DEFAULT_DATABASE_PORT', ''),
-    },
+    DEFAULT_DATABASE: dj_database_url.parse(os.getenv('DEFAULT_DATABASE_URL', 'postgres://postgres:1234@127.0.0.1:5432/main')),
     MONGO_DATABASE: {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': False,
