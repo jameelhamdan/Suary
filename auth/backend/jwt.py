@@ -100,13 +100,12 @@ def verify_refresh_token(token):
         raise Exception('This Token is expired!')
 
 
-def renew_auth_token(token, secret_key):
-    token = decode_refresh_token(token, secret_key)
-    user_uuid = token[user_id_field]
-    return create_auth_token(user_uuid)
-
-
 def renew_refresh_token(token, secret_key):
     token = decode_refresh_token(token, secret_key)
     user_uuid = token[user_id_field]
-    return create_refresh_token(user_uuid, secret_key)
+    expiration_date = token['exp']
+    # Renew refresh token if is about to expire otherwise return same token
+    if datetime.utcnow() - expiration_date > timedelta(hours=1):
+        return create_refresh_token(user_uuid, secret_key)
+    else:
+        return token

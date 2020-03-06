@@ -1,5 +1,5 @@
-const axios = require('axios').default;
-
+import axios from 'axios';
+import "./interceptor"
 
 const api_root_url = document.getElementById("app").getAttribute('api-root-url');
 const headers = {

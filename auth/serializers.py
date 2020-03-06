@@ -99,21 +99,19 @@ class ResetPasswordSerializer(serializers.Serializer):
         return user, auth_token, refresh_token
 
 
-class RenewAuthTokenSerializer(serializers.Serializer):
+class RefreshTokenSerializer(serializers.Serializer):
+    refresh_token = serializers.CharField(required=True)
+
     def validate(self, data):
-        user = self.context['request'].current_user
+        refresh_token = data['refresh_token']
 
-        old_token = utils.get_auth_header(self.context['request'])
-        new_token = jwt.renew_auth_token(old_token, user.get_secret_key())
-        return new_token
+        try:
+            user = jwt.verify_refresh_token(refresh_token)
+        except Exception:
+            raise utils.AuthException()
 
+        new_token = jwt.create_auth_token(user.pk)
 
-class RenewRefreshTokenSerializer(serializers.Serializer):
-    def validate(self, data):
-        user = self.context['request'].current_user
-        
-        old_token = utils.get_auth_header(self.context['request'])
-        new_refresh_token = jwt.renew_refresh_token(old_token, user.get_secret_key())
-        new_auth_token = jwt.renew_auth_token(old_token, user.get_secret_key())
+        new_refresh_token = jwt.renew_refresh_token(refresh_token, user.get_secret_key())
 
-        return new_refresh_token, new_auth_token
+        return new_token, new_refresh_token
