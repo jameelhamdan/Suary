@@ -4,7 +4,7 @@ from ..backend.utils import AuthErrorException
 from django.utils.decorators import method_decorator
 
 
-def _auth_user(auth_type='api_settings.VERIFY_TYPE_AUTH', custom_auth_method_name=None):
+def _auth_user(auth_type=api_settings.VERIFY_TYPE_AUTH, custom_auth_method_name=None):
     def decorator(view_func):
         @wraps(view_func)
         def wrapped_view(*args, **kwargs):
