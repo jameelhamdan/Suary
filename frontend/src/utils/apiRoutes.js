@@ -1,4 +1,4 @@
-export default class ApiUrlService {
+export default class apiRoutes {
   //Authentication
   static Register() {
      return 'auth/login';

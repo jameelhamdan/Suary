@@ -1,5 +1,6 @@
 import axios from 'axios';
 import "./interceptor"
+import apiRoutes from "../apiRoutes";
 
 const api_root_url = document.getElementById("app").getAttribute('api-root-url');
 const headers = {
@@ -12,4 +13,8 @@ let Ajax = axios.create({
   headers: headers
 });
 
-export default Ajax
+export {
+  Ajax as ajax,
+  apiRoutes as apiRoutes
+};
+
