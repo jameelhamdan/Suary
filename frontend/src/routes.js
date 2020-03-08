@@ -5,13 +5,8 @@ import { Redirect } from "react-router-dom";
 import { DefaultLayout } from "./layouts";
 
 // Route Views
-import BlogOverview from "./views/BlogOverview";
-import UserProfileLite from "./views/UserProfileLite";
-import AddNewPost from "./views/AddNewPost";
-import Errors from "./views/Errors";
-import ComponentsOverview from "./views/ComponentsOverview";
-import Tables from "./views/Tables";
-import BlogPosts from "./views/BlogPosts";
+import Login from "./views/auth/Login";
+import Register from "./views/auth/Register";
 
 export default [
   {
@@ -22,50 +17,17 @@ export default [
     component: () => <Redirect to="/blog-overview" />
   },
   {
-    path: "/blog-overview",
-      exact: true,
-    strict: true,
-    layout: DefaultLayout,
-    component: BlogOverview
-  },
-  {
-    path: "/user-profile-lite",
+    path: "/login",
     exact: true,
     strict: true,
     layout: DefaultLayout,
-    component: UserProfileLite
+    component: Login
   },
   {
-    path: "/add-new-post",
+    path: "/register",
     exact: true,
     strict: true,
     layout: DefaultLayout,
-    component: AddNewPost
+    component: Register
   },
-  {
-    path: "/errors",
-    exact: true,
-    strict: true,
-    layout: DefaultLayout,
-    component: Errors
-  },
-  {
-    path: "/components-overview",
-    layout: DefaultLayout,
-    component: ComponentsOverview
-  },
-  {
-    path: "/tables",
-    exact: true,
-    strict: true,
-    layout: DefaultLayout,
-    component: Tables
-  },
-  {
-    path: "/blog-posts",
-    exact: true,
-    strict: true,
-    layout: DefaultLayout,
-    component: BlogPosts
-  }
 ];

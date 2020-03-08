@@ -11,6 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "",
+  "devDependencies": {
+    "react-hot-loader": "^4.11.0"
+  },
   "dependencies": {
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
