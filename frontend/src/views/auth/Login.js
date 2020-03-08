@@ -1,6 +1,6 @@
 /* eslint jsx-a11y/anchor-is-valid: 0 */
 
-import React, {useEffect} from "react";
+import React from "react";
 import {
   Container,
   Row,
@@ -10,9 +10,9 @@ import {
 } from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
-import {ajax, apiRoutes, get_errors} from "../../utils/ajax/ajax"
-import history from "../../utils/history";
-import {TokenStorage} from "../../utils/ajax/storage";
+import {ajax, apiRoutes, get_errors} from "../../utils/ajax"
+import {history} from "./../../utils/history"
+import UserStorage from "../../utils/storage";
 
 
 export default class Login extends React.Component {
@@ -38,9 +38,13 @@ export default class Login extends React.Component {
       password: password,
     }).then(res => {
       data = res.data['result'];
-      TokenStorage.storeToken(data['auth_token']);
-      TokenStorage.storeRefreshToken(data['refresh_token']);
+      UserStorage.storeToken(data['auth_token']);
+      UserStorage.storeRefreshToken(data['refresh_token']);
+      UserStorage.storeUserData(data['uuid'], data['username'], data['full_name'], data['avatar_uuid']);
       history.push('/');
+      // TODO: do this in a better way.
+      window.location.reload();
+
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;

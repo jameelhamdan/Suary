@@ -9,16 +9,21 @@ import {
   NavItem,
   NavLink
 } from "shards-react";
+import UserStorage from "../../../../utils/storage"
+import {staticRoutes} from "../../../../utils/apiRoutes"
 
 export default class UserActions extends React.Component {
   constructor(props) {
     super(props);
-
+    console.log(props);
     this.state = {
-      visible: false
+      visible: false,
+      logged_in: UserStorage.isAuthenticated(),
+      user_data: UserStorage.getUserData()
     };
 
     this.toggleUserActions = this.toggleUserActions.bind(this);
+    this.get_avatar_url = this.get_avatar_url.bind(this);
   }
 
   toggleUserActions() {
@@ -27,16 +32,33 @@ export default class UserActions extends React.Component {
     });
   }
 
+  get_avatar_url(){
+    const avatar_uuid = this.state.user_data.avatar_uuid;
+    if(this.state.logged_in && avatar_uuid !== null && avatar_uuid !== undefined && avatar_uuid.length > 0){
+      return staticRoutes.Media(avatar_uuid);
+    } else {
+      return require("./../../../../images/avatars/1.jpg")
+    }
+  }
+
+  get_username(){
+    if(this.state.logged_in){
+      return this.state.user_data.username
+    } else {
+      return 'Login'
+    }
+  }
+
   render() {
     return (
       <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
         <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
           <img
             className="user-avatar rounded-circle mr-2"
-            src={require("./../../../../images/avatars/1.jpg")}
-            alt="User Avatar"
-          />{" "}
-          <span className="d-none d-md-inline-block">NAME GOES HERE</span>
+            src={this.get_avatar_url()}
+            alt="Avatar"
+          />
+          <span className="d-none d-md-inline-block">{this.get_username()}</span>
         </DropdownToggle>
         <Collapse tag={DropdownMenu} right small open={this.state.visible}>
           <DropdownItem tag={Link} to="user-profile-lite">

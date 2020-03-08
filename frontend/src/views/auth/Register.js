@@ -1,6 +1,6 @@
 /* eslint jsx-a11y/anchor-is-valid: 0 */
 
-import React, {useEffect} from "react";
+import React from "react";
 import {
   Container,
   Row,
@@ -10,8 +10,8 @@ import {
 } from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
-import {ajax, apiRoutes, get_errors} from "../../utils/ajax/ajax"
-import history from "../../utils/history";
+import {history} from "./../../utils/history"
+import {ajax, apiRoutes, get_errors} from "../../utils/ajax"
 
 
 export default class Register extends React.Component {
@@ -47,6 +47,7 @@ export default class Register extends React.Component {
       password_confirm: password_confirm
     }).then(res => {
       history.push('/login');
+
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;
