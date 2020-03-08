@@ -11,6 +11,8 @@ import {
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {ajax, apiRoutes, get_errors} from "../../utils/ajax/ajax"
+import history from "../../utils/history";
+import {TokenStorage} from "../../utils/ajax/storage";
 
 
 export default class Login extends React.Component {
@@ -22,7 +24,6 @@ export default class Login extends React.Component {
     };
     this.onSubmit = this.onSubmit.bind(this);
     this.LoginForm = this.LoginForm.bind(this);
-
   }
 
   onSubmit(data) {
@@ -36,7 +37,10 @@ export default class Login extends React.Component {
       username: username,
       password: password,
     }).then(res => {
-      console.log(res);
+      data = res.data['result'];
+      TokenStorage.storeToken(data['auth_token']);
+      TokenStorage.storeRefreshToken(data['refresh_token']);
+      history.push('/');
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;

@@ -11,6 +11,7 @@ import {
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {ajax, apiRoutes, get_errors} from "../../utils/ajax/ajax"
+import history from "../../utils/history";
 
 
 export default class Register extends React.Component {
@@ -45,7 +46,7 @@ export default class Register extends React.Component {
       password: password,
       password_confirm: password_confirm
     }).then(res => {
-      console.log(res);
+      history.push('/login');
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;

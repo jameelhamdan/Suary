@@ -1,7 +1,7 @@
 import axios from "axios";
 import {TokenStorage} from "./storage";
 import ApiUrlService from "../apiRoutes"
-
+import history from "../history"
 
 export default () => {
 
@@ -20,7 +20,7 @@ export default () => {
     if (error.config.url == ApiUrlService.refreshToken() || error.response.message == 'Account is disabled.') {
 
       TokenStorage.clear();
-      router.push({name: 'root'});
+      history.push('/');
 
       return new Promise((resolve, reject) => {
         reject(error);
