@@ -11,11 +11,13 @@ import {
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {ajax, apiRoutes, get_errors} from "../../utils/ajax"
-import {history} from "./../../utils/history"
+import history from "./../../utils/history"
 import UserStorage from "../../utils/storage";
+import {loginAction} from "./../../actions/userAction";
+import {connect} from "react-redux";
+import Wrapper from "../../components/common/Wrapper"
 
-
-export default class Login extends React.Component {
+class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -40,10 +42,20 @@ export default class Login extends React.Component {
       data = res.data['result'];
       UserStorage.storeToken(data['auth_token']);
       UserStorage.storeRefreshToken(data['refresh_token']);
-      UserStorage.storeUserData(data['uuid'], data['username'], data['full_name'], data['avatar_uuid']);
+
+      const user_data = {
+        'uuid': data['uuid'],
+        'username': data['username'],
+        'full_name': data['full_name'],
+        'avatar_uuid': data['avatar_uuid'],
+        'logged_in': true
+      };
+
+      UserStorage.storeUserData(user_data);
+
+      this.props.loginAction(user_data);
+
       history.push('/');
-      // TODO: do this in a better way.
-      window.location.reload();
 
     }).catch(error => {
       if (error.response.status === 400) {
@@ -92,22 +104,26 @@ export default class Login extends React.Component {
 
   render() {
     return (
-      <Container fluid className="main-content-container px-4">
-        <Row className="mt-5">
-          <Col md={{size: 8, offset: 2}} sm="12">
-            <Card small className="mb-4">
-              <CardBody>
-                <h5 className="card-title">Login</h5>
-                <p className="card-text text-muted">Login to Suary!</p>
-                {this.state.errors.map((error) => {
-                  return <p key={error.i} className="text-danger">{error.message}</p>
-                })}
-                <this.LoginForm/>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+      <Wrapper>
+        <Card small className="mb-4">
+          <CardBody>
+            <h5 className="card-title">Login</h5>
+            <p className="card-text text-muted">Login to Suary!</p>
+            {this.state.errors.map((error) => {
+              return <p key={error.i} className="text-danger">{error.message}</p>
+            })}
+            <this.LoginForm/>
+          </CardBody>
+        </Card>
+      </Wrapper>
     )
   }
 }
+
+const mapStateToProps = state => ({
+  ...state
+});
+const mapDispatchToProps = dispatch => ({
+  loginAction: (payload) => dispatch(loginAction(payload)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

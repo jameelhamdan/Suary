@@ -1,17 +1,12 @@
 /* eslint jsx-a11y/anchor-is-valid: 0 */
 
 import React from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody, ListGroupItem, Button, Form
-} from "shards-react";
+import {Card, CardBody, ListGroupItem, Button, Form} from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
-import {history} from "./../../utils/history"
+import history from "./../../utils/history"
 import {ajax, apiRoutes, get_errors} from "../../utils/ajax"
+import Wrapper from "../../components/common/Wrapper";
 
 
 export default class Register extends React.Component {
@@ -122,22 +117,18 @@ export default class Register extends React.Component {
 
   render() {
     return (
-      <Container fluid className="main-content-container px-4">
-        <Row className="mt-5">
-          <Col md={{size: 8, offset: 2}} sm="12">
-            <Card small className="mb-4">
-              <CardBody>
-                <h5 className="card-title">Register</h5>
-                <p className="card-text text-muted">Register to Suary!</p>
-                {this.state.errors.map((error) => {
-                  return <p key={error.i} className="text-danger">{error.message}</p>
-                })}
-                <this.RegisterForm/>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+      <Wrapper>
+        <Card small className="mb-4">
+          <CardBody>
+            <h5 className="card-title">Register</h5>
+            <p className="card-text text-muted">Register to Suary!</p>
+            {this.state.errors.map((error) => {
+              return <p key={error.i} className="text-danger">{error.message}</p>
+            })}
+            <this.RegisterForm/>
+          </CardBody>
+        </Card>
+      </Wrapper>
     )
   }
 }

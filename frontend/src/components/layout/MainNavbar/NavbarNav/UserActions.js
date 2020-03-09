@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   Dropdown,
@@ -9,17 +10,14 @@ import {
   NavItem,
   NavLink
 } from "shards-react";
-import UserStorage from "../../../../utils/storage"
 import {staticRoutes} from "../../../../utils/apiRoutes"
 
-export default class UserActions extends React.Component {
+class UserActions extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props);
+
     this.state = {
       visible: false,
-      logged_in: UserStorage.isAuthenticated(),
-      user_data: UserStorage.getUserData()
     };
 
     this.toggleUserActions = this.toggleUserActions.bind(this);
@@ -33,17 +31,16 @@ export default class UserActions extends React.Component {
   }
 
   get_avatar_url(){
-    const avatar_uuid = this.state.user_data.avatar_uuid;
-    if(this.state.logged_in && avatar_uuid !== null && avatar_uuid !== undefined && avatar_uuid.length > 0){
-      return staticRoutes.Media(avatar_uuid);
+    if(this.props.userState.userData != null && this.props.userState.userData.avatar_uuid !== null && this.props.userState.userData.avatar_uuid !== undefined && this.props.userState.userData.avatar_uuid.length > 0){
+      return staticRoutes.Media(this.props.userState.userData.avatar_uuid);
     } else {
       return require("./../../../../images/avatars/1.jpg")
     }
   }
 
   get_username(){
-    if(this.state.logged_in){
-      return this.state.user_data.username
+    if(this.props.userState.userData != null){
+      return this.props.userState.userData.username
     } else {
       return 'Login'
     }
@@ -82,3 +79,8 @@ export default class UserActions extends React.Component {
     );
   }
 }
+const mapStateToProps = state => ({
+  ...state
+});
+
+export default connect(mapStateToProps)(UserActions);

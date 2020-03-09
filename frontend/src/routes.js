@@ -7,6 +7,7 @@ import { DefaultLayout } from "./layouts";
 // Route Views
 import Login from "./views/auth/Login";
 import Register from "./views/auth/Register";
+import Home from "./views/home/Home";
 
 export default [
   {
@@ -14,7 +15,7 @@ export default [
     exact: true,
     strict: true,
     layout: DefaultLayout,
-    component: () => <Redirect to="/login" />
+    component: Home
   },
   {
     path: "/login",

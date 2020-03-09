@@ -22,34 +22,21 @@ export default class UserStorage {
     static storeRefreshToken(refreshToken) {
         setItem(UserStorage.LOCAL_STORAGE_REFRESH_TOKEN, refreshToken);
     }
-    static storeUserData(uuid=null, username=null, full_name=null, avatar_uuid=null){
-        if(uuid != null){
-            setItem('uuid', uuid);
-        }
-        if(username != null){
-            setItem('username', username);
-        }
-        if(full_name != null){
-            setItem('full_name', full_name);
-        }
-        if(avatar_uuid != null){
-            setItem('avatar_uuid', avatar_uuid);
-        }
+    static storeUserData(user_data){
+        const json_string = JSON.stringify(user_data);
+        setItem(UserStorage.LOCAL_STORAGE_USER_DATA, json_string);
     }
     static getUserData(){
-        if(!this.isAuthenticated()){
-            return {};
+        const json_string = getItem(UserStorage.LOCAL_STORAGE_USER_DATA);
+        if(!this.isAuthenticated() || json_string ===null || json_string.length === 0){
+            return null;
         }
-        return {
-            'uuid': getItem('uuid'),
-            'username': getItem('username'),
-            'full_name': getItem('full_name'),
-            'avatar_uuid': getItem('avatar_uuid'),
-        }
+        return JSON.parse(json_string);
     }
     static clear() {
         localStorage.removeItem(UserStorage.LOCAL_STORAGE_TOKEN);
         localStorage.removeItem(UserStorage.LOCAL_STORAGE_REFRESH_TOKEN);
+        localStorage.removeItem(UserStorage.LOCAL_STORAGE_USER_DATA);
     }
     static getRefreshToken() {
         return getItem(UserStorage.LOCAL_STORAGE_REFRESH_TOKEN);
@@ -61,3 +48,4 @@ export default class UserStorage {
 }
 UserStorage.LOCAL_STORAGE_TOKEN = 'token';
 UserStorage.LOCAL_STORAGE_REFRESH_TOKEN = 'refresh_token';
+UserStorage.LOCAL_STORAGE_USER_DATA = 'user_data';

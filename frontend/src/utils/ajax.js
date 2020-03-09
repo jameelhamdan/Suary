@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {apiRoutes} from "./apiRoutes";
 import UserStorage from "./storage";
-import {history} from "./history"
+import history from "./history"
 const headers = {};
 const refresh_token_url = apiRoutes.Root() + apiRoutes.refreshToken();
 
