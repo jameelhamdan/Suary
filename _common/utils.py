@@ -1,5 +1,6 @@
-from rest_framework import response, status
 from django.http import JsonResponse
+from django.utils import timezone
+from rest_framework import response, status
 import uuid
 import hashlib
 import binascii
@@ -14,7 +15,7 @@ def generate_uuid(repeat=1):
     return final_uuid
 
 
-def stream_response(request, response, content_length):
+def stream_response(request, response, content_length, is_stream=True):
     http_range = request.META.get('HTTP_RANGE')
     if not (http_range and http_range.startswith('bytes=') and http_range.count('-') == 1):
         return response
@@ -25,20 +26,29 @@ def stream_response(request, response, content_length):
 
     st_size = content_length
 
-    start, end = http_range.split('=')[1].split('-')
-    if not start:  # requesting the last N bytes
-        start = max(0, st_size - int(end))
-        end = ''
-    start, end = int(start or 0), int(end or st_size - 1)
-    assert 0 <= start < st_size, (start, st_size)
-    end = min(end, st_size - 1)
-    f.seek(start)
-    old_read = f.read
-    f.read = lambda n: old_read(min(n, end + 1 - f.tell()))
-    response.status_code = 206
-    response['Content-Length'] = end + 1 - start
-    response['Content-Range'] = 'bytes %d-%d/%d' % (start, end, st_size)
+    if is_stream:
+        start, end = http_range.split('=')[1].split('-')
+        if not start:  # requesting the last N bytes
+            start = max(0, st_size - int(end))
+            end = ''
+        start, end = int(start or 0), int(end or st_size - 1)
+        assert 0 <= start < st_size, (start, st_size)
+        end = min(end, st_size - 1)
+        f.seek(start)
+        old_read = f.read
+        f.read = lambda n: old_read(min(n, end + 1 - f.tell()))
+
+        response.status_code = 206
+        response['Content-Length'] = end + 1 - start
+        response['Content-Range'] = 'bytes %d-%d/%d' % (start, end, st_size)
+
     return response
+
+
+def cache_response(r):
+    r['cache-control'] = 'max-age=604800, s-maxage=604800, must-revalidate'
+    r['expires'] = timezone.now() + timezone.timedelta(days=7)
+    return r
 
 
 def hash_password(password):

@@ -1,6 +1,7 @@
 import React from "react";
-import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import Img from 'react-image'
 import {
   Dropdown,
   DropdownToggle,
@@ -50,7 +51,8 @@ class UserActions extends React.Component {
     return (
       <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
         <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
-          <img
+          <Img
+            decode={false}
             className="user-avatar rounded-circle mr-2"
             src={this.get_avatar_url()}
             alt="Avatar"
