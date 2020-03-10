@@ -5,7 +5,8 @@ import {Card, CardBody, ListGroupItem, Button, Form} from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import history from "./../../utils/history"
-import {ajax, apiRoutes, get_errors} from "../../utils/ajax"
+import {userService} from "../../services/userService";
+import {get_errors} from "../../utils/ajax"
 import Wrapper from "../../components/common/Wrapper";
 
 
@@ -22,27 +23,22 @@ export default class Register extends React.Component {
   }
 
   onSubmit(data) {
-    let username = data['username'];
-    let email = data['email'];
-    let birth_date = data['birth_date'];
-    let password = data['password'];
-    let password_confirm = data['password_confirm'];
-
     this.setState((state) => {
       state.loading = true;
       return state
     });
 
-    ajax.post(apiRoutes.Register(), {
-      username: username,
-      full_name: username,
-      email: email,
-      birth_date: birth_date,
-      password: password,
-      password_confirm: password_confirm
-    }).then(res => {
-      history.push('/login');
+    const submitData = {
+      username: data['username'],
+      full_name: data['username'],
+      email: data['email'],
+      birth_date: data['birth_date'],
+      password: data['password'],
+      password_confirm: data['password_confirm']
+    };
 
+    userService.register(submitData).then((userData) => {
+      history.push('/login');
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;

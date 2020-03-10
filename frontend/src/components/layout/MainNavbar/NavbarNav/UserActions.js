@@ -1,6 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { connect } from "react-redux";
+import {Link} from "react-router-dom";
+import {connect} from "react-redux";
 import Img from 'react-image'
 import {
   Dropdown,
@@ -9,7 +9,9 @@ import {
   DropdownItem,
   Collapse,
   NavItem,
-  NavLink
+  NavLink,
+  Button,
+  ButtonGroup,
 } from "shards-react";
 import {staticRoutes} from "../../../../utils/apiRoutes"
 
@@ -19,6 +21,7 @@ class UserActions extends React.Component {
 
     this.state = {
       visible: false,
+      logged_in: this.props.userState.userData != null
     };
 
     this.toggleUserActions = this.toggleUserActions.bind(this);
@@ -31,16 +34,18 @@ class UserActions extends React.Component {
     });
   }
 
-  get_avatar_url(){
-    if(this.props.userState.userData != null && this.props.userState.userData.avatar_uuid !== null && this.props.userState.userData.avatar_uuid !== undefined && this.props.userState.userData.avatar_uuid.length > 0){
-      return staticRoutes.Media(this.props.userState.userData.avatar_uuid);
-    } else {
-      return require("./../../../../images/avatars/1.jpg")
+  get_avatar_url() {
+    let urls = [];
+    if (this.state.logged_in && this.props.userState.userData.avatar_uuid !== null && this.props.userState.userData.avatar_uuid !== undefined && this.props.userState.userData.avatar_uuid.length > 0) {
+      urls.push(staticRoutes.Media(this.props.userState.userData.avatar_uuid));
     }
+
+    urls.push(require("./../../../../images/avatars/placeholder.png"));
+    return urls
   }
 
-  get_username(){
-    if(this.props.userState.userData != null){
+  get_username() {
+    if (this.state.logged_in) {
       return this.props.userState.userData.username
     } else {
       return 'Login'
@@ -48,39 +53,41 @@ class UserActions extends React.Component {
   }
 
   render() {
-    return (
-      <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
-        <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
-          <Img
-            decode={false}
-            className="user-avatar rounded-circle mr-2"
-            src={this.get_avatar_url()}
-            alt="Avatar"
-          />
-          <span className="d-none d-md-inline-block">{this.get_username()}</span>
-        </DropdownToggle>
-        <Collapse tag={DropdownMenu} right small open={this.state.visible}>
-          <DropdownItem tag={Link} to="user-profile-lite">
-            <i className="material-icons">&#xE7FD;</i> Profile
-          </DropdownItem>
-          <DropdownItem tag={Link} to="edit-user-profile">
-            <i className="material-icons">&#xE8B8;</i> Edit Profile
-          </DropdownItem>
-          <DropdownItem tag={Link} to="file-manager-list">
-            <i className="material-icons">&#xE2C7;</i> Files
-          </DropdownItem>
-          <DropdownItem tag={Link} to="transaction-history">
-            <i className="material-icons">&#xE896;</i> Transactions
-          </DropdownItem>
-          <DropdownItem divider />
-          <DropdownItem tag={Link} to="/" className="text-danger">
-            <i className="material-icons text-danger">&#xE879;</i> Logout
-          </DropdownItem>
-        </Collapse>
-      </NavItem>
-    );
+    if (this.state.logged_in) {
+      return (
+        <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
+          <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
+            <Img
+              decode={false}
+              className="user-avatar rounded-circle mr-2"
+              src={this.get_avatar_url()}
+              alt="Avatar"
+              loader={<span className="user-avatar d-inline-block rounded-circle mr-2 w-2-5 h-2-5 vertical-align-middle"></span>}
+            />
+            <span className="d-none d-md-inline-block">{this.get_username()}</span>
+          </DropdownToggle>
+          <Collapse tag={DropdownMenu} right small open={this.state.visible}>
+            <DropdownItem tag={Link} to="user-profile">
+              <i className="material-icons">&#xE7FD;</i> Profile
+            </DropdownItem>
+            <DropdownItem divider/>
+            <DropdownItem tag={Link} to="/logout" className="text-danger">
+              <i className="material-icons text-danger">&#xE879;</i> Logout
+            </DropdownItem>
+          </Collapse>
+        </NavItem>
+      );
+    } else {
+      return (
+        <ButtonGroup size="sm" className="p-3">
+          <Button tag={Link} to='login' theme="accent">Login</Button>
+          <Button tag={Link} to='register' theme="light">Register</Button>
+        </ButtonGroup>
+      )
+    }
   }
 }
+
 const mapStateToProps = state => ({
   ...state
 });

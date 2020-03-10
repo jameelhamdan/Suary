@@ -1,6 +1,6 @@
 class staticRoutes {
   static Media(media_uuid) {
-    return `media/${media_uuid}.webm`
+    return `media/${media_uuid}.webm`;
   }
 }
 

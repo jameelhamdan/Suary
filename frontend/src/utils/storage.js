@@ -1,9 +1,12 @@
+import SecureLS from "secure-ls";
+
+const ls = new SecureLS({encodingType: 'des', isCompression: false, encryptionSecret: 'this-is-a-secret-key-but-its-meaningless-in-react'});
 function setItem(item_name, item_value){
-    localStorage.setItem(item_name, item_value);
+    ls.set(item_name, item_value);
 }
 
 function getItem(item_name){
-    return localStorage.getItem(item_name);
+    return ls.get(item_name);
 }
 
 
@@ -23,20 +26,17 @@ export default class UserStorage {
         setItem(UserStorage.LOCAL_STORAGE_REFRESH_TOKEN, refreshToken);
     }
     static storeUserData(user_data){
-        const json_string = JSON.stringify(user_data);
-        setItem(UserStorage.LOCAL_STORAGE_USER_DATA, json_string);
+        setItem(UserStorage.LOCAL_STORAGE_USER_DATA, user_data);
     }
     static getUserData(){
-        const json_string = getItem(UserStorage.LOCAL_STORAGE_USER_DATA);
-        if(!this.isAuthenticated() || json_string ===null || json_string.length === 0){
+        const user_data = getItem(UserStorage.LOCAL_STORAGE_USER_DATA);
+        if(!this.isAuthenticated() || user_data === null || user_data.length === 0){
             return null;
         }
-        return JSON.parse(json_string);
+        return user_data;
     }
     static clear() {
-        localStorage.removeItem(UserStorage.LOCAL_STORAGE_TOKEN);
-        localStorage.removeItem(UserStorage.LOCAL_STORAGE_REFRESH_TOKEN);
-        localStorage.removeItem(UserStorage.LOCAL_STORAGE_USER_DATA);
+        ls.removeAll();
     }
     static getRefreshToken() {
         return getItem(UserStorage.LOCAL_STORAGE_REFRESH_TOKEN);

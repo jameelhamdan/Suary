@@ -1,11 +1,11 @@
 import React from "react";
-import { Redirect } from "react-router-dom";
 
 // Layout Types
 import { DefaultLayout } from "./layouts";
 
 // Route Views
 import Login from "./views/auth/Login";
+import Logout from "./views/auth/Logout";
 import Register from "./views/auth/Register";
 import Home from "./views/home/Home";
 
@@ -30,5 +30,12 @@ export default [
     strict: true,
     layout: DefaultLayout,
     component: Register
+  },
+  {
+    path: "/logout",
+    exact: true,
+    strict: true,
+    layout: DefaultLayout,
+    component: Logout
   },
 ];

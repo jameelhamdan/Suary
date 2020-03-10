@@ -4,7 +4,7 @@ const loginAction = (payload) => {
     payload
   }
 };
-const logoutAction = (payload) => {
+const logoutAction = (payload = {}) => {
   return {
     type: "logout",
     payload

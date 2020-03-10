@@ -2,17 +2,14 @@
 
 import React from "react";
 import {
-  Container,
-  Row,
-  Col,
   Card,
   CardBody, ListGroupItem, Button, Form
 } from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
-import {ajax, apiRoutes, get_errors} from "../../utils/ajax"
+import {get_errors} from "../../utils/ajax"
 import history from "./../../utils/history"
-import UserStorage from "../../utils/storage";
+import {userService} from "../../services/userService";
 import {loginAction} from "./../../actions/userAction";
 import {connect} from "react-redux";
 import Wrapper from "../../components/common/Wrapper"
@@ -29,34 +26,19 @@ class Login extends React.Component {
   }
 
   onSubmit(data) {
-    let username = data['username'];
-    let password = data['password'];
     this.setState((state) => {
       state.loading = true;
       return state
     });
-    ajax.post(apiRoutes.Login(), {
-      username: username,
-      password: password,
-    }).then(res => {
-      data = res.data['result'];
-      UserStorage.storeToken(data['auth_token']);
-      UserStorage.storeRefreshToken(data['refresh_token']);
 
-      const user_data = {
-        'uuid': data['uuid'],
-        'username': data['username'],
-        'full_name': data['full_name'],
-        'avatar_uuid': data['avatar_uuid'],
-        'logged_in': true
-      };
+    const submitData = {
+      username: data['username'],
+      password: data['password'],
+    };
 
-      UserStorage.storeUserData(user_data);
-
+    userService.login(submitData).then((user_data) => {
       this.props.loginAction(user_data);
-
       history.push('/');
-
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;
