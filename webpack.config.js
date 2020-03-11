@@ -30,7 +30,7 @@ module.exports = {
             loader: 'file-loader',
             options: {
               esModule: false,
-              publicPath: 'public/build',
+              publicPath: 'frontend/public/build',
             },
           },
         ],

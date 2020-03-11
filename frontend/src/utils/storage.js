@@ -1,6 +1,6 @@
 import SecureLS from "secure-ls";
 
-const ls = new SecureLS({encodingType: 'des', isCompression: false, encryptionSecret: 'this-is-a-secret-key-but-its-meaningless-in-react'});
+const ls = new SecureLS({encodingType: "des", isCompression: false, encryptionSecret: "this-is-a-secret-key-but-its-meaningless-in-react"});
 function setItem(item_name, item_value){
     ls.set(item_name, item_value);
 }
@@ -16,7 +16,7 @@ export default class UserStorage {
     }
     static getAuthentication() {
         return {
-            headers: { 'Authorization': 'Bearer ' + this.getToken() }
+            headers: { "Authorization": "Bearer " + this.getToken() }
         };
     }
     static storeToken(token) {
@@ -46,6 +46,6 @@ export default class UserStorage {
     }
 
 }
-UserStorage.LOCAL_STORAGE_TOKEN = 'token';
-UserStorage.LOCAL_STORAGE_REFRESH_TOKEN = 'refresh_token';
-UserStorage.LOCAL_STORAGE_USER_DATA = 'user_data';
+UserStorage.LOCAL_STORAGE_TOKEN = "token";
+UserStorage.LOCAL_STORAGE_REFRESH_TOKEN = "refresh_token";
+UserStorage.LOCAL_STORAGE_USER_DATA = "user_data";

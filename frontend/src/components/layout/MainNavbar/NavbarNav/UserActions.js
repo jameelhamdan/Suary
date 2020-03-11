@@ -1,7 +1,7 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import Img from 'react-image'
+import Img from "react-image";
 import {
   Dropdown,
   DropdownToggle,
@@ -13,7 +13,7 @@ import {
   Button,
   ButtonGroup,
 } from "shards-react";
-import {staticRoutes} from "../../../../utils/apiRoutes"
+import {staticRoutes} from "utils/apiRoutes"
 
 class UserActions extends React.Component {
   constructor(props) {

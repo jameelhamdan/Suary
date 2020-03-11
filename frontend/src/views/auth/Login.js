@@ -7,12 +7,13 @@ import {
 } from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
-import {get_errors} from "../../utils/ajax"
-import history from "./../../utils/history"
-import {userService} from "../../services/userService";
-import {loginAction} from "./../../actions/userAction";
+import {get_errors} from "utils/ajax"
+import history from "utils/history"
+import {userService} from "services/userService";
+import {loginAction} from "actions/userAction";
 import {connect} from "react-redux";
-import Wrapper from "../../components/common/Wrapper"
+import Wrapper from "components/common/Wrapper"
+
 
 class Login extends React.Component {
   constructor(props) {

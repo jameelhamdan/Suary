@@ -1,7 +1,6 @@
 import React from "react";
 import {Card, CardBody} from "shards-react";
-import Wrapper from "../../components/common/Wrapper";
-import {loginAction} from "../../actions/userAction";
+import Wrapper from "components/common/Wrapper";
 import {connect} from "react-redux";
 
 

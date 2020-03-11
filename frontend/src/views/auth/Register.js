@@ -4,10 +4,10 @@ import React from "react";
 import {Card, CardBody, ListGroupItem, Button, Form} from "shards-react";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
-import history from "./../../utils/history"
-import {userService} from "../../services/userService";
-import {get_errors} from "../../utils/ajax"
-import Wrapper from "../../components/common/Wrapper";
+import history from "utils/history"
+import {userService} from "services/userService";
+import {get_errors} from "utils/ajax"
+import Wrapper from "components/common/Wrapper";
 
 
 export default class Register extends React.Component {
@@ -29,16 +29,16 @@ export default class Register extends React.Component {
     });
 
     const submitData = {
-      username: data['username'],
-      full_name: data['username'],
-      email: data['email'],
-      birth_date: data['birth_date'],
-      password: data['password'],
-      password_confirm: data['password_confirm']
+      username: data["username"],
+      full_name: data["username"],
+      email: data["email"],
+      birth_date: data["birth_date"],
+      password: data["password"],
+      password_confirm: data["password_confirm"]
     };
 
     userService.register(submitData).then((userData) => {
-      history.push('/login');
+      history.push("/login");
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;

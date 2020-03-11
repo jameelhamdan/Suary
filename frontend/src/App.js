@@ -1,12 +1,12 @@
 import React from "react";
 import {Router, Route} from "react-router-dom";
-import routes from "./routes";
-import history from './utils/history';
-import withTracker from "./withTracker";
+import routes from "routes";
+import history from "utils/history";
+import withTracker from "withTracker";
 import {Provider} from "react-redux";
-import configureStore from "./store";
+import configureStore from "store";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./styles/theme.css";
+import "styles/theme.css";
 
 export default () => (
   <Provider store={configureStore()}>

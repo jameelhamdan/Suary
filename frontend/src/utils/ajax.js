@@ -1,7 +1,7 @@
-import axios from 'axios';
-import {apiRoutes} from "./apiRoutes";
-import UserStorage from "./storage";
-import history from "./history"
+import axios from "axios";
+import {apiRoutes} from "utils/apiRoutes";
+import UserStorage from "utils/storage";
+import history from "utils/history"
 const headers = {};
 const refresh_token_url = apiRoutes.Root() + apiRoutes.refreshToken();
 
@@ -10,7 +10,7 @@ const get_errors = function (result) {
   let errors = [];
   let i=1;
   if (result.success === false) {
-    for (let [key, value] of Object.entries(result['result'])) {
+    for (let [key, value] of Object.entries(result["result"])) {
       if (Array.isArray(value)){
         value.forEach(message => {
           errors.push({i:i, message:message});
@@ -39,7 +39,7 @@ Ajax.interceptors.request.use(
   config => {
     const token = UserStorage.getToken();
     if (token) {
-      config.headers['Authorization'] = 'Bearer ' + token;
+      config.headers["Authorization"] = "Bearer " + token;
     }
     return config;
   },
@@ -54,7 +54,7 @@ Ajax.interceptors.response.use((response) => {
 
     if (error.response.status === 401 && originalRequest.url === refresh_token_url) {
       UserStorage.clear();
-      history.push('/login');
+      history.push("/login");
       return Promise.reject(error);
     }
 
@@ -67,9 +67,9 @@ Ajax.interceptors.response.use((response) => {
           "refresh_token": refreshToken
         }).then(res => {
         if (res.status === 200) {
-          UserStorage.storeRefreshToken(res.data['auth_token']);
-          UserStorage.storeToken(res.data['token']);
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + UserStorage.getToken();
+          UserStorage.storeRefreshToken(res.data["auth_token"]);
+          UserStorage.storeToken(res.data["token"]);
+          axios.defaults.headers.common["Authorization"] = "Bearer " + UserStorage.getToken();
           return axios(originalRequest);
         }
       })

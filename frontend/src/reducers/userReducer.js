@@ -1,4 +1,4 @@
-import UserStorage from "../utils/storage";
+import UserStorage from "utils/storage";
 
 const initialState = {
   userData: UserStorage.isAuthenticated() ? UserStorage.getUserData() : null

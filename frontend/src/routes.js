@@ -1,13 +1,13 @@
 import React from "react";
 
 // Layout Types
-import { DefaultLayout } from "./layouts";
+import { DefaultLayout } from "layouts";
 
 // Route Views
-import Login from "./views/auth/Login";
-import Logout from "./views/auth/Logout";
-import Register from "./views/auth/Register";
-import Home from "./views/home/Home";
+import Login from "views/auth/Login";
+import Logout from "views/auth/Logout";
+import Register from "views/auth/Register";
+import Home from "views/home/Home";
 
 export default [
   {

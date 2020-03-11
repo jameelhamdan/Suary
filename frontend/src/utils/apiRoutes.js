@@ -8,19 +8,19 @@ class apiRoutes {
 
   //Authentication
   static Root() {
-    return document.getElementById("app").getAttribute('api-root-url');
+    return document.getElementById("app").getAttribute("api-root-url");
   }
 
   static Register() {
-    return 'auth/register';
+    return "auth/register";
   }
 
   static Login() {
-    return 'auth/login';
+    return "auth/login";
   }
 
   static refreshToken() {
-    return 'auth/token/refresh';
+    return "auth/token/refresh";
   }
 
 }

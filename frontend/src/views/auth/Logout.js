@@ -1,8 +1,8 @@
 /* eslint jsx-a11y/anchor-is-valid: 0 */
 
 import React from "react";
-import {userService} from "../../services/userService";
-import {logoutAction} from "./../../actions/userAction";
+import {userService} from "services/userService";
+import {logoutAction} from "actions/userAction";
 import {connect} from "react-redux";
 import {Redirect} from "react-router-dom";
 

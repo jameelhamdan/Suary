@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "*": ["frontend/src/*"],
+      "test/*": ["frontend/test/*"],
+      "underscore": ["lodash"]
+    }
+  }
+}
