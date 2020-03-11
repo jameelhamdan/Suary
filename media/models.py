@@ -28,7 +28,7 @@ class MediaDocument(mongo.Model):
     def stream_image(self, request, *args, **kwargs):
         stream = self.stream()
         response = FileResponse(stream, content_type=self.content_type)
-        return utils.stream_response(request, response, self.length)
+        return utils.cache_response(response)
 
     def stream_video(self, request, *args, **kwargs):
         stream = self.stream()

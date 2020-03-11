@@ -18,11 +18,13 @@ ADMINS = [('Jameel Hamdan', 'jameelhamdan99@yahoo.com')]
 
 # Application definition
 INSTALLED_APPS = [
+    'django.contrib.staticfiles',
     'rest_framework',
     'auth',
     'media',
     'users',
     'main',
+    'frontend'
 ]
 
 MIDDLEWARE = [
@@ -49,12 +51,41 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.0/howto/static-files/
+STATIC_URL = '/public/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'frontend/public'),
+)
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+
+# Templating
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'frontend/templates')],
+        'APP_DIRS': False,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                '_common.context_processors.settings_export',
+            ],
+        },
+    },
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
     'UNAUTHENTICATED_USER': None,
 }
+
+API_PREFIX = 'api'
 
 # Authentication settings
 REFRESH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24 * 14)

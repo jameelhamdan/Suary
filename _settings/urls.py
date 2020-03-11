@@ -1,9 +1,16 @@
-from django.urls import path, include
+from django.conf import settings
+from django.urls import path, re_path, include
+import frontend.views
 
-
+api_prefix = settings.API_PREFIX
 urlpatterns = [
-    path('auth/', include('auth.urls')),
+    path(api_prefix + '/auth/', include('auth.urls')),
+    path(api_prefix + '/users/', include('users.urls')),
+    path(api_prefix + '/main/', include('main.urls')),
     path('media/', include('media.urls')),
-    path('users/', include('users.urls')),
-    path('main/', include('main.urls')),
+]
+
+
+urlpatterns += [
+    re_path(r'^.*', frontend.views.IndexView.as_view(), name='index')
 ]

@@ -70,34 +70,18 @@ class ResetPasswordView(APIViewMixin, generics.CreateAPIView):
         return self.get_response(message='Successfully Updated Password', result=result)
 
 
-@view_authenticate_refresh()
-class RenewAuthTokenView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = serializers.RenewAuthTokenSerializer
+@view_allow_any()
+class RefreshTokenView(APIViewMixin, generics.CreateAPIView):
+    serializer_class = serializers.RefreshTokenSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        auth_token = serializer.validated_data
+        auth_token, refresh_token = serializer.validated_data
 
         result = {
-            'new_token': auth_token,
-        }
-
-        return self.get_response(message='Successfully Refreshed Token', result=result)
-
-
-@view_authenticate_refresh()
-class RenewRefreshTokenView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = serializers.RenewRefreshTokenSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        refresh_token, auth_token = serializer.validated_data
-
-        result = {
-            'refresh_token': refresh_token,
-            'auth_token': auth_token,
+            'token': auth_token,
+            'refresh_token': refresh_token
         }
 
         return self.get_response(message='Successfully Refreshed Token', result=result)
