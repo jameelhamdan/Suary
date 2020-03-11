@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import path, re_path, include
+from django.views.decorators.cache import never_cache
 import frontend.views
 
 api_prefix = settings.API_PREFIX
@@ -12,5 +13,5 @@ urlpatterns = [
 
 
 urlpatterns += [
-    re_path(r'^.*', frontend.views.IndexView.as_view(), name='index')
+    re_path(r'^.*', never_cache(frontend.views.IndexView.as_view()), name='index')
 ]

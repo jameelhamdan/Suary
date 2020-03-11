@@ -1,7 +1,13 @@
+const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
+  output: {
+   path: path.join(__dirname, 'public'),
+   filename: 'bundle.js',
+   publicPath: '/',
+  },
   plugins: [
     new CompressionPlugin({
       filename: '[path].br[query]',
@@ -30,7 +36,7 @@ module.exports = {
             loader: 'file-loader',
             options: {
               esModule: false,
-              publicPath: 'frontend/public/build',
+              publicPath: 'frontend/public/images',
             },
           },
         ],

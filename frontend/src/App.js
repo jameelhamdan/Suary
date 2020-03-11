@@ -1,5 +1,8 @@
 import React from "react";
-import {Router, Route} from "react-router-dom";
+import {
+  Router,
+  Route,
+} from "react-router-dom";
 import routes from "routes";
 import history from "utils/history";
 import withTracker from "withTracker";
@@ -28,7 +31,21 @@ export default () => (
             />
           );
         })}
+        <Route path="*" target='_self'>
+          <NoMatch />
+        </Route>
       </div>
     </Router>
   </Provider>
 );
+
+
+function NoMatch() {
+  return (
+    <div>
+      <h3>
+        Page not found 404
+      </h3>
+    </div>
+  );
+}
