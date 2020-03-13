@@ -2,14 +2,15 @@ import React from "react";
 import {Card, CardBody, Col, Row, Fade} from "shards-react";
 import {BaseWrapper} from "components/common/Wrapper";
 import {userService} from "services/userService";
-import UserDetails from './components/UserDetails';
 import NotFound from "components/common/pages/NotFound"
+import UserDetails from './components/UserDetails';
+import UserPosts from "./components/UserPosts";
 
 
 export default class UserDetail extends React.Component {
-
   constructor(props) {
     super(props);
+    this.username = this.props.match.params.username;
     this.state = {
       data: {},
       error: null,
@@ -17,14 +18,12 @@ export default class UserDetail extends React.Component {
     };
   }
 
-  async componentDidMount() {
-    const username = this.props.match.params.username;
-    try {
-      const data = await userService.getUser(username);
+  componentDidMount() {
+    userService.getUser(this.username).then((data) => {
       this.setState({data, isLoading: false});
-    } catch(error){
+    }).catch((error) => {
       this.setState({error, isLoading: false});
-    }
+    });
   }
 
   render() {
@@ -40,11 +39,7 @@ export default class UserDetail extends React.Component {
             </Fade>
           </Col>
           <Col lg="9" md="8">
-            <Card small className="mb-4">
-              <CardBody>
-                <h5 className="card-title">USER POSTS GO HERE</h5>
-              </CardBody>
-            </Card>
+            <UserPosts username={this.username}/>
           </Col>
         </Row>
       </BaseWrapper>

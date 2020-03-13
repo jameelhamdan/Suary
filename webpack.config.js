@@ -43,18 +43,25 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        enforce: "pre",
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
           options: {
             presets: [
-              "@babel/preset-env",
+              ["@babel/preset-env",
+                {
+                  "targets": {
+                    "node": "current",
+                    "esmodules": true
+                  }
+                }
+              ],
               "@babel/preset-react"
             ],
             plugins: [
-              "@babel/transform-runtime",
+              "@babel/plugin-transform-runtime",
               "@babel/plugin-proposal-class-properties",
+              "emotion",
               ["module-resolver", {
                 "root": "./frontend/src",
                 "alias": {

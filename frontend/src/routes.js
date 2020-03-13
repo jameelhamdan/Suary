@@ -16,6 +16,7 @@ import UserDetail from "views/user/Detail"
 export default [
   {
     path: "/",
+    logged_in_only: false,
     exact: true,
     strict: true,
     layout: DefaultLayout,
@@ -23,6 +24,7 @@ export default [
   },
   {
     path: "/login",
+    logged_in_only: false,
     exact: true,
     strict: true,
     layout: DefaultLayout,
@@ -30,6 +32,7 @@ export default [
   },
   {
     path: "/register",
+    logged_in_only: false,
     exact: true,
     strict: true,
     layout: DefaultLayout,
@@ -37,6 +40,7 @@ export default [
   },
   {
     path: "/logout",
+    logged_in_only: true,
     exact: true,
     strict: true,
     layout: DefaultLayout,
@@ -44,6 +48,7 @@ export default [
   },
   {
     path: "/profile/:username",
+    logged_in_only: true,
     exact: true,
     strict: true,
     layout: DefaultLayout,

@@ -1,6 +1,6 @@
 from rest_framework import generics, parsers
 from . import serializers, models
-from auth.backend.decorators import view_authenticate, view_allow_any
+from auth.backend.decorators import view_authenticate
 from _common.mixins import APIViewMixin, PaginationMixin
 
 
@@ -58,7 +58,7 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
         return models.Follow.objects.filter(follower_id=user_pk).only('following', 'updated_on')
 
 
-@view_allow_any()
+@view_authenticate()
 class DetailUserView(APIViewMixin, generics.RetrieveAPIView):
     queryset = models.UserData.objects.all()
     serializer_class = serializers.UserSerializer

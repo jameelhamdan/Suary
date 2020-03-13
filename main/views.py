@@ -4,18 +4,14 @@ from . import serializers, models
 from auth.backend.decorators import view_authenticate
 from _common.mixins import APIViewMixin, PaginationMixin
 import media.models
+import users.models
 
 
 @view_authenticate()
-class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
+class CreatePostView(APIViewMixin, generics.CreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
     pagination_kwarg_message = 'Successfully listed my posts!'
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return serializers.ListPostSerializer
-        else:
-            return serializers.PostSerializer
+    serializer_class = serializers.PostSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -40,10 +36,24 @@ class ListCreatePostView(APIViewMixin, PaginationMixin, generics.ListCreateAPIVi
         json_data = serializer.data
         return self.get_response(message='Successfully Added Post', result=json_data)
 
+
+@view_authenticate()
+class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
+    pagination_kwarg_message = 'Successfully Returned User Posts'
+    serializer_class = serializers.ListPostSerializer
+
+    def get_object(self, *args, **kwargs):
+        username = self.kwargs.get('username', None)
+
+        try:
+            return users.models.UserData.objects.only('id', 'username').get(username=username)
+        except users.models.UserData.DoesNotExist:
+            raise NotFound()
+
     def get_queryset(self):
-        user_pk = self.request.current_user.pk
-        queryset = models.Post.objects.filter(created_by_id=user_pk).select_related('created_by').only('content', 'media_list', 'created_by', 'created_on', 'tags')
-        return queryset
+        user = self.get_object()
+
+        return models.Post.objects.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
 
 
 @view_authenticate()

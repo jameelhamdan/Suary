@@ -11,7 +11,6 @@ const uploadConfig = {
 export const userService = {
   getUser: async (username) => {
     return ajax.get(apiRoutes.userDetail(username)).then(res => {
-      console.log(res);
       return res.data['result'];
     });
   },

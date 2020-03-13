@@ -37,11 +37,11 @@ class UserActions extends React.Component {
       return (
         <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
           <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
-            <Avatar image_uuid={this.props.userState.userData.avatar_uuid} fallback={require("images/avatars/placeholder.png")} />
+            <Avatar image_uuid={this.props.userState.userData.avatar_uuid} fallback={require("images/avatars/placeholder.png")}/>
             <span className="d-none d-md-inline-block">{this.props.userState.userData.username}</span>
           </DropdownToggle>
           <Collapse tag={DropdownMenu} right small open={this.state.visible}>
-            <DropdownItem tag={Link} to={"/profile/"+this.props.userState.userData.username}>
+            <DropdownItem tag={Link} to={"/profile/" + this.props.userState.userData.username}>
               <i className="material-icons">&#xE7FD;</i> Profile
             </DropdownItem>
             <DropdownItem divider/>

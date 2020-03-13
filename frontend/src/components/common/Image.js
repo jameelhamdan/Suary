@@ -30,7 +30,7 @@ export default class Avatar extends React.Component {
     return (
       <Img
         decode={false}
-        className="user-avatar rounded-circle mr-2"
+        className="user-avatar rounded-circle mr-2 w-2-5"
         src={this.get_image_url()}
         alt="Avatar"
         loader={defaultComponent}
@@ -65,9 +65,47 @@ export class LargeAvatar extends Avatar {
   }
 }
 
+export class PostImage extends React.Component  {
+  avatarPlaceholder() {
+    if (this.props.placeholder != null) {
+      return this.props.placeholder
+    } else {
+      return null;
+    }
+  }
+
+  get_image_url(){
+    const image_uuid = this.props.image_uuid;
+    if(image_uuid !== undefined && image_uuid !== null){
+      return staticRoutes.Media(image_uuid);
+    } else {
+      return null;
+    }
+  }
+
+  render() {
+    const defaultComponent = this.avatarPlaceholder();
+    return (
+      <Img
+        decode={false}
+        className="card-img-bottom"
+        src={this.get_image_url()}
+        alt={this.props.alt || "post image"}
+        loader={defaultComponent}
+        unloader={defaultComponent}
+      />
+    )
+  }
+}
+
 Avatar.propTypes = {
   image_uuid: PropTypes.string,
   fallback: PropTypes.string,
+  placeholder: PropTypes.node,
+};
+
+PostImage.propTypes = {
+  image_uuid: PropTypes.string.isRequired,
   placeholder: PropTypes.node,
 };
 

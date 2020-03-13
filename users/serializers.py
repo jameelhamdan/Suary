@@ -7,7 +7,7 @@ import users.models
 class UserSerializer(serializers.Serializer):
     id = serializers.CharField()
     username = serializers.CharField()
-    full_name = serializers.CharField()
+    # full_name = serializers.CharField() # Add When Needed
     avatar_uuid = serializers.CharField()
 
 
