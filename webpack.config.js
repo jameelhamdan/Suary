@@ -4,16 +4,16 @@ const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   output: {
-   path: path.join(__dirname, 'public'),
-   filename: 'bundle.js',
-   publicPath: '/',
+    path: path.join(__dirname, 'public'),
+    filename: 'bundle.js',
+    publicPath: '/',
   },
   plugins: [
     new CompressionPlugin({
       filename: '[path].br[query]',
       algorithm: 'brotliCompress',
       test: /\.(js|css|html|svg)$/,
-      compressionOptions: { level: 11 },
+      compressionOptions: {level: 11},
       threshold: 10240,
       minRatio: 0.8,
       deleteOriginalAssets: false,
@@ -43,9 +43,28 @@ module.exports = {
       },
       {
         test: /\.js$/,
+        enforce: "pre",
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader"
+          loader: "babel-loader",
+          options: {
+            presets: [
+              "@babel/preset-env",
+              "@babel/preset-react"
+            ],
+            plugins: [
+              "@babel/transform-runtime",
+              "@babel/plugin-proposal-class-properties",
+              ["module-resolver", {
+                "root": "./frontend/src",
+                "alias": {
+                  "~": "./frontend/src",
+                  "test": "./frontend/src",
+                  "underscore": "lodash"
+                }
+              }]
+            ]
+          }
         }
       },
       {

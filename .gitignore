@@ -12,7 +12,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -134,3 +133,9 @@ dmypy.json
 
 # React
 node_modules
+dist
+
+package-lock.json
+yarn.lock
+
+.DS_Store

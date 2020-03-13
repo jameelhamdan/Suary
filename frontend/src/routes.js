@@ -9,6 +9,10 @@ import Logout from "views/auth/Logout";
 import Register from "views/auth/Register";
 import Home from "views/home/Home";
 
+//Users
+import UserDetail from "views/user/Detail"
+
+
 export default [
   {
     path: "/",
@@ -37,5 +41,12 @@ export default [
     strict: true,
     layout: DefaultLayout,
     component: Logout
+  },
+  {
+    path: "/profile/:username",
+    exact: true,
+    strict: true,
+    layout: DefaultLayout,
+    component: UserDetail
   },
 ];

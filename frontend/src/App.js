@@ -2,6 +2,7 @@ import React from "react";
 import {
   Router,
   Route,
+  Switch
 } from "react-router-dom";
 import routes from "routes";
 import history from "utils/history";
@@ -10,11 +11,13 @@ import {Provider} from "react-redux";
 import configureStore from "store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "styles/theme.css";
+import NotFound from "components/common/pages/NotFound"
+
 
 export default () => (
   <Provider store={configureStore()}>
     <Router history={history}>
-      <div>
+      <Switch>
         {routes.map((route, index) => {
           return (
             <Route
@@ -31,21 +34,15 @@ export default () => (
             />
           );
         })}
-        <Route path="*" target='_self'>
-          <NoMatch />
-        </Route>
-      </div>
+        <Route
+          render={({staticContext}) => {
+            if (staticContext) {
+              staticContext.statusCode = 404
+            }
+            return <NotFound/>
+          }}
+        />
+      </Switch>
     </Router>
   </Provider>
 );
-
-
-function NoMatch() {
-  return (
-    <div>
-      <h3>
-        Page not found 404
-      </h3>
-    </div>
-  );
-}

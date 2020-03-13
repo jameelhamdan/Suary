@@ -1,9 +1,16 @@
 from rest_framework import exceptions, status, views, response
 from _common.utils import get_response
 from _common import pagination
+from django.shortcuts import Http404
 
 
 class APIViewMixin(views.APIView):
+    def get_object(self, *args, **kwargs):
+        try:
+            return super(APIViewMixin, self).get_object(*args, **kwargs)
+        except Http404:
+            raise exceptions.NotFound
+
     def handle_exception(self, exc):
         if isinstance(exc, (exceptions.NotAuthenticated, exceptions.AuthenticationFailed)):
             auth_header = self.get_authenticate_header(self.request)

@@ -12,7 +12,7 @@ import history from "utils/history"
 import {userService} from "services/userService";
 import {loginAction} from "actions/userAction";
 import {connect} from "react-redux";
-import Wrapper from "components/common/Wrapper"
+import {Wrapper} from "components/common/Wrapper"
 
 
 class Login extends React.Component {

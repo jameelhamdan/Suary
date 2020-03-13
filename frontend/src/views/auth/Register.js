@@ -7,7 +7,7 @@ import {useForm} from "react-hook-form";
 import history from "utils/history"
 import {userService} from "services/userService";
 import {get_errors} from "utils/ajax"
-import Wrapper from "components/common/Wrapper";
+import {Wrapper} from "components/common/Wrapper";
 
 
 export default class Register extends React.Component {

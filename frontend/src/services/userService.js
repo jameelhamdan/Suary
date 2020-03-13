@@ -1,11 +1,24 @@
+import FormData from 'form-data';
 import {ajax, apiRoutes} from "utils/ajax";
 import UserStorage from "utils/storage";
 
+const uploadConfig = {
+  headers: {
+    'content-type': 'multipart/form-data'
+  }
+};
 
 export const userService = {
+  getUser: async (username) => {
+    return ajax.get(apiRoutes.userDetail(username)).then(res => {
+      console.log(res);
+      return res.data['result'];
+    });
+  },
+
   register: async (userData) => {
     return ajax.post(apiRoutes.Register(), userData).then(res => {
-      return res;
+      return res.data['result'];
     })
   },
   login: async (userData) => {
@@ -27,6 +40,14 @@ export const userService = {
 
       return user_data;
     })
+  },
+  updateAvatar: async (imageFile) => {
+    let requestData = new FormData();
+
+    requestData.append('avatar', imageFile, imageFile.fileName);
+    return ajax.put(apiRoutes.userUpdateAvatar(), requestData, uploadConfig).then(res => {
+      return res;
+    });
   },
   logout: () => {
     UserStorage.clear();

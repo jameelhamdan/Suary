@@ -12,7 +12,8 @@ function getItem(item_name){
 
 export default class UserStorage {
     static isAuthenticated() {
-        return this.getToken() !== null;
+        const token = this.getToken();
+        return token !== null && token !== '' && token.length > 0;
     }
     static getAuthentication() {
         return {

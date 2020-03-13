@@ -1,7 +1,8 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import Img from "react-image";
+import Avatar from "components/common/Image";
+
 import {
   Dropdown,
   DropdownToggle,
@@ -13,7 +14,6 @@ import {
   Button,
   ButtonGroup,
 } from "shards-react";
-import {staticRoutes} from "utils/apiRoutes"
 
 class UserActions extends React.Component {
   constructor(props) {
@@ -21,11 +21,9 @@ class UserActions extends React.Component {
 
     this.state = {
       visible: false,
-      logged_in: this.props.userState.userData != null
     };
 
     this.toggleUserActions = this.toggleUserActions.bind(this);
-    this.get_avatar_url = this.get_avatar_url.bind(this);
   }
 
   toggleUserActions() {
@@ -34,40 +32,16 @@ class UserActions extends React.Component {
     });
   }
 
-  get_avatar_url() {
-    let urls = [];
-    if (this.state.logged_in && this.props.userState.userData.avatar_uuid !== null && this.props.userState.userData.avatar_uuid !== undefined && this.props.userState.userData.avatar_uuid.length > 0) {
-      urls.push(staticRoutes.Media(this.props.userState.userData.avatar_uuid));
-    }
-
-    urls.push(require("./../../../../images/avatars/placeholder.png"));
-    return urls
-  }
-
-  get_username() {
-    if (this.state.logged_in) {
-      return this.props.userState.userData.username
-    } else {
-      return 'Login'
-    }
-  }
-
   render() {
-    if (this.state.logged_in) {
+    if (this.props.userState.logged_in) {
       return (
         <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
           <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
-            <Img
-              decode={false}
-              className="user-avatar rounded-circle mr-2"
-              src={this.get_avatar_url()}
-              alt="Avatar"
-              loader={<span className="user-avatar d-inline-block rounded-circle mr-2 w-2-5 h-2-5 vertical-align-middle"></span>}
-            />
-            <span className="d-none d-md-inline-block">{this.get_username()}</span>
+            <Avatar image_uuid={this.props.userState.userData.avatar_uuid} fallback={require("images/avatars/placeholder.png")} />
+            <span className="d-none d-md-inline-block">{this.props.userState.userData.username}</span>
           </DropdownToggle>
           <Collapse tag={DropdownMenu} right small open={this.state.visible}>
-            <DropdownItem tag={Link} to="user-profile">
+            <DropdownItem tag={Link} to={"/profile/"+this.props.userState.userData.username}>
               <i className="material-icons">&#xE7FD;</i> Profile
             </DropdownItem>
             <DropdownItem divider/>
@@ -80,8 +54,8 @@ class UserActions extends React.Component {
     } else {
       return (
         <ButtonGroup size="sm" className="p-3">
-          <Button tag={Link} to='login' theme="accent">Login</Button>
-          <Button tag={Link} to='register' theme="light">Register</Button>
+          <Button tag={Link} to='/login' theme="accent">Login</Button>
+          <Button tag={Link} to='/register' theme="light">Register</Button>
         </ButtonGroup>
       )
     }

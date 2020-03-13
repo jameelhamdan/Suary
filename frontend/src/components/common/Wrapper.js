@@ -2,7 +2,17 @@ import React from "react";
 import {Col, Container, Row} from "shards-react";
 
 
-export default class Wrapper extends React.Component {
+class BaseWrapper extends React.Component {
+  render() {
+    return (
+      <Container fluid className="main-content-container px-4">
+        {this.props.children}
+      </Container>
+    )
+  }
+}
+
+class Wrapper extends React.Component {
   render() {
     return (
       <Container fluid className="main-content-container px-4">
@@ -15,3 +25,8 @@ export default class Wrapper extends React.Component {
     )
   }
 }
+
+export {
+  BaseWrapper,
+  Wrapper
+};

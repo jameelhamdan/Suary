@@ -1,6 +1,6 @@
 class staticRoutes {
   static Media(media_uuid) {
-    return `media/${media_uuid}.webm`;
+    return `/media/${media_uuid}.webm`;
   }
 }
 
@@ -23,6 +23,15 @@ class apiRoutes {
     return "auth/token/refresh";
   }
 
+  // User Routes
+  static userDetail(username) {
+    return `users/detail/${username}`;
+  }
+
+  // User Routes
+  static userUpdateAvatar(user_id) {
+    return `users/avatar/${user_id}`;
+  }
 }
 
 module.exports = {

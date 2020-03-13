@@ -6,4 +6,5 @@ app_name = 'users'
 urlpatterns = [
     path('avatar', views.UpdateAvatarView.as_view(), name='update_avatar'),
     path('follow', views.FollowView.as_view(), name='follow_user'),
+    path('detail/<str:username>', views.DetailUserView.as_view(), name='detail_user'),
 ]
