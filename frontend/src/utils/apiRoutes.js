@@ -28,8 +28,8 @@ class apiRoutes {
     return `users/detail/${username}`;
   }
 
-  static userUpdateAvatar(user_id) {
-    return `users/avatar/${user_id}`;
+  static userUpdateAvatar() {
+    return `users/avatar`;
   }
 
   // Post Routes
@@ -38,6 +38,9 @@ class apiRoutes {
       return `main/user/${username}/posts?cursor=${cursor}`;
     }
     return `main/user/${username}/posts`
+  }
+    static addPost() {
+    return `main/post`;
   }
 }
 

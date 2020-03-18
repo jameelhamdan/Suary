@@ -2,12 +2,15 @@ import React from "react";
 import {Card, CardBody} from "shards-react";
 import {Wrapper} from "components/common/Wrapper";
 import {connect} from "react-redux";
-
+import AddPostWidget from "./AddPost"
 
 class Home extends React.Component {
   render() {
     return (
       <Wrapper>
+        {this.props.userState.logged_in &&
+          <AddPostWidget/>
+        }
         <Card small className="mb-4">
           <CardBody>
             <h5 className="card-title">Hello {this.props.userState.logged_in ? this.props.userState.userData.username : 'Stranger!'}</h5>

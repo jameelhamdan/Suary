@@ -47,7 +47,7 @@ export default [
     component: Logout
   },
   {
-    path: "/profile/:username",
+    path: "/profile/:username?",
     logged_in_only: true,
     exact: true,
     strict: true,

@@ -5,7 +5,7 @@ from _common.utils import get_response
 
 class CustomPagination(pagination.CursorPagination, object):
     # Class override with object to allow passing of custom settings for each CustomPagination instance
-    page_size = 4
+    page_size = 16
     page_size_query_param = 'limit'
     max_page_size = 128
     ordering = '-created_on'

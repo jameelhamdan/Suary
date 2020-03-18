@@ -4,9 +4,10 @@ from django.views.decorators.cache import never_cache
 import frontend.views
 
 api_prefix = settings.API_PREFIX
+static_prefix = settings.STATIC_URL.strip('/')
 excludes_string = ''
 
-for route in [api_prefix, 'media', 'admin']:
+for route in [api_prefix, static_prefix, 'media', 'admin']:
     excludes_string += f'(?!{route}/)'
 
 exclude_regex = fr'^{excludes_string}[\w\/]+$'

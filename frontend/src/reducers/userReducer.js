@@ -1,11 +1,22 @@
 import UserStorage from "utils/storage";
 
-const initialState = {
-  logged_in: UserStorage.isAuthenticated(),
-  userData: UserStorage.isAuthenticated() ? UserStorage.getUserData() : null
+let initialState = {
+  logged_in: false,
+  userData: null
 };
 
-export default (state = initialState , action) => {
+try {
+  initialState = {
+    logged_in: UserStorage.isAuthenticated(),
+    userData: UserStorage.isAuthenticated() ? UserStorage.getUserData() : null
+  };
+
+} catch (e) {
+  console.error('error reading user state.');
+}
+
+
+export default (state = initialState, action) => {
   switch (action.type) {
     case "login":
       return {

@@ -5,20 +5,28 @@ import {userService} from "services/userService";
 import NotFound from "components/common/pages/NotFound"
 import UserDetails from './components/UserDetails';
 import UserPosts from "./components/UserPosts";
+import {connect} from "react-redux";
+import {Redirect} from "react-router-dom"
 
 
-export default class UserDetail extends React.Component {
+class UserDetail extends React.Component {
   constructor(props) {
     super(props);
     this.username = this.props.match.params.username;
+    console.log(this.props.match);
     this.state = {
       data: {},
+      redirect: this.username === undefined && this.props.userState.logged_in,
       error: null,
       isLoading: true
     };
+
   }
 
   componentDidMount() {
+    if (this.state.redirect) {
+      return
+    }
     userService.getUser(this.username).then((data) => {
       this.setState({data, isLoading: false});
     }).catch((error) => {
@@ -27,6 +35,11 @@ export default class UserDetail extends React.Component {
   }
 
   render() {
+    if (this.state.redirect) {
+      const new_url = `/profile/${this.props.userState.userData.username}`;
+      return (<Redirect to={new_url} />);
+    }
+
     if (this.state.isLoading) return null;
     if (this.state.error) return (<NotFound/>);
 
@@ -46,3 +59,9 @@ export default class UserDetail extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  ...state
+});
+
+export default connect(mapStateToProps)(UserDetail);
