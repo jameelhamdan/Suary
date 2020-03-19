@@ -11,6 +11,7 @@ import Home from "views/home/Home";
 
 //Users
 import UserDetail from "views/user/Detail"
+import UserProfileRedirect from "views/user/ProfileRedirect"
 
 
 export default [
@@ -45,6 +46,14 @@ export default [
     strict: true,
     layout: DefaultLayout,
     component: Logout
+  },
+  {
+    path: "/profile",
+    logged_in_only: true,
+    exact: true,
+    strict: true,
+    layout: DefaultLayout,
+    component: UserProfileRedirect
   },
   {
     path: "/profile/:username?",
