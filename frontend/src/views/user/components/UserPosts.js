@@ -33,6 +33,10 @@ export default class UserPosts extends React.Component {
 
   render() {
     const EmptyMessage = <CardText>This user hasn't posted anything yet :(</CardText>;
+    if(this.state.list.length === 0){
+      return EmptyMessage;
+    }
+
     return (
       <div>
         <InfiniteScroll

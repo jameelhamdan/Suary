@@ -1,7 +1,6 @@
 import axios from "axios";
 import {apiRoutes} from "utils/apiRoutes";
 import UserStorage from "utils/storage";
-import history from "utils/history"
 const headers = {};
 const refresh_token_url = apiRoutes.Root() + apiRoutes.refreshToken();
 
@@ -29,7 +28,7 @@ const get_errors = function (result) {
 
 let Ajax = axios.create({
   baseURL: apiRoutes.Root(),
-  timeout: 10000,
+  timeout: 27000,
   headers: headers,
 });
 
@@ -54,7 +53,7 @@ Ajax.interceptors.response.use((response) => {
 
     if (error.response.status === 401 && originalRequest.url === refresh_token_url) {
       UserStorage.clear();
-      history.push("/login");
+      window.location = "/login";
       return Promise.reject(error);
     }
 

@@ -19,6 +19,7 @@ class PostSerializer(serializers.Serializer):
     # All Files must be sent under the same name 'media_list' they will get parsed individually as a list.
     media_list = serializers.ListField(
         child=serializers.FileField(validators=[FileExtensionValidator(settings.MEDIA_FORMATS)], allow_empty_file=False, use_url=False),
+        allow_empty=False,
         required=False
     )
 

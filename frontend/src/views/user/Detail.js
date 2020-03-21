@@ -1,13 +1,14 @@
 import React from "react";
-import {Card, CardBody, Col, Row, Fade} from "shards-react";
+import {Col, Row, Fade} from "shards-react";
 import {BaseWrapper} from "components/common/Wrapper";
 import {userService} from "services/userService";
 import NotFound from "components/common/pages/NotFound"
 import UserDetails from './components/UserDetails';
 import UserPosts from "./components/UserPosts";
+import {connect} from "react-redux";
 
 
-export default class UserDetail extends React.Component {
+class UserDetail extends React.Component {
   constructor(props) {
     super(props);
     this.username = this.props.match.params.username;
@@ -16,6 +17,7 @@ export default class UserDetail extends React.Component {
       error: null,
       isLoading: true
     };
+
   }
 
   componentDidMount() {
@@ -46,3 +48,9 @@ export default class UserDetail extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  ...state
+});
+
+export default connect(mapStateToProps)(UserDetail);
