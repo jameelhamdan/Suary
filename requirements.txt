@@ -1,7 +1,7 @@
 asgiref==3.2.3
-Django==3.0.3
+Django==3.0.*
 djangorestframework==3.11.0
-djongo
+# djongo
 pytz==2019.3
 psycopg2==2.8.4
 PyJWT==1.7.1

@@ -28,12 +28,10 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
             media_document = media.models.MediaDocument(parent_id=post.pk)
             media_document.upload(uploaded_media)
 
-            post_image = models.PostMedia(
-                hash=media_document.pk,
-                content_type=media_document.content_type
-            )
-
-            media_document_list.append(post_image)
+            media_document_list.append({
+                'hash': media_document.pk,
+                'content_type': media_document.content_type
+            })
 
         post.media_list = media_document_list
         post.save()

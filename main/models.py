@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 import djongo.models as mongo
 from _common import utils
 import users.models
+from django import forms
 
 
 class AbstractDocument(mongo.Model):
@@ -25,12 +26,19 @@ class PostMedia(mongo.Model):
         abstract = True
 
 
+class PostMediaForm(forms.ModelForm):
+    class Meta:
+        model = PostMedia
+        fields = ('hash', 'content_type', )
+
+
 class Post(AbstractDocument):
     content = mongo.TextField(null=False)
     tags = mongo.ListField(mongo.CharField(), default=[])
     media_list = mongo.ListField(
         mongo.EmbeddedField(
-            model_container=PostMedia
+            model_container=PostMedia,
+            model_form_class=PostMediaForm
         ), default=[]
     )
 

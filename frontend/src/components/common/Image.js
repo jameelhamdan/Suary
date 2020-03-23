@@ -86,7 +86,7 @@ export class PostMedia extends React.Component  {
 
   get_content_type() {
     const content_type = this.props.content_type;
-    if (this.props.content_type != null) {
+    if (content_type != null) {
       return this.props.content_type
     } else {
       return 'image/webp';
@@ -100,10 +100,12 @@ export class PostMedia extends React.Component  {
     if(content_type.startsWith('video')){
       return (
           <ReactPlayer
-          className="card-img-bottom"
+          className="card-img-bottom card-video-bottom"
           url={this.get_media_url()}
           width="100%"
           height="100%"
+          controls
+          playing
         />
       )
     } else {

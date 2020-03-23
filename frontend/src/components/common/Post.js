@@ -24,7 +24,7 @@ export default class Post extends React.Component {
         </CardBody>
 
         {this.data.media_list.length > 0 &&
-          <PostMedia media_uuid={this.data.media_list[0]} />
+          <PostMedia media_uuid={this.data.media_list[0].hash} content_type={this.data.media_list[0].content_type}/>
         }
       </Card>
     );
