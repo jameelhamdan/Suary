@@ -1,4 +1,5 @@
 import Img from "react-image";
+import ReactPlayer from "react-player"
 import React from "react";
 import {staticRoutes} from "utils/apiRoutes"
 import PropTypes from "prop-types";
@@ -65,7 +66,7 @@ export class LargeAvatar extends Avatar {
   }
 }
 
-export class PostImage extends React.Component  {
+export class PostMedia extends React.Component  {
   avatarPlaceholder() {
     if (this.props.placeholder != null) {
       return this.props.placeholder
@@ -74,27 +75,50 @@ export class PostImage extends React.Component  {
     }
   }
 
-  get_image_url(){
-    const image_uuid = this.props.image_uuid;
-    if(image_uuid !== undefined && image_uuid !== null){
-      return staticRoutes.Media(image_uuid);
+  get_media_url(){
+    const media_uuid = this.props.media_uuid;
+    if(media_uuid !== undefined && media_uuid !== null){
+      return staticRoutes.Media(media_uuid);
     } else {
       return null;
     }
   }
 
+  get_content_type() {
+    const content_type = this.props.content_type;
+    if (this.props.content_type != null) {
+      return this.props.content_type
+    } else {
+      return 'image/webp';
+    }
+  }
+
   render() {
     const defaultComponent = this.avatarPlaceholder();
-    return (
+    const content_type = this.get_content_type();
+
+    if(content_type.startsWith('video')){
+      return (
+          <ReactPlayer
+          className="card-img-bottom"
+          url={this.get_media_url()}
+          width="100%"
+          height="100%"
+        />
+      )
+    } else {
+      return (
       <Img
         decode={false}
         className="card-img-bottom"
-        src={this.get_image_url()}
+        src={this.get_media_url()}
         alt={this.props.alt || "post image"}
         loader={defaultComponent}
         unloader={defaultComponent}
       />
     )
+    }
+
   }
 }
 
@@ -104,8 +128,8 @@ Avatar.propTypes = {
   placeholder: PropTypes.node,
 };
 
-PostImage.propTypes = {
-  image_uuid: PropTypes.string.isRequired,
+PostMedia.propTypes = {
+  media_uuid: PropTypes.string.isRequired,
+  content_type: PropTypes.string,
   placeholder: PropTypes.node,
 };
-

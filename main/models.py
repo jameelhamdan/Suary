@@ -17,10 +17,22 @@ class AbstractDocument(mongo.Model):
         abstract = True
 
 
+class PostMedia(mongo.Model):
+    hash = mongo.TextField()
+    content_type = mongo.TextField()
+
+    class Meta:
+        abstract = True
+
+
 class Post(AbstractDocument):
     content = mongo.TextField(null=False)
     tags = mongo.ListField(mongo.CharField(), default=[])
-    media_list = mongo.ListField(mongo.CharField(), default=[])
+    media_list = mongo.ListField(
+        mongo.EmbeddedField(
+            model_container=PostMedia
+        ), default=[]
+    )
 
     def add_comment(self, content, created_by):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)

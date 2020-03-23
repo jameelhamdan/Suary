@@ -5,12 +5,19 @@ from . import models
 import users.serializers
 
 
+class PostImageSerializer(serializers.Serializer):
+    hash = serializers.CharField()
+    content_type = serializers.CharField()
+
+
 class ListPostSerializer(serializers.Serializer):
     id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
     tags = serializers.ListField()
-    media_list = serializers.ListField()
+    media_list = serializers.ListField(
+        child=PostImageSerializer()
+    )
     created_by = users.serializers.UserSerializer()
 
 

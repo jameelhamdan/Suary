@@ -1,5 +1,5 @@
 import React from "react";
-import Avatar, {PostImage} from "components/common/Image"
+import Avatar, {PostMedia} from "components/common/Image"
 import {Card, CardBody, CardTitle} from "shards-react";
 import PropTypes from "prop-types";
 
@@ -24,7 +24,7 @@ export default class Post extends React.Component {
         </CardBody>
 
         {this.data.media_list.length > 0 &&
-          <PostImage image_uuid={this.data.media_list[0]} />
+          <PostMedia media_uuid={this.data.media_list[0]} />
         }
       </Card>
     );
