@@ -22,14 +22,18 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
         media_list = cleaned_data.pop('media_list', [])
 
         post = models.Post(created_by_id=user_pk, **cleaned_data)
-        post.save()
 
+        media_document_list = []
         for uploaded_media in media_list:
             media_document = media.models.MediaDocument(parent_id=post.pk)
             media_document.upload(uploaded_media)
 
-            post.media_list.append(media_document.pk)
+            media_document_list.append({
+                'hash': media_document.pk,
+                'content_type': media_document.content_type
+            })
 
+        post.media_list = media_document_list
         post.save()
 
         serializer = serializers.ListPostSerializer(post, many=False)

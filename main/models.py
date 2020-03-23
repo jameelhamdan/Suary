@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 import djongo.models as mongo
 from _common import utils
 import users.models
+from django import forms
 
 
 class AbstractDocument(mongo.Model):
@@ -17,10 +18,29 @@ class AbstractDocument(mongo.Model):
         abstract = True
 
 
+class PostMedia(mongo.Model):
+    hash = mongo.TextField()
+    content_type = mongo.TextField()
+
+    class Meta:
+        abstract = True
+
+
+class PostMediaForm(forms.ModelForm):
+    class Meta:
+        model = PostMedia
+        fields = ('hash', 'content_type', )
+
+
 class Post(AbstractDocument):
     content = mongo.TextField(null=False)
     tags = mongo.ListField(mongo.CharField(), default=[])
-    media_list = mongo.ListField(mongo.CharField(), default=[])
+    media_list = mongo.ListField(
+        mongo.EmbeddedField(
+            model_container=PostMedia,
+            model_form_class=PostMediaForm
+        ), default=[]
+    )
 
     def add_comment(self, content, created_by):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)

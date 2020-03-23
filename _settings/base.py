@@ -158,5 +158,5 @@ DATABASES = {
 DATABASE_ROUTERS = ['_settings.db_routers.Router', ]
 
 # Custom
-MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm']
+MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm', 'webp']
 AVATAR_FORMATS = ['png', 'jpeg', 'jpg']
