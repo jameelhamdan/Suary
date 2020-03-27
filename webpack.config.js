@@ -6,7 +6,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'public'),
     filename: 'bundle.js',
-    publicPath: '/',
+    publicPath: '/public',
   },
   plugins: [
     new CompressionPlugin({
@@ -36,7 +36,8 @@ module.exports = {
             loader: 'file-loader',
             options: {
               esModule: false,
-              publicPath: 'frontend/public/images',
+              outputPath: '/images',
+              publicPath: '/public/build/images',
             },
           },
         ],

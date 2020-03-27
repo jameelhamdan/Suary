@@ -84,6 +84,12 @@ class Post(AbstractDocument):
 
         return None
 
+    def get_likes_count(self):
+        return PostCounter.objects.get(pk=self.pk).likes_count
+
+    def get_comments_count(self):
+        return PostCounter.objects.get(pk=self.pk).comments_count
+
     def save(self, *args, **kwargs):
         if self.content:
             self.tags = [i for i in self.content.split() if i.startswith("#")]
@@ -96,7 +102,7 @@ class Post(AbstractDocument):
 
 
 class Comment(AbstractDocument):
-    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, null=False)
+    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='comments', null=False)
     content = mongo.TextField(null=False)
 
     class Meta:
@@ -105,9 +111,25 @@ class Comment(AbstractDocument):
 
 
 class Like(AbstractDocument):
-    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, null=True)
-    comment = mongo.ForeignKey(Comment, on_delete=mongo.CASCADE, null=True)
+    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='likes', null=True)
+    comment = mongo.ForeignKey(Comment, on_delete=mongo.CASCADE, related_name='likes', null=True)
 
     class Meta:
         db_table = 'main_likes'
+        db = settings.MONGO_DATABASE
+
+
+class PostCounter(mongo.Model): # Interface class for database view
+    # id is post_id
+    id = mongo.CharField(max_length=36, db_column='_id', primary_key=True,)
+    likes_count = mongo.IntegerField()
+    comments_count = mongo.IntegerField()
+
+    objects = mongo.DjongoManager()
+
+    def save(self, *args, **kwargs):
+        raise NotImplementedError('Post counter is a readonly model')
+
+    class Meta:
+        db_table = 'main_posts_counter'
         db = settings.MONGO_DATABASE

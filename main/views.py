@@ -56,7 +56,6 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
     def get_queryset(self):
         user = self.get_object()
-
         return models.Post.objects.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
 
 
