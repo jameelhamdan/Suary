@@ -30,10 +30,10 @@ export default class Post extends React.Component {
         <CardBody>
           <Nav justified>
             <NavItem>
-              <NavLink className="h2" href="#">{this.data.likes_count} Likes</NavLink>
+              <NavLink href="#">{this.data.likes_count} Likes</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink className="h1" href="#">{this.data.comments_count} Comments</NavLink>
+              <NavLink href="#">{this.data.comments_count} Comments</NavLink>
             </NavItem>
           </Nav>
         </CardBody>
