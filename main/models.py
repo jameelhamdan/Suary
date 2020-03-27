@@ -84,6 +84,12 @@ class Post(AbstractDocument):
 
         return None
 
+    def get_likes_count(self):
+        return self.likes.count()
+
+    def get_comments_count(self):
+        return self.likes.count()
+
     def save(self, *args, **kwargs):
         if self.content:
             self.tags = [i for i in self.content.split() if i.startswith("#")]
@@ -96,7 +102,7 @@ class Post(AbstractDocument):
 
 
 class Comment(AbstractDocument):
-    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, null=False)
+    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='comments', null=False)
     content = mongo.TextField(null=False)
 
     class Meta:
@@ -105,8 +111,8 @@ class Comment(AbstractDocument):
 
 
 class Like(AbstractDocument):
-    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, null=True)
-    comment = mongo.ForeignKey(Comment, on_delete=mongo.CASCADE, null=True)
+    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='likes', null=True)
+    comment = mongo.ForeignKey(Comment, on_delete=mongo.CASCADE, related_name='likes', null=True)
 
     class Meta:
         db_table = 'main_likes'

@@ -19,8 +19,17 @@ class ListPostSerializer(serializers.Serializer):
         child=PostImageSerializer()
     )
     created_by = users.serializers.UserSerializer()
+    likes_count = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+
+    def get_likes_count(self, obj):
+        return obj.get_likes_count()
+
+    def get_comments_count(self, obj):
+        return obj.get_comments_count()
 
 
+# Used for Adding a post
 class PostSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
     # All Files must be sent under the same name 'media_list' they will get parsed individually as a list.

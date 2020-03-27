@@ -2,6 +2,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import Avatar from "components/common/Image";
+import placeholderImage from "images/avatars/placeholder.png"
 
 import {
   Dropdown,
@@ -37,7 +38,7 @@ class UserActions extends React.Component {
       return (
         <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
           <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
-            <Avatar image_uuid={this.props.userState.userData.avatar_uuid} fallback={require("images/avatars/placeholder.png")}/>
+            <Avatar image_uuid={this.props.userState.userData.avatar_uuid} fallback={placeholderImage}/>
             <span className="d-none d-md-inline-block">{this.props.userState.userData.username}</span>
           </DropdownToggle>
           <Collapse tag={DropdownMenu} right small open={this.state.visible}>

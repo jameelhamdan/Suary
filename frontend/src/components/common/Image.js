@@ -17,7 +17,7 @@ export default class Avatar extends React.Component {
   get_image_url(){
     const image_uuid = this.props.image_uuid;
     const fallback = this.props.fallback;
-    if(image_uuid !== undefined && image_uuid !== null){
+    if(image_uuid !== undefined && image_uuid !== null && image_uuid !== ""){
       return staticRoutes.Media(image_uuid);
     } else if (fallback !== undefined && fallback !== null){
       return fallback
