@@ -16,6 +16,7 @@ urlpatterns = [
     path(api_prefix + '/auth/', include('auth.urls')),
     path(api_prefix + '/users/', include('users.urls')),
     path(api_prefix + '/main/', include('main.urls')),
+    path(api_prefix + '/feed/', include('feed.urls')),
     path('media/', include('media.urls')),
 ]
 

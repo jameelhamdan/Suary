@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'media',
     'users',
     'main',
+    'feed',
     'frontend'
 ]
 

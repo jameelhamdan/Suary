@@ -146,6 +146,9 @@ class User(models.Model):
 
         return follow
 
+    def get_following_queryset(self):
+        return users.models.Follow.objects.filter(follower_id=self.pk, is_active=True)
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.uuid = utils.generate_uuid()
