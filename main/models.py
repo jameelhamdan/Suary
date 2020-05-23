@@ -34,12 +34,11 @@ class PostMediaForm(forms.ModelForm):
 
 class Post(AbstractDocument):
     content = mongo.TextField(null=False)
-    tags = mongo.ListField(mongo.CharField(), default=[])
-    media_list = mongo.ListField(
-        mongo.EmbeddedField(
-            model_container=PostMedia,
-            model_form_class=PostMediaForm
-        ), default=[]
+    tags = mongo.JSONField()
+
+    media_list = mongo.ArrayField(
+        model_container=PostMedia,
+        model_form_class=PostMediaForm,
     )
 
     def add_comment(self, content, created_by):
