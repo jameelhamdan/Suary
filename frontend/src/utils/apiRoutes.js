@@ -33,14 +33,23 @@ class apiRoutes {
   }
 
   // Post Routes
-  static userPostsList(username, cursor=null){
-    if(cursor !== null){
+  static userPostsList(username, cursor = null) {
+    if (cursor !== null) {
       return `main/user/${username}/posts?cursor=${cursor}`;
     }
     return `main/user/${username}/posts`
   }
-    static addPost() {
+
+  static getPost(id) {
+    return `main/post/${id}`
+  }
+
+  static addPost() {
     return `main/post`;
+  }
+
+  static postComment() {
+    return `main/comment`;
   }
 }
 

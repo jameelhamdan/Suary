@@ -13,18 +13,48 @@ export const postService = {
       return res.data['result'];
     });
   },
+  getPost: async (id) => {
+    return ajax.get(apiRoutes.getPost(id)).then(res => {
+      return res.data['result'];
+    });
+  },
   addPost: async (content, imageFile) => {
-    let requestData = new FormData();
+    let payload = new FormData();
 
-    requestData.set('content', content);
-    requestData.append('media_list', imageFile, imageFile.fileName);
+    payload.set('content', content);
+    payload.append('media_list', imageFile, imageFile.fileName);
     return ajax({
       method: 'post',
       url: apiRoutes.addPost(),
-      data: requestData,
+      data: payload,
       headers: uploadConfig
     }).then(res => {
       return res;
     });
   },
+  getPostComments: async (post_id) => {
+    const payload = {
+      post: post_id,
+    };
+    return ajax({
+      method: 'get',
+      url: apiRoutes.postComment(),
+      data: payload,
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  addPostComment: async (post_id, content) => {
+    const payload = {
+      post: post_id,
+      content: content
+    };
+    return ajax({
+      method: 'post',
+      url: apiRoutes.postComment(),
+      data: payload
+    }).then(res => {
+      return res.data['result'];
+    });
+  }
 };

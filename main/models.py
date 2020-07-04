@@ -32,6 +32,14 @@ class PostMediaForm(forms.ModelForm):
         fields = ('hash', 'content_type', )
 
 
+class CountManager(mongo.Manager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            likes_count=mongo.Count('likes'),
+            comments_count=mongo.Count('comments'),
+        )
+
+
 class Post(AbstractDocument):
     content = mongo.TextField(null=False)
     tags = mongo.JSONField()
@@ -40,6 +48,8 @@ class Post(AbstractDocument):
         model_container=PostMedia,
         model_form_class=PostMediaForm,
     )
+
+    counted = CountManager()
 
     def add_comment(self, content, created_by):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)
@@ -84,10 +94,10 @@ class Post(AbstractDocument):
         return None
 
     def get_likes_count(self):
-        return PostCounter.objects.get(pk=self.pk).likes_count
+        return self.likes.count()
 
     def get_comments_count(self):
-        return PostCounter.objects.get(pk=self.pk).comments_count
+        return self.comments.count()
 
     def save(self, *args, **kwargs):
         if self.content:
@@ -115,20 +125,4 @@ class Like(AbstractDocument):
 
     class Meta:
         db_table = 'main_likes'
-        db = settings.MONGO_DATABASE
-
-
-class PostCounter(mongo.Model): # Interface class for database view
-    # id is post_id
-    id = mongo.CharField(max_length=36, db_column='_id', primary_key=True,)
-    likes_count = mongo.IntegerField()
-    comments_count = mongo.IntegerField()
-
-    objects = mongo.DjongoManager()
-
-    def save(self, *args, **kwargs):
-        raise NotImplementedError('Post counter is a readonly model')
-
-    class Meta:
-        db_table = 'main_posts_counter'
         db = settings.MONGO_DATABASE

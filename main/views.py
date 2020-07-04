@@ -11,7 +11,7 @@ import users.models
 class CreatePostView(APIViewMixin, generics.CreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
     pagination_kwarg_message = 'Successfully listed my posts!'
-    serializer_class = serializers.PostSerializer
+    serializer_class = serializers.AddPostSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -36,7 +36,7 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
         post.media_list = media_document_list
         post.save()
 
-        serializer = serializers.ListPostSerializer(post, many=False)
+        serializer = serializers.PostSerializer(post, many=False)
         json_data = serializer.data
         return self.get_response(message='Successfully Added Post', result=json_data)
 
@@ -44,10 +44,10 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
 @view_authenticate()
 class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     pagination_kwarg_message = 'Successfully Returned User Posts'
-    serializer_class = serializers.ListPostSerializer
+    serializer_class = serializers.PostSerializer
 
     def get_object(self, *args, **kwargs):
-        username = self.kwargs.get('username', None)
+        username = self.kwargs.get('username')
 
         try:
             return users.models.UserData.objects.only('id', 'username').get(username=username)
@@ -56,7 +56,20 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
     def get_queryset(self):
         user = self.get_object()
-        return models.Post.objects.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        return models.Post.counted.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+
+
+@view_authenticate()
+class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
+    queryset = models.Post.counted.all()
+    serializer_class = serializers.PostSerializer
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'pk'
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return self.get_response(message='Post Details!', result=serializer.data)
 
 
 @view_authenticate()
@@ -103,14 +116,17 @@ class LikePostView(APIViewMixin, generics.CreateAPIView):
         cleaned_data = serializer.validated_data
 
         post = cleaned_data['post']
+        action = cleaned_data['action']
         user_pk = self.request.current_user.pk
 
-        if cleaned_data['like']:
+        if action == self.serializer_class.ACTION_CHOICE_LIKE:
             like = post.add_like(user_pk)
             message = 'Successfully Liked Post'
-        else:
+        elif action == self.serializer_class.ACTION_CHOICE_UNLIKE:
             like = post.remove_like(user_pk)
             message = 'Successfully Unliked Post'
+        else:
+            raise Exception('Action Method Not Defined in LikePostView')
 
         result = {
             'uuid': post.pk,

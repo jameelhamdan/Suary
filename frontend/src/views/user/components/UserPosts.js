@@ -52,8 +52,7 @@ export default class UserPosts extends React.Component {
     )
   }
 
-  static
-  propTypes = {
+  static propTypes = {
     username: PropTypes.string.isRequired
   };
 

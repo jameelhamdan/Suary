@@ -10,7 +10,7 @@ class PostImageSerializer(serializers.Serializer):
     content_type = serializers.CharField()
 
 
-class ListPostSerializer(serializers.Serializer):
+class PostSerializer(serializers.Serializer):
     id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
@@ -19,18 +19,12 @@ class ListPostSerializer(serializers.Serializer):
         child=PostImageSerializer()
     )
     created_by = users.serializers.UserSerializer()
-    likes_count = serializers.SerializerMethodField()
-    comments_count = serializers.SerializerMethodField()
-
-    def get_likes_count(self, obj):
-        return obj.get_likes_count()
-
-    def get_comments_count(self, obj):
-        return obj.get_comments_count()
+    likes_count = serializers.CharField()
+    comments_count = serializers.CharField()
 
 
 # Used for Adding a post
-class PostSerializer(serializers.Serializer):
+class AddPostSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
     # All Files must be sent under the same name 'media_list' they will get parsed individually as a list.
     media_list = serializers.ListField(
@@ -49,26 +43,18 @@ class ListCommentSerializer(serializers.Serializer):
 
 
 class CommentSerializer(serializers.Serializer):
-    post_id = serializers.CharField(max_length=36, required=True)
+    post = serializers.SlugRelatedField(slug_field='pk', queryset=models.Post.objects.all(), required=True)
     content = serializers.CharField(required=True)
-
-    def validate(self, data):
-        post = models.Post.objects.filter(pk=data['post_id']).first()
-        if not post:
-            raise serializers.ValidationError({'post': 'Post doesn\'t exist!'})
-
-        data['post'] = post
-        return data
 
 
 class SwitchPostLikeSerializer(serializers.Serializer):
-    post_id = serializers.CharField(max_length=36, required=True)
-    like = serializers.BooleanField(default=True)
+    ACTION_CHOICE_LIKE = 'like'
+    ACTION_CHOICE_UNLIKE = 'unlike'
 
-    def validate(self, data):
-        post = models.Post.objects.filter(pk=data['post_id']).first()
-        if not post:
-            raise serializers.ValidationError({'post': 'Post doesn\'t exist!'})
+    ACTION_CHOICES = (
+        (ACTION_CHOICE_LIKE, 'Like'),
+        (ACTION_CHOICE_UNLIKE, 'Unlike'),
+    )
 
-        data['post'] = post
-        return data
+    post = serializers.SlugRelatedField(slug_field='pk', queryset=models.Post.objects.all(), required=True)
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, required=True)

@@ -1,14 +1,13 @@
 import React from "react";
 import Avatar, {PostMedia} from "components/common/Image"
-import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
+import {Card, CardBody, CardTitle, DropdownItem, Modal, Nav, NavItem, NavLink} from "shards-react";
 import PropTypes from "prop-types";
 import placeholderImage from "images/avatars/placeholder.png"
-
+import {Link} from "react-router-dom";
 
 export default class Post extends React.Component {
   constructor(props) {
     super(props);
-
     this.data = this.props.postDetails;
   }
 
@@ -25,15 +24,15 @@ export default class Post extends React.Component {
         </CardBody>
 
         {this.data.media_list.length > 0 &&
-        <PostMedia media_uuid={this.data.media_list[0].hash} content_type={this.data.media_list[0].content_type}/>
+        <PostMedia onClick={this.toggle} media_uuid={this.data.media_list[0].hash} content_type={this.data.media_list[0].content_type}/>
         }
         <CardBody>
           <Nav justified>
             <NavItem>
-              <NavLink href="#">{this.data.likes_count} Likes</NavLink>
+              <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.likes_count} Likes</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="#">{this.data.comments_count} Comments</NavLink>
+              <NavLink tag={Link} to={'/post/' + this.data.id} onClick={this.toggle}>{this.data.comments_count} Comments</NavLink>
             </NavItem>
           </Nav>
         </CardBody>
@@ -46,18 +45,18 @@ export default class Post extends React.Component {
      * The post details object.
      */
     key: PropTypes.string,
-    postDetails: {
+    postDetails: PropTypes.shape({
       id: PropTypes.string.isRequired,
       content: PropTypes.string,
       media_list: PropTypes.array,
-      created_by: {
+      created_by: PropTypes.shape({
         id: PropTypes.string,
         username: PropTypes.string,
         avatar_uuid: PropTypes.string,
-      },
-      likes_count: PropTypes.number,
-      comments_count: PropTypes.number,
-    }
+      }),
+      likes_count: PropTypes.string,
+      comments_count: PropTypes.string,
+    })
   };
 
   static defaultProps = {
@@ -71,8 +70,8 @@ export default class Post extends React.Component {
         username: null,
         avatar_uuid: null,
       },
-      likes_count: 0,
-      comments_count: 0,
+      likes_count: '0',
+      comments_count: '0',
     }
   };
 }

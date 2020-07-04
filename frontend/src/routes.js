@@ -10,8 +10,11 @@ import Register from "views/auth/Register";
 import Home from "views/home/Home";
 
 //Users
-import UserDetail from "views/user/Detail"
-import UserProfileRedirect from "views/user/ProfileRedirect"
+import UserDetail from "views/user/Detail";
+import UserProfileRedirect from "views/user/ProfileRedirect";
+
+// Posts
+import PostDetail from "views/posts/Detail";
 
 
 export default [
@@ -57,10 +60,18 @@ export default [
   },
   {
     path: "/profile/:username?",
-    logged_in_only: true,
+    logged_in_only: false,
     exact: true,
     strict: true,
     layout: DefaultLayout,
     component: UserDetail
+  },
+  {
+    path: "/post/:id",
+    logged_in_only: false,
+    exact: true,
+    strict: true,
+    layout: DefaultLayout,
+    component: PostDetail
   },
 ];
