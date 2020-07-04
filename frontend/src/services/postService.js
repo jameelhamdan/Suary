@@ -7,6 +7,12 @@ const uploadConfig = {
   }
 };
 
+const jsonConfig = {
+  headers: {
+    'content-type': 'application/json'
+  }
+};
+
 export const postService = {
   getUserPosts: async (username, cursor = null) => {
     return ajax.get(apiRoutes.userPostsList(username, cursor)).then(res => {
@@ -32,26 +38,22 @@ export const postService = {
       return res;
     });
   },
-  getPostComments: async (post_id) => {
-    const payload = {
-      post: post_id,
-    };
+  getPostComments: async (post_id, cursor = null) => {
     return ajax({
       method: 'get',
-      url: apiRoutes.postComment(),
-      data: payload,
+      url: apiRoutes.ListComments(post_id, cursor),
+      headers: jsonConfig,
     }).then(res => {
       return res.data['result'];
     });
   },
   addPostComment: async (post_id, content) => {
     const payload = {
-      post: post_id,
       content: content
     };
     return ajax({
       method: 'post',
-      url: apiRoutes.postComment(),
+      url: apiRoutes.AddComment(post_id),
       data: payload
     }).then(res => {
       return res.data['result'];

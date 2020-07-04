@@ -34,7 +34,7 @@ class AddPostSerializer(serializers.Serializer):
     )
 
 
-class ListCommentSerializer(serializers.Serializer):
+class CommentSerializer(serializers.Serializer):
     id = serializers.CharField()
     post_id = serializers.CharField()
     content = serializers.CharField()
@@ -42,8 +42,7 @@ class ListCommentSerializer(serializers.Serializer):
     created_by = users.serializers.UserSerializer()
 
 
-class CommentSerializer(serializers.Serializer):
-    post = serializers.SlugRelatedField(slug_field='pk', queryset=models.Post.objects.all(), required=True)
+class AddCommentSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
 
 

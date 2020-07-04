@@ -7,7 +7,7 @@ import Post from 'components/common/Post';
 import {connect} from "react-redux";
 
 
-class UserDetail extends React.Component {
+class PostDetail extends React.Component {
   constructor(props) {
     super(props);
     this.id = this.props.match.params.id;
@@ -35,7 +35,7 @@ class UserDetail extends React.Component {
         <Row className="mt-5">
           <Col lg="12" md="12">
             <Fade in={!this.state.isLoading}>
-              <Post key={this.state.data.id} postDetails={this.state.data}/>
+              <Post postDetails={this.state.data} enableComments={true}/>
             </Fade>
           </Col>
         </Row>
@@ -48,4 +48,4 @@ const mapStateToProps = state => ({
   ...state
 });
 
-export default connect(mapStateToProps)(UserDetail);
+export default connect(mapStateToProps)(PostDetail);

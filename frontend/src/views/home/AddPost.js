@@ -52,7 +52,6 @@ export default class AddPostWidget extends React.Component {
       return state
     });
 
-    console.log(data);
     postService.addPost(data['content'], this.state.file).then((result) => {
       history.push('profile/')
     }).catch(error => {

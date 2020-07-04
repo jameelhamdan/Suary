@@ -1,42 +1,52 @@
 import React from "react";
-import Avatar, {PostMedia} from "components/common/Image"
-import {Card, CardBody, CardTitle, DropdownItem, Modal, Nav, NavItem, NavLink} from "shards-react";
-import PropTypes from "prop-types";
-import placeholderImage from "images/avatars/placeholder.png"
 import {Link} from "react-router-dom";
+import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
+import PropTypes from "prop-types";
+import Avatar, {PostMedia} from "components/common/Image"
+import PostComments from "components/common/PostComments"
+import placeholderImage from "images/avatars/placeholder.png"
+
 
 export default class Post extends React.Component {
   constructor(props) {
     super(props);
     this.data = this.props.postDetails;
+    this.enableComments = this.props.enableComments;
   }
 
   render() {
     return (
-      <Card key={this.data.id} small className="mb-4 pt-3">
-        <CardBody>
-          <CardTitle>
-            <Avatar image_uuid={this.data.created_by.avatar_uuid} fallback={placeholderImage}/>
-            <span className="d-none d-md-inline-block">{this.data.created_by.username}</span>
-          </CardTitle>
+      <div key={this.props.key}>
+        <Card small className="mb-4 pt-3">
+          <CardBody>
+            <CardTitle>
+              <Avatar image_uuid={this.data.created_by.avatar_uuid} fallback={placeholderImage}/>
+              <span className="d-none d-md-inline-block">{this.data.created_by.username}</span>
+            </CardTitle>
 
-          <p>{this.data.content}</p>
-        </CardBody>
+            <p>{this.data.content}</p>
+          </CardBody>
 
-        {this.data.media_list.length > 0 &&
-        <PostMedia onClick={this.toggle} media_uuid={this.data.media_list[0].hash} content_type={this.data.media_list[0].content_type}/>
+          {this.data.media_list.length > 0 &&
+          <PostMedia media_uuid={this.data.media_list[0].hash} content_type={this.data.media_list[0].content_type}/>
+          }
+          <CardBody>
+            <Nav justified>
+              <NavItem>
+                <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.likes_count} Likes</NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink tag={Link} to={'/post/' + this.data.id} onClick={this.toggle}>{this.data.comments_count} Comments</NavLink>
+              </NavItem>
+            </Nav>
+          </CardBody>
+        </Card>
+        {this.enableComments === true &&
+        <Card small className="mb-4">
+          <PostComments post_id={this.data.id}/>
+        </Card>
         }
-        <CardBody>
-          <Nav justified>
-            <NavItem>
-              <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.likes_count} Likes</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} to={'/post/' + this.data.id} onClick={this.toggle}>{this.data.comments_count} Comments</NavLink>
-            </NavItem>
-          </Nav>
-        </CardBody>
-      </Card>
+      </div>
     );
   }
 
@@ -45,6 +55,7 @@ export default class Post extends React.Component {
      * The post details object.
      */
     key: PropTypes.string,
+    enableComments: PropTypes.bool,
     postDetails: PropTypes.shape({
       id: PropTypes.string.isRequired,
       content: PropTypes.string,
@@ -61,6 +72,7 @@ export default class Post extends React.Component {
 
   static defaultProps = {
     key: '1',
+    enableComments: false,
     postDetails: {
       id: null,
       content: null,

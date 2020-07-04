@@ -48,7 +48,6 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
     def get_object(self, *args, **kwargs):
         username = self.kwargs.get('username')
-
         try:
             return users.models.UserData.objects.only('id', 'username').get(username=username)
         except users.models.UserData.DoesNotExist:
@@ -72,38 +71,39 @@ class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
         return self.get_response(message='Post Details!', result=serializer.data)
 
 
-@view_authenticate()
-class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
-    pagination_kwarg_message = 'Successfully Returned Post Comments'
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return serializers.ListCommentSerializer
-        else:
-            return serializers.CommentSerializer
+class CreateCommentView(APIViewMixin, generics.CreateAPIView):
+    serializer_class = serializers.AddCommentSerializer
 
     def create(self, request, *args, **kwargs):
+        post = generics.get_object_or_404(models.Post.objects, pk=self.kwargs['post_id'])
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
         user = self.request.current_user
 
-        post = cleaned_data['post']
         comment = post.add_comment(cleaned_data['content'], user)
 
-        serializer = serializers.ListCommentSerializer(comment, many=False)
+        serializer = serializers.CommentSerializer(comment, many=False)
         json_data = serializer.data
         return self.get_response(message='Successfully Added Comment', result=json_data)
 
-    def get_queryset(self):
-        # TODO: get a better way of doing this
-        post_pk = self.request.POST.get('post_id', None)
 
-        if not post_pk:
+@view_authenticate()
+class ListCommentsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
+    pagination_kwarg_message = 'Successfully Returned Post Comments'
+    serializer_class = serializers.CommentSerializer
+
+    def get_object(self, *args, **kwargs):
+        try:
+            return models.Post.objects.only('id').get(pk=self.kwargs['pk'])
+        except models.Post.DoesNotExist:
             raise NotFound()
 
-        return models.Comment.objects.filter(post_id=post_pk).select_related('created_by').only('content', 'post_id', 'created_by', 'created_on')
+    def get_queryset(self):
+        post = self.get_object()
+        return models.Comment.objects.filter(post_id=post.pk).select_related('created_by').only('id', 'content', 'post_id', 'created_by', 'created_on')
 
 
 @view_authenticate()
