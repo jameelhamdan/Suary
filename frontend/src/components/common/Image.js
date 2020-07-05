@@ -67,7 +67,7 @@ export class LargeAvatar extends Avatar {
 }
 
 export class PostMedia extends React.Component  {
-  avatarPlaceholder() {
+  imagePlaceholder() {
     if (this.props.placeholder != null) {
       return this.props.placeholder
     } else {
@@ -94,7 +94,7 @@ export class PostMedia extends React.Component  {
   }
 
   render() {
-    const defaultComponent = this.avatarPlaceholder();
+    const defaultComponent = this.imagePlaceholder();
     const content_type = this.get_content_type();
 
     if(content_type.startsWith('video')){
@@ -105,7 +105,6 @@ export class PostMedia extends React.Component  {
           width="100%"
           height="100%"
           controls
-          playing
         />
       )
     } else {
@@ -123,6 +122,58 @@ export class PostMedia extends React.Component  {
 
   }
 }
+
+
+
+export class CommentMedia extends React.Component  {
+  get_media_url(){
+    const media_uuid = this.props.media_uuid;
+    if(media_uuid !== undefined && media_uuid !== null){
+      return staticRoutes.Media(media_uuid);
+    } else {
+      return null;
+    }
+  }
+
+  get_content_type() {
+    const content_type = this.props.content_type;
+    if (content_type != null) {
+      return this.props.content_type
+    } else {
+      return 'image/webp';
+    }
+  }
+
+  render() {
+    const defaultComponent = null;
+    const content_type = this.get_content_type();
+
+    if(content_type.startsWith('video')){
+      return (
+          <ReactPlayer
+          className="card-img-bottom card-video-bottom"
+          url={this.get_media_url()}
+          width="100%"
+          height="100%"
+          controls
+        />
+      )
+    } else {
+      return (
+      <Img
+        decode={false}
+        className="img-responsive"
+        src={this.get_media_url()}
+        alt={this.props.alt || "comment image"}
+        loader={defaultComponent}
+        unloader={defaultComponent}
+      />
+    )
+    }
+
+  }
+}
+
 
 Avatar.propTypes = {
   image_uuid: PropTypes.string,

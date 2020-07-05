@@ -11,7 +11,7 @@ import users.models
 class CreatePostView(APIViewMixin, generics.CreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
     pagination_kwarg_message = 'Successfully listed my posts!'
-    serializer_class = serializers.PostSerializer
+    serializer_class = serializers.AddPostSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -21,11 +21,16 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
         user_pk = self.request.current_user.pk
         media_list = cleaned_data.pop('media_list', [])
 
+        # TODO: MOVE this logic to class
         post = models.Post(created_by_id=user_pk, **cleaned_data)
 
         media_document_list = []
         for uploaded_media in media_list:
-            media_document = media.models.MediaDocument(parent_id=post.pk)
+            media_document = media.models.MediaDocument(
+                parent_id=post.pk,
+                parent_type=media.models.MediaDocument.ParentTypes.POST
+            )
+
             media_document.upload(uploaded_media)
 
             media_document_list.append({
@@ -36,7 +41,7 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
         post.media_list = media_document_list
         post.save()
 
-        serializer = serializers.ListPostSerializer(post, many=False)
+        serializer = serializers.PostSerializer(post, many=False)
         json_data = serializer.data
         return self.get_response(message='Successfully Added Post', result=json_data)
 
@@ -44,11 +49,10 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
 @view_authenticate()
 class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     pagination_kwarg_message = 'Successfully Returned User Posts'
-    serializer_class = serializers.ListPostSerializer
+    serializer_class = serializers.PostSerializer
 
     def get_object(self, *args, **kwargs):
-        username = self.kwargs.get('username', None)
-
+        username = self.kwargs.get('username')
         try:
             return users.models.UserData.objects.only('id', 'username').get(username=username)
         except users.models.UserData.DoesNotExist:
@@ -56,41 +60,56 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
     def get_queryset(self):
         user = self.get_object()
-        return models.Post.objects.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        return models.Post.counted.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
 
 
 @view_authenticate()
-class ListCreateCommentView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
-    pagination_kwarg_message = 'Successfully Returned Post Comments'
+class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
+    queryset = models.Post.counted.all()
+    serializer_class = serializers.PostSerializer
+    lookup_field = 'pk'
+    lookup_url_kwarg = 'pk'
 
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return serializers.ListCommentSerializer
-        else:
-            return serializers.CommentSerializer
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return self.get_response(message='Post Details!', result=serializer.data)
+
+
+@view_authenticate()
+class CreateCommentView(APIViewMixin, generics.CreateAPIView):
+    serializer_class = serializers.AddCommentSerializer
 
     def create(self, request, *args, **kwargs):
+        post = generics.get_object_or_404(models.Post.objects, pk=self.kwargs['pk'])
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        user = self.request.current_user
+        comment_content = cleaned_data['content']
+        comment_media = cleaned_data.get('media')
+        comment = post.add_comment(comment_content, self.request.current_user, media_file=comment_media)
 
-        post = cleaned_data['post']
-        comment = post.add_comment(cleaned_data['content'], user)
-
-        serializer = serializers.ListCommentSerializer(comment, many=False)
+        serializer = serializers.CommentSerializer(comment, many=False)
         json_data = serializer.data
         return self.get_response(message='Successfully Added Comment', result=json_data)
 
-    def get_queryset(self):
-        # TODO: get a better way of doing this
-        post_pk = self.request.POST.get('post_id', None)
 
-        if not post_pk:
+@view_authenticate()
+class ListCommentsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
+    pagination_kwarg_message = 'Successfully Returned Post Comments'
+    serializer_class = serializers.CommentSerializer
+
+    def get_object(self, *args, **kwargs):
+        try:
+            return models.Post.objects.only('id').get(pk=self.kwargs['pk'])
+        except models.Post.DoesNotExist:
             raise NotFound()
 
-        return models.Comment.objects.filter(post_id=post_pk).select_related('created_by').only('content', 'post_id', 'created_by', 'created_on')
+    def get_queryset(self):
+        post = self.get_object()
+        return models.Comment.objects.filter(post_id=post.pk).select_related('created_by').only('id', 'content', 'post_id', 'created_by', 'created_on')
 
 
 @view_authenticate()
@@ -103,14 +122,17 @@ class LikePostView(APIViewMixin, generics.CreateAPIView):
         cleaned_data = serializer.validated_data
 
         post = cleaned_data['post']
+        action = cleaned_data['action']
         user_pk = self.request.current_user.pk
 
-        if cleaned_data['like']:
+        if action == self.serializer_class.ACTION_CHOICE_LIKE:
             like = post.add_like(user_pk)
             message = 'Successfully Liked Post'
-        else:
+        elif action == self.serializer_class.ACTION_CHOICE_UNLIKE:
             like = post.remove_like(user_pk)
             message = 'Successfully Unliked Post'
+        else:
+            raise Exception('Action Method Not Defined in LikePostView')
 
         result = {
             'uuid': post.pk,

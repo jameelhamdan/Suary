@@ -7,24 +7,61 @@ const uploadConfig = {
   }
 };
 
+const jsonConfig = {
+  headers: {
+    'content-type': 'application/json'
+  }
+};
+
 export const postService = {
   getUserPosts: async (username, cursor = null) => {
     return ajax.get(apiRoutes.userPostsList(username, cursor)).then(res => {
       return res.data['result'];
     });
   },
+  getPost: async (id) => {
+    return ajax.get(apiRoutes.getPost(id)).then(res => {
+      return res.data['result'];
+    });
+  },
   addPost: async (content, imageFile) => {
-    let requestData = new FormData();
+    let payload = new FormData();
 
-    requestData.set('content', content);
-    requestData.append('media_list', imageFile, imageFile.fileName);
+    payload.set('content', content);
+    payload.append('media_list', imageFile, imageFile.fileName);
     return ajax({
       method: 'post',
       url: apiRoutes.addPost(),
-      data: requestData,
+      data: payload,
       headers: uploadConfig
     }).then(res => {
       return res;
     });
   },
+  getPostComments: async (post_id, cursor = null) => {
+    return ajax({
+      method: 'get',
+      url: apiRoutes.ListComments(post_id, cursor),
+      headers: jsonConfig,
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  addPostComment: async (post_id, content, imageFile) => {
+    let payload = new FormData();
+    if(content){
+      payload.set('content', content);
+    }
+    if(imageFile){
+      payload.append('media', imageFile, imageFile.fileName);
+    }
+    return ajax({
+      method: 'post',
+      url: apiRoutes.AddComment(post_id),
+      data: payload,
+      uploadConfig: uploadConfig,
+    }).then(res => {
+      return res.data['result'];
+    });
+  }
 };

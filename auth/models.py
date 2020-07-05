@@ -89,7 +89,10 @@ class User(models.Model):
                 old_avatar.delete()
 
         # Upload new avatar
-        media_document = media.models.MediaDocument(parent_id=self.pk)
+        media_document = media.models.MediaDocument(
+            parent_id=self.pk,
+            parent_type=media.models.MediaDocument.ParentTypes.AVATAR
+        )
         media_document.upload(new_avatar)
         media_document.save()
 

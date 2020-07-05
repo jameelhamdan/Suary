@@ -1,9 +1,10 @@
 from django.conf import settings
+from django import forms
 from rest_framework.exceptions import ValidationError
 import djongo.models as mongo
 from _common import utils
 import users.models
-from django import forms
+import media.models
 
 
 class AbstractDocument(mongo.Model):
@@ -18,7 +19,7 @@ class AbstractDocument(mongo.Model):
         abstract = True
 
 
-class PostMedia(mongo.Model):
+class Media(mongo.Model):
     hash = mongo.TextField()
     content_type = mongo.TextField()
 
@@ -26,10 +27,18 @@ class PostMedia(mongo.Model):
         abstract = True
 
 
-class PostMediaForm(forms.ModelForm):
+class MediaForm(forms.ModelForm):
     class Meta:
-        model = PostMedia
+        model = Media
         fields = ('hash', 'content_type', )
+
+
+class CountManager(mongo.Manager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            likes_count=mongo.Count('likes'),
+            comments_count=mongo.Count('comments'),
+        )
 
 
 class Post(AbstractDocument):
@@ -37,14 +46,26 @@ class Post(AbstractDocument):
     tags = mongo.JSONField()
 
     media_list = mongo.ArrayField(
-        model_container=PostMedia,
-        model_form_class=PostMediaForm,
+        model_container=Media,
+        model_form_class=MediaForm,
     )
 
-    def add_comment(self, content, created_by):
-        comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)
-        comment.save()
+    counted = CountManager()
 
+    def add_comment(self, content, created_by, media_file=None):
+        comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)
+        if media_file:
+            media_document = media.models.MediaDocument(
+                parent_id=self.pk,
+                parent_type=media.models.MediaDocument.ParentTypes.COMMENT
+            )
+            media_document.upload(media_file)
+            comment.media = {
+                'hash': media_document.pk,
+                'content_type': media_document.content_type
+            }
+
+        comment.save()
         return comment
 
     def add_like(self, user_pk):
@@ -84,10 +105,10 @@ class Post(AbstractDocument):
         return None
 
     def get_likes_count(self):
-        return PostCounter.objects.get(pk=self.pk).likes_count
+        return self.likes.count()
 
     def get_comments_count(self):
-        return PostCounter.objects.get(pk=self.pk).comments_count
+        return self.comments.count()
 
     def save(self, *args, **kwargs):
         if self.content:
@@ -104,6 +125,12 @@ class Comment(AbstractDocument):
     post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='comments', null=False)
     content = mongo.TextField(null=False)
 
+    media = mongo.EmbeddedField(
+        model_container=Media,
+        model_form_class=MediaForm,
+        null=True
+    )
+
     class Meta:
         db_table = 'main_comments'
         db = settings.MONGO_DATABASE
@@ -115,20 +142,4 @@ class Like(AbstractDocument):
 
     class Meta:
         db_table = 'main_likes'
-        db = settings.MONGO_DATABASE
-
-
-class PostCounter(mongo.Model): # Interface class for database view
-    # id is post_id
-    id = mongo.CharField(max_length=36, db_column='_id', primary_key=True,)
-    likes_count = mongo.IntegerField()
-    comments_count = mongo.IntegerField()
-
-    objects = mongo.DjongoManager()
-
-    def save(self, *args, **kwargs):
-        raise NotImplementedError('Post counter is a readonly model')
-
-    class Meta:
-        db_table = 'main_posts_counter'
         db = settings.MONGO_DATABASE

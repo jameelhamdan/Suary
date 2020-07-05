@@ -17,6 +17,7 @@ def generate_uuid(repeat=1):
 
 def stream_response(request, response, content_length, is_stream=True):
     http_range = request.META.get('HTTP_RANGE')
+    content_type = response['Content-Type'].split('/', 1)
     if not (http_range and http_range.startswith('bytes=') and http_range.count('-') == 1):
         return response
     if_range = request.META.get('HTTP_IF_RANGE')
@@ -42,6 +43,7 @@ def stream_response(request, response, content_length, is_stream=True):
         response['Content-Length'] = end + 1 - start
         response['Content-Range'] = 'bytes %d-%d/%d' % (start, end, st_size)
 
+        response['Content-Disposition'] = f'inline; filename=".{content_type}"'
     return response
 
 
