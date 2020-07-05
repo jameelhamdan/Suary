@@ -8,6 +8,12 @@ from _common import utils, images
 
 
 class MediaDocument(mongo.Model):
+    class ParentTypes(mongo.TextChoices):
+        AVATAR = 'avatar', 'Avatar'
+        POST = 'post', 'post'
+        COMMENT = 'comment', 'comment'
+
+
     collection_name = 'media'
     database_name = 'media'
     objects = mongo.DjongoManager()
@@ -18,6 +24,7 @@ class MediaDocument(mongo.Model):
     length = mongo.IntegerField()
     created_on = mongo.DateTimeField(default=timezone.now)
     parent_id = mongo.CharField(max_length=36, null=True)
+    parent_type = mongo.CharField(choices=ParentTypes.choices, default=ParentTypes.POST, max_length=15)
 
     def get_url(self):
         return reverse_lazy('view_media', kwargs={'pk': self.pk})

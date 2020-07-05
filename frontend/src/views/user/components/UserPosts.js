@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from "prop-types";
 import {postService} from "services/postService";
 import InfiniteScroll from 'react-infinite-scroller';
-import Post from "components/common/Post"
+import Post from "components/posts/Post"
 import Loading from "components/common/Loading"
 import {CardText} from "shards-react"
 

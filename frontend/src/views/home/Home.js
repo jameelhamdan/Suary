@@ -2,7 +2,7 @@ import React from "react";
 import {Card, CardBody} from "shards-react";
 import {Wrapper} from "components/common/Wrapper";
 import {connect} from "react-redux";
-import AddPostWidget from "./AddPost"
+import AddPostWidget from "components/posts/AddPost"
 
 class Home extends React.Component {
   render() {

@@ -21,11 +21,16 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
         user_pk = self.request.current_user.pk
         media_list = cleaned_data.pop('media_list', [])
 
+        # TODO: MOVE this logic to class
         post = models.Post(created_by_id=user_pk, **cleaned_data)
 
         media_document_list = []
         for uploaded_media in media_list:
-            media_document = media.models.MediaDocument(parent_id=post.pk)
+            media_document = media.models.MediaDocument(
+                parent_id=post.pk,
+                parent_type=media.models.MediaDocument.ParentTypes.POST
+            )
+
             media_document.upload(uploaded_media)
 
             media_document_list.append({
@@ -71,19 +76,20 @@ class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
         return self.get_response(message='Post Details!', result=serializer.data)
 
 
+@view_authenticate()
 class CreateCommentView(APIViewMixin, generics.CreateAPIView):
     serializer_class = serializers.AddCommentSerializer
 
     def create(self, request, *args, **kwargs):
-        post = generics.get_object_or_404(models.Post.objects, pk=self.kwargs['post_id'])
+        post = generics.get_object_or_404(models.Post.objects, pk=self.kwargs['pk'])
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        user = self.request.current_user
-
-        comment = post.add_comment(cleaned_data['content'], user)
+        comment_content = cleaned_data['content']
+        comment_media = cleaned_data.get('media')
+        comment = post.add_comment(comment_content, self.request.current_user, media_file=comment_media)
 
         serializer = serializers.CommentSerializer(comment, many=False)
         json_data = serializer.data

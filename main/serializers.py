@@ -5,7 +5,7 @@ from . import models
 import users.serializers
 
 
-class PostImageSerializer(serializers.Serializer):
+class MediaSerializer(serializers.Serializer):
     hash = serializers.CharField()
     content_type = serializers.CharField()
 
@@ -16,7 +16,7 @@ class PostSerializer(serializers.Serializer):
     created_on = serializers.DateTimeField()
     tags = serializers.ListField()
     media_list = serializers.ListField(
-        child=PostImageSerializer()
+        child=MediaSerializer()
     )
     created_by = users.serializers.UserSerializer()
     likes_count = serializers.CharField()
@@ -40,10 +40,12 @@ class CommentSerializer(serializers.Serializer):
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
     created_by = users.serializers.UserSerializer()
+    media = MediaSerializer(default=None)
 
 
 class AddCommentSerializer(serializers.Serializer):
-    content = serializers.CharField(required=True)
+    content = serializers.CharField(required=False)
+    media = serializers.FileField(validators=[FileExtensionValidator(settings.IMAGE_FORMATS)], allow_empty_file=False, use_url=False, required=False)
 
 
 class SwitchPostLikeSerializer(serializers.Serializer):

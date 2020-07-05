@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
 import PropTypes from "prop-types";
 import Avatar, {PostMedia} from "components/common/Image"
-import PostComments from "components/common/PostComments"
+import PostComments from "./PostComments"
 import placeholderImage from "images/avatars/placeholder.png"
 
 
@@ -17,7 +17,7 @@ export default class Post extends React.Component {
   render() {
     return (
       <div key={this.props.key}>
-        <Card small className="mb-4 pt-3">
+        <Card small className="mb-4">
           <CardBody>
             <CardTitle>
               <Avatar image_uuid={this.data.created_by.avatar_uuid} fallback={placeholderImage}/>
@@ -36,7 +36,7 @@ export default class Post extends React.Component {
                 <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.likes_count} Likes</NavLink>
               </NavItem>
               <NavItem>
-                <NavLink tag={Link} to={'/post/' + this.data.id} onClick={this.toggle}>{this.data.comments_count} Comments</NavLink>
+                <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.comments_count} Comments</NavLink>
               </NavItem>
             </Nav>
           </CardBody>

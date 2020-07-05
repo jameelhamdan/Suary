@@ -1,7 +1,7 @@
 import React from "react";
 import {CardText, Row, Col, ListGroupItem} from "shards-react";
 import PropTypes from "prop-types";
-import Avatar from "components/common/Image"
+import Avatar, {CommentMedia} from "components/common/Image"
 import placeholderImage from "images/avatars/placeholder.png"
 import {Link} from "react-router-dom";
 import TimeAgo from "react-timeago";
@@ -22,7 +22,12 @@ export default class Post extends React.Component {
             <Link tag={Link} to={"/profile/" + this.data.created_by.username} className="d-none d-md-inline-block">{this.data.created_by.username}</Link>
             <TimeAgo component={CardText} className={"float-right"} date={this.data.created_on}/>
           </Col>
-          <Col>{this.data.content}</Col>
+          <Col lg={12}>{this.data.content}</Col>
+          {this.data.media &&
+          <Col sm={6} md={4} lg={3}>
+            <CommentMedia media_uuid={this.data.media.hash} content_type={this.data.media.content_type}/>
+          </Col>
+          }
         </Row>
       </ListGroupItem>
     );
@@ -37,7 +42,10 @@ export default class Post extends React.Component {
       id: PropTypes.string.isRequired,
       post_id: PropTypes.string,
       content: PropTypes.string,
-      media: PropTypes.string,
+      media: PropTypes.shape({
+        content_type: PropTypes.string,
+        hash: PropTypes.string,
+      }),
       created_on: PropTypes.string,
       created_by: PropTypes.shape({
         id: PropTypes.string,

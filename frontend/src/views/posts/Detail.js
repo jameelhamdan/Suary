@@ -3,7 +3,7 @@ import {Col, Row, Fade} from "shards-react";
 import {BaseWrapper} from "components/common/Wrapper";
 import {postService} from "services/postService";
 import NotFound from "components/common/pages/NotFound"
-import Post from 'components/common/Post';
+import Post from "components/posts/Post";
 import {connect} from "react-redux";
 
 

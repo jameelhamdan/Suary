@@ -47,14 +47,19 @@ export const postService = {
       return res.data['result'];
     });
   },
-  addPostComment: async (post_id, content) => {
-    const payload = {
-      content: content
-    };
+  addPostComment: async (post_id, content, imageFile) => {
+    let payload = new FormData();
+    if(content){
+      payload.set('content', content);
+    }
+    if(imageFile){
+      payload.append('media', imageFile, imageFile.fileName);
+    }
     return ajax({
       method: 'post',
       url: apiRoutes.AddComment(post_id),
-      data: payload
+      data: payload,
+      uploadConfig: uploadConfig,
     }).then(res => {
       return res.data['result'];
     });

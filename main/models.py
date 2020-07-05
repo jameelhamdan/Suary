@@ -1,9 +1,10 @@
 from django.conf import settings
+from django import forms
 from rest_framework.exceptions import ValidationError
 import djongo.models as mongo
 from _common import utils
 import users.models
-from django import forms
+import media.models
 
 
 class AbstractDocument(mongo.Model):
@@ -18,7 +19,7 @@ class AbstractDocument(mongo.Model):
         abstract = True
 
 
-class PostMedia(mongo.Model):
+class Media(mongo.Model):
     hash = mongo.TextField()
     content_type = mongo.TextField()
 
@@ -26,9 +27,9 @@ class PostMedia(mongo.Model):
         abstract = True
 
 
-class PostMediaForm(forms.ModelForm):
+class MediaForm(forms.ModelForm):
     class Meta:
-        model = PostMedia
+        model = Media
         fields = ('hash', 'content_type', )
 
 
@@ -45,16 +46,26 @@ class Post(AbstractDocument):
     tags = mongo.JSONField()
 
     media_list = mongo.ArrayField(
-        model_container=PostMedia,
-        model_form_class=PostMediaForm,
+        model_container=Media,
+        model_form_class=MediaForm,
     )
 
     counted = CountManager()
 
-    def add_comment(self, content, created_by):
+    def add_comment(self, content, created_by, media_file=None):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)
-        comment.save()
+        if media_file:
+            media_document = media.models.MediaDocument(
+                parent_id=self.pk,
+                parent_type=media.models.MediaDocument.ParentTypes.COMMENT
+            )
+            media_document.upload(media_file)
+            comment.media = {
+                'hash': media_document.pk,
+                'content_type': media_document.content_type
+            }
 
+        comment.save()
         return comment
 
     def add_like(self, user_pk):
@@ -113,6 +124,12 @@ class Post(AbstractDocument):
 class Comment(AbstractDocument):
     post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='comments', null=False)
     content = mongo.TextField(null=False)
+
+    media = mongo.EmbeddedField(
+        model_container=Media,
+        model_form_class=MediaForm,
+        null=True
+    )
 
     class Meta:
         db_table = 'main_comments'
