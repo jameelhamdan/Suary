@@ -9,7 +9,7 @@ class Home extends React.Component {
     return (
       <Wrapper>
         {this.props.userState.logged_in &&
-          <AddPostWidget/>
+          <AddPostWidget history={this.props.history}/>
         }
         <Card small className="mb-4">
           <CardBody>

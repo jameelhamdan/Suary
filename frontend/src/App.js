@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Router,
+  //Router,
   Route,
   Switch
-} from "react-router-dom";
+} from "react-router";
+import {BrowserRouter as Router} from "react-router-dom";
 import routes from "routes";
-import history from "utils/history";
 import withTracker from "withTracker";
 import {connect} from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -16,7 +16,6 @@ import NotFound from "components/common/pages/NotFound"
 class App extends React.Component {
   constructor(props) {
     super(props);
-
     this.get_routes = this.get_routes.bind(this);
   }
 
@@ -25,16 +24,14 @@ class App extends React.Component {
     for (let i = 0; i < routes.length; i++) {
       const route = routes[i];
       if (!this.props.userState.logged_in && route.logged_in_only) continue;
-
       route_list.push(route);
-
     }
     return route_list;
   }
 
   render() {
     return (
-      <Router history={history}>
+      <Router>
         <Switch>
           {this.get_routes().map((route, index) => {
             return (

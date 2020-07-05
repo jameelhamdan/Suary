@@ -8,7 +8,6 @@ import {
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {get_errors} from "utils/ajax"
-import history from "utils/history"
 import {userService} from "services/userService";
 import {loginAction} from "actions/userAction";
 import {connect} from "react-redux";
@@ -29,6 +28,7 @@ class Login extends React.Component {
   onSubmit(data) {
     this.setState((state) => {
       state.loading = true;
+      state.errors = [];
       return state
     });
 
@@ -39,7 +39,7 @@ class Login extends React.Component {
 
     userService.login(submitData).then((user_data) => {
       this.props.loginAction(user_data);
-      history.push('/');
+      this.props.history.push('/');
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;
@@ -50,7 +50,7 @@ class Login extends React.Component {
           return state
         });
       }
-    })
+    });
   };
 
   LoginForm() {

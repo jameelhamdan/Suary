@@ -22,7 +22,7 @@ export default [
     path: "/",
     logged_in_only: false,
     exact: true,
-    strict: true,
+    strict: false,
     layout: DefaultLayout,
     component: Home
   },
@@ -38,7 +38,7 @@ export default [
     path: "/register",
     logged_in_only: false,
     exact: true,
-    strict: true,
+    strict: false,
     layout: DefaultLayout,
     component: Register
   },
@@ -46,7 +46,7 @@ export default [
     path: "/logout",
     logged_in_only: true,
     exact: true,
-    strict: true,
+    strict: false,
     layout: DefaultLayout,
     component: Logout
   },
@@ -54,23 +54,23 @@ export default [
     path: "/profile",
     logged_in_only: true,
     exact: true,
-    strict: true,
+    strict: false,
     layout: DefaultLayout,
     component: UserProfileRedirect
   },
   {
     path: "/profile/:username?",
-    logged_in_only: false,
-    exact: true,
-    strict: true,
+    logged_in_only: true,
+    exact: false,
+    strict: false,
     layout: DefaultLayout,
     component: UserDetail
   },
   {
     path: "/post/:id",
     logged_in_only: false,
-    exact: true,
-    strict: true,
+    exact: false,
+    strict: false,
     layout: DefaultLayout,
     component: PostDetail
   },

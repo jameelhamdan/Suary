@@ -11,7 +11,6 @@ import {
 import {useForm} from "react-hook-form";
 import {get_errors} from "utils/ajax"
 import {postService} from "services/postService";
-import history from "utils/history"
 
 
 export default class AddPostWidget extends React.Component {
@@ -53,7 +52,7 @@ export default class AddPostWidget extends React.Component {
     });
 
     postService.addPost(data['content'], this.state.file).then((result) => {
-      history.push('profile/')
+      this.props.history.push('profile/')
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;
