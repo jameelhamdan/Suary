@@ -21,6 +21,14 @@ class PostSerializer(serializers.Serializer):
     created_by = users.serializers.UserSerializer()
     likes_count = serializers.CharField()
     comments_count = serializers.CharField()
+    is_liked = serializers.SerializerMethodField()
+
+    def get_is_liked(self, obj):
+        # TODO: Remove this after djongo fix
+        if len(obj.user_likes) > 0:
+            return True
+        else:
+            return False
 
 
 # Used for Adding a post

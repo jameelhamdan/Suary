@@ -60,12 +60,23 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
     def get_queryset(self):
         user = self.get_object()
-        return models.Post.counted.filter(created_by_id=user.pk).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        current_user = self.request.current_user
+
+        return models.Post.objects.liked(
+            user=current_user
+        ).filter(
+            created_by_id=user.pk
+        ).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
 
 
 @view_authenticate()
 class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
-    queryset = models.Post.counted.all()
+    def get_queryset(self):
+        current_user = self.request.current_user
+        return models.Post.objects.liked(
+            user=current_user
+        ).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+
     serializer_class = serializers.PostSerializer
     lookup_field = 'pk'
     lookup_url_kwarg = 'pk'

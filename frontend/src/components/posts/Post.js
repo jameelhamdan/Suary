@@ -58,6 +58,7 @@ export default class Post extends React.Component {
     enableComments: PropTypes.bool,
     postDetails: PropTypes.shape({
       id: PropTypes.string.isRequired,
+      is_liked: PropTypes.bool,
       content: PropTypes.string,
       media_list: PropTypes.array,
       created_by: PropTypes.shape({
@@ -75,6 +76,7 @@ export default class Post extends React.Component {
     enableComments: false,
     postDetails: {
       id: null,
+      is_liked: false,
       content: null,
       media_list: [],
       created_by: {

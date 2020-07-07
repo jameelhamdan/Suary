@@ -30,15 +30,25 @@ class Media(mongo.Model):
 class MediaForm(forms.ModelForm):
     class Meta:
         model = Media
-        fields = ('hash', 'content_type', )
+        fields = ('hash', 'content_type',)
 
 
-class CountManager(mongo.Manager):
-    def get_queryset(self):
-        return super().get_queryset().annotate(
+class PostManager(mongo.Manager):
+    def liked(self, user=None):
+        qs = super().get_queryset().annotate(
             likes_count=mongo.Count('likes'),
             comments_count=mongo.Count('comments'),
         )
+
+        likes_prefetch = mongo.Prefetch(
+            'likes',
+            Like.objects.filter(created_by_id=user.pk),
+            to_attr='user_likes'
+        )
+
+        qs = qs.prefetch_related(likes_prefetch)
+
+        return qs
 
 
 class Post(AbstractDocument):
@@ -50,7 +60,7 @@ class Post(AbstractDocument):
         model_form_class=MediaForm,
     )
 
-    counted = CountManager()
+    objects = PostManager()
 
     def add_comment(self, content, created_by, media_file=None):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)

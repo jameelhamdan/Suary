@@ -12,4 +12,4 @@ class FeedView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     def get_queryset(self):
         user = self.request.current_user
         following_ids = user.get_following_queryset().values_list('following_id', flat=True)
-        return models.Post.counted.filter(created_by_id__in=following_ids).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        return models.Post.objects.liked(user=user).filter(created_by_id__in=following_ids).select_related('created_by').only('content', 'id', 'created_by', 'created_on')

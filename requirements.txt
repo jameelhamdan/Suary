@@ -1,7 +1,7 @@
 asgiref==3.2.3
 djangorestframework==3.11.0
 # TODO Replace with proper djongo library when they release django3 support
-git+https://github.com/nesdis/djongo.git@9e7d093040b5a1b1b90985e5fac1d2bb4940ce17
+git+https://github.com/nesdis/djongo.git@953fec5bbf4b7297b9ea6a16269d2ae45335f257
 jsonfield>=2.0.2
 django-jsoneditor>=0.0.12
 Django==3.0.*
