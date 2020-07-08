@@ -98,7 +98,7 @@ class CreateCommentView(APIViewMixin, generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        comment_content = cleaned_data['content']
+        comment_content = cleaned_data.get('content')
         comment_media = cleaned_data.get('media')
         comment = post.add_comment(comment_content, self.request.current_user, media_file=comment_media)
 
