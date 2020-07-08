@@ -20,8 +20,8 @@ urlpatterns = [
     path('media/', include('media.urls')),
 ]
 
-
-urlpatterns += [
-    re_path(exclude_regex, never_cache(frontend.views.IndexView.as_view()), name='index'),
-    path('', never_cache(frontend.views.IndexView.as_view()), name='index')
-]
+if settings.SERVE_FRONTEND:
+    urlpatterns += [
+        re_path(exclude_regex, never_cache(frontend.views.IndexView.as_view()), name='index'),
+        path('', never_cache(frontend.views.IndexView.as_view()), name='index')
+    ]

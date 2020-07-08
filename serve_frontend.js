@@ -10,7 +10,7 @@ const ejs = require('ejs');
 const app = express();
 app.engine('html', require('ejs').renderFile);
 
-const frontendStatic = path.join(__dirname, 'frontend', 'public');
+const frontendStatic = path.join(__dirname, 'public');
 const frontendEntryFile = path.join(__dirname, 'frontend', 'templates', 'index_raw.html');
 const PORT = process.env.PORT || 3000;
 const API_URL = process.env.API_URL || 'http://127.0.0.1:8000/api';  // the /api is very important
@@ -22,6 +22,10 @@ const context = {
 
 app.use('/public', express.static(frontendStatic));
 app.get('/*', (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,PATCH");
+  res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
   res.render(frontendEntryFile, context);
 });
 

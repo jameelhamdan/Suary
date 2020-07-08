@@ -1,6 +1,12 @@
+const app = document.getElementById("app");
+
 class staticRoutes {
   static Media(media_uuid) {
-    return `/media/${media_uuid}`;
+    //TODO: find a better way to do this
+    let root_url = app.getAttribute("api-root-url");
+    let arr = root_url.split("/");
+    root_url = arr[0] + "//" + arr[2];
+    return `${root_url}/media/${media_uuid}`;
   }
 }
 
@@ -8,7 +14,7 @@ class apiRoutes {
 
   //Authentication
   static Root() {
-    return document.getElementById("app").getAttribute("api-root-url");
+    return app.getAttribute("api-root-url");
   }
 
   static Register() {

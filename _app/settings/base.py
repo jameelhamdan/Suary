@@ -6,10 +6,10 @@ django.db.models.options.DEFAULT_NAMES = django.db.models.options.DEFAULT_NAMES 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = 'y#(a2(nm=98!xe48ozi-81o7r7#&8s68x6j0@323ciq&3yq%^#'
+SECRET_KEY = os.getenv('SECRET_KEY', 'y#(a2(nm=98!xe48ozi-81o7r7#&8s68x6j0@323ciq&3yq%^#')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 APPEND_SLASH = False
@@ -26,20 +26,21 @@ INSTALLED_APPS = [
     'users',
     'main',
     'feed',
-    'frontend'
+    'frontend',
 ]
 
 MIDDLEWARE = [
     'auth.backend.middleware.AuthMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = '_settings.urls'
+ROOT_URLCONF = '_app.urls'
 
-WSGI_APPLICATION = '_settings.wsgi.application'
+WSGI_APPLICATION = '_app.wsgi.application'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -59,10 +60,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_URL = '/public/'
 SERVE_FRONTEND = os.getenv('SERVE_FRONTEND', True)
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'frontend/public'),
-)
+STATIC_ROOT = os.path.join(BASE_DIR, '../public')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
@@ -71,8 +69,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'frontend/templates')],
-        'APP_DIRS': False,
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -161,7 +158,7 @@ DATABASES = {
     }
 }
 
-DATABASE_ROUTERS = ['_settings.db_routers.Router', ]
+DATABASE_ROUTERS = ['_app.db_routers.Router', ]
 
 # Custom
 MEDIA_FORMATS = ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'm4a', 'm4v', 'webm', 'webp']

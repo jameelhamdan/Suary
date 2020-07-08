@@ -137,5 +137,5 @@ dist
 build
 package-lock.json
 yarn.lock
-
+local.py
 .DS_Store

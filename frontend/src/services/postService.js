@@ -2,15 +2,11 @@ import FormData from 'form-data';
 import {ajax, apiRoutes} from "utils/ajax";
 
 const uploadConfig = {
-  headers: {
     'content-type': 'multipart/form-data'
-  }
 };
 
 const jsonConfig = {
-  headers: {
     'content-type': 'application/json'
-  }
 };
 
 export const postService = {
@@ -26,7 +22,6 @@ export const postService = {
   },
   addPost: async (content, imageFile) => {
     let payload = new FormData();
-
     payload.set('content', content);
     payload.append('media_list', imageFile, imageFile.fileName);
     return ajax({
