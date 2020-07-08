@@ -15,3 +15,4 @@ sqlparse==0.2.4
 pillow
 dj_database_url
 whitenoise
+django-cors-headers==3.4.0

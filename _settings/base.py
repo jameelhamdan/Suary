@@ -19,6 +19,7 @@ ADMINS = [('Jameel Hamdan', 'jameelhamdan99@yahoo.com')]
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'auth',
     'media',
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'auth.backend.middleware.AuthMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -56,6 +58,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_URL = '/public/'
+SERVE_FRONTEND = os.getenv('SERVE_FRONTEND', True)
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'frontend/public'),
@@ -87,6 +90,8 @@ REST_FRAMEWORK = {
 }
 
 API_PREFIX = 'api'
+# TODO: Setup proper cross origin policy for dev environment
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Authentication settings
 REFRESH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24 * 14)
