@@ -19,11 +19,13 @@ class PostSerializer(serializers.Serializer):
         child=MediaSerializer()
     )
     created_by = users.serializers.UserSerializer()
-    likes_count = serializers.CharField()
-    comments_count = serializers.CharField()
+    likes_count = serializers.CharField(default=None)
+    comments_count = serializers.CharField(default=None)
     is_liked = serializers.SerializerMethodField()
 
     def get_is_liked(self, obj):
+        if not hasattr(obj, 'user_likes'):
+            return False
         # TODO: Remove this after djongo fix
         if len(obj.user_likes) > 0:
             return True
