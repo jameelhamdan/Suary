@@ -2,11 +2,11 @@ import FormData from 'form-data';
 import {ajax, apiRoutes} from "utils/ajax";
 
 const uploadConfig = {
-    'content-type': 'multipart/form-data'
+  'content-type': 'multipart/form-data'
 };
 
 const jsonConfig = {
-    'content-type': 'application/json'
+  'content-type': 'application/json'
 };
 
 export const postService = {
@@ -44,10 +44,10 @@ export const postService = {
   },
   addPostComment: async (post_id, content, imageFile) => {
     let payload = new FormData();
-    if(content){
+    if (content) {
       payload.set('content', content);
     }
-    if(imageFile){
+    if (imageFile) {
       payload.append('media', imageFile, imageFile.fileName);
     }
     return ajax({
@@ -59,9 +59,9 @@ export const postService = {
       return res.data['result'];
     });
   },
-  reactToPost: async (post_id, action) => {
+  likePost: async (post_id) => {
     const payload = {
-      action: action
+      action: 'like'
     };
 
     return ajax({
@@ -72,10 +72,17 @@ export const postService = {
       return res.data['result'];
     });
   },
-  // likePost: async (post_id) => {
-  //   return this.reactToPost(post_id, 'like');
-  // },
-  // unlikePost: async (post_id) => {
-  //   return this.reactToPost(post_id, 'unlike');
-  // }
+  unlikePost: async (post_id) => {
+    const payload = {
+      action: 'unlike'
+    };
+
+    return ajax({
+      method: 'post',
+      url: apiRoutes.likePost(post_id),
+      data: payload
+    }).then(res => {
+      return res.data['result'];
+    });
+  }
 };

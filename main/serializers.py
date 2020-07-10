@@ -13,7 +13,9 @@ class PostSerializer(serializers.Serializer):
     id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
-    tags = serializers.ListField()
+    tags = serializers.ListField(
+        child=serializers.CharField()
+    )
     media_list = serializers.ListField(
         child=MediaSerializer()
     )
@@ -26,7 +28,8 @@ class PostSerializer(serializers.Serializer):
         if not hasattr(obj, 'user_likes'):
             return False
         # TODO: Remove this after djongo fix
-        if len(obj.user_likes) > 0:
+        like_count = len(obj.user_likes)
+        if like_count > 0:
             return True
         else:
             return False

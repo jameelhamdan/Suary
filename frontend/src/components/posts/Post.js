@@ -4,8 +4,9 @@ import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
 import PropTypes from "prop-types";
 import Avatar, {PostMedia} from "components/common/Image";
 import placeholderImage from "images/avatars/placeholder.png";
+import {Comment as CommentIcon} from "@material-ui/icons";
 import PostComments from "./PostComments";
-// import Like from "./Like";
+import Like from "./Like";
 
 
 export default class Post extends React.Component {
@@ -25,7 +26,7 @@ export default class Post extends React.Component {
               <span className="d-none d-md-inline-block">{this.data.created_by.username}</span>
             </CardTitle>
 
-            <p>{this.data.content}</p>
+            <p>{this.data.content}</p>tags
           </CardBody>
 
           {this.data.media_list.length > 0 &&
@@ -33,11 +34,11 @@ export default class Post extends React.Component {
           }
           <CardBody>
             <Nav justified>
-              {/*<NavItem>*/}
-                {/*<Like post_id={this.data.id} likes_count={this.data.likes_count} is_liked={this.data.is_liked} />*/}
-              {/*</NavItem>*/}
               <NavItem>
-                <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.comments_count} Comments</NavLink>
+                <Like post_id={this.data.id} likes_count={this.data.likes_count} is_liked={this.data.is_liked} />
+              </NavItem>
+              <NavItem>
+                <NavLink tag={Link} to={'/post/' + this.data.id}><CommentIcon className={'mx-3'}></CommentIcon>{this.data.comments_count} </NavLink>
               </NavItem>
             </Nav>
           </CardBody>

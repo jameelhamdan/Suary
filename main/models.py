@@ -35,20 +35,20 @@ class MediaForm(forms.ModelForm):
 
 class PostManager(mongo.Manager):
     def liked(self, user=None):
-        qs = super().get_queryset().annotate(
-            likes_count=mongo.Count('likes'),
-            comments_count=mongo.Count('comments'),
-        )
-
         likes_prefetch = mongo.Prefetch(
             'likes',
-            Like.objects.filter(created_by_id=user.pk),
+            Like.objects.filter(created_by_id=user.pk).only('id'),
             to_attr='user_likes'
         )
 
-        qs = qs.prefetch_related(likes_prefetch)
+        qs = super().get_queryset()
+        # TODO: fix bug here for likes gets count of comments
+        qs = qs.annotate(
+            likes_count=mongo.Count('likes', distinct=True),
+            comments_count=mongo.Count('comments', distinct=True),
+        )
 
-        return qs
+        return qs.prefetch_related(likes_prefetch)
 
 
 class Post(AbstractDocument):
