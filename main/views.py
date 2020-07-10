@@ -125,14 +125,15 @@ class ListCommentsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
 @view_authenticate()
 class LikePostView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = serializers.SwitchPostLikeSerializer
+    serializer_class = serializers.PostLikeSerializer
 
     def create(self, request, *args, **kwargs):
+        post = generics.get_object_or_404(models.Post.objects, pk=self.kwargs['pk'])
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        post = cleaned_data['post']
         action = cleaned_data['action']
         user_pk = self.request.current_user.pk
 

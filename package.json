@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "node -r dotenv/config serve_frontend.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --mode development ./frontend/src/index.js --output ./public/build/bundle.js && npm run serve",
+    "dev": "webpack --mode development ./frontend/src/index.js --output ./public/build/bundle.js",
     "build": "webpack --mode production ./frontend/src/index.js --output ./public/build/bundle.js"
   },
   "keywords": [],

@@ -2,9 +2,10 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
 import PropTypes from "prop-types";
-import Avatar, {PostMedia} from "components/common/Image"
-import PostComments from "./PostComments"
-import placeholderImage from "images/avatars/placeholder.png"
+import Avatar, {PostMedia} from "components/common/Image";
+import placeholderImage from "images/avatars/placeholder.png";
+import PostComments from "./PostComments";
+// import Like from "./Like";
 
 
 export default class Post extends React.Component {
@@ -32,9 +33,9 @@ export default class Post extends React.Component {
           }
           <CardBody>
             <Nav justified>
-              <NavItem>
-                <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.likes_count} Likes</NavLink>
-              </NavItem>
+              {/*<NavItem>*/}
+                {/*<Like post_id={this.data.id} likes_count={this.data.likes_count} is_liked={this.data.is_liked} />*/}
+              {/*</NavItem>*/}
               <NavItem>
                 <NavLink tag={Link} to={'/post/' + this.data.id}>{this.data.comments_count} Comments</NavLink>
               </NavItem>
@@ -66,8 +67,8 @@ export default class Post extends React.Component {
         username: PropTypes.string,
         avatar_uuid: PropTypes.string,
       }),
-      likes_count: PropTypes.string,
-      comments_count: PropTypes.string,
+      likes_count: PropTypes.number,
+      comments_count: PropTypes.number,
     })
   };
 
@@ -84,8 +85,8 @@ export default class Post extends React.Component {
         username: null,
         avatar_uuid: null,
       },
-      likes_count: '0',
-      comments_count: '0',
+      likes_count: 0,
+      comments_count: 0,
     }
   };
 }

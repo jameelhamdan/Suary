@@ -54,15 +54,19 @@ class apiRoutes {
     return `main/post`;
   }
 
-  static ListComments(post_id, cursor = null) {
+  static listComments(post_id, cursor = null) {
       if (cursor !== null) {
       return `main/post/${post_id}/comments?cursor=${cursor}`;
     }
     return `main/post/${post_id}/comments`;
   }
 
-  static AddComment(post_id) {
+  static addComment(post_id) {
     return `main/post/${post_id}/comments/add`;
+  }
+
+  static likePost(post_id) {
+    return `main/post/${post_id}/likes/add`;
   }
 }
 

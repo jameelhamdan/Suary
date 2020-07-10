@@ -36,7 +36,7 @@ export const postService = {
   getPostComments: async (post_id, cursor = null) => {
     return ajax({
       method: 'get',
-      url: apiRoutes.ListComments(post_id, cursor),
+      url: apiRoutes.listComments(post_id, cursor),
       headers: jsonConfig,
     }).then(res => {
       return res.data['result'];
@@ -52,11 +52,30 @@ export const postService = {
     }
     return ajax({
       method: 'post',
-      url: apiRoutes.AddComment(post_id),
+      url: apiRoutes.addComment(post_id),
       data: payload,
       uploadConfig: uploadConfig,
     }).then(res => {
       return res.data['result'];
     });
-  }
+  },
+  reactToPost: async (post_id, action) => {
+    const payload = {
+      action: action
+    };
+
+    return ajax({
+      method: 'post',
+      url: apiRoutes.likePost(post_id),
+      data: payload
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  // likePost: async (post_id) => {
+  //   return this.reactToPost(post_id, 'like');
+  // },
+  // unlikePost: async (post_id) => {
+  //   return this.reactToPost(post_id, 'unlike');
+  // }
 };

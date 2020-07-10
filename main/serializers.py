@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
-from . import models
 import users.serializers
 
 
@@ -19,8 +18,8 @@ class PostSerializer(serializers.Serializer):
         child=MediaSerializer()
     )
     created_by = users.serializers.UserSerializer()
-    likes_count = serializers.CharField(default=None)
-    comments_count = serializers.CharField(default=None)
+    likes_count = serializers.IntegerField(default=None)
+    comments_count = serializers.IntegerField(default=None)
     is_liked = serializers.SerializerMethodField()
 
     def get_is_liked(self, obj):
@@ -58,7 +57,7 @@ class AddCommentSerializer(serializers.Serializer):
     media = serializers.FileField(validators=[FileExtensionValidator(settings.IMAGE_FORMATS)], allow_empty_file=False, use_url=False, required=False)
 
 
-class SwitchPostLikeSerializer(serializers.Serializer):
+class PostLikeSerializer(serializers.Serializer):
     ACTION_CHOICE_LIKE = 'like'
     ACTION_CHOICE_UNLIKE = 'unlike'
 
@@ -67,5 +66,4 @@ class SwitchPostLikeSerializer(serializers.Serializer):
         (ACTION_CHOICE_UNLIKE, 'Unlike'),
     )
 
-    post = serializers.SlugRelatedField(slug_field='pk', queryset=models.Post.objects.all(), required=True)
     action = serializers.ChoiceField(choices=ACTION_CHOICES, required=True)
