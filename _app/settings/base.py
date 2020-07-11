@@ -97,40 +97,11 @@ REFRESH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 6
 AUTH_TOKEN_EXPIRATION_PERIOD = os.getenv('REFRESH_TOKEN_EXPIRATION_PERIOD', 60 * 24)
 
 # Databases
-
 DEFAULT_DATABASE = 'default'
-MONGO_DATABASE = 'mongo'
 MEDIA_DATABASE = 'media'
 
 DATABASES = {
     DEFAULT_DATABASE: dj_database_url.parse(os.getenv('DEFAULT_DATABASE_URL', 'postgres://postgres:1234@127.0.0.1:5432/main')),
-    MONGO_DATABASE: {
-        'ENGINE': 'djongo',
-        'ENFORCE_SCHEMA': False,
-        'LOGGING': {
-            'version': 1,
-            'loggers': {
-                'djongo': {
-                    'level': 'DEBUG',
-                    'propogate': False,
-                    'handlers': ['console']
-                }
-            },
-            'handlers': {
-                'console': {
-                    'class': 'logging.StreamHandler',
-                    'level': 'DEBUG'
-                }
-            }
-        },
-        'NAME': 'default',
-        'CONN_MAX_AGE': 600,
-        'CLIENT': {
-            'host': os.getenv('MONGO_DATABASE_URL', 'mongodb://localhost:27017'),
-            'minPoolSize': 1,
-            'maxPoolSize': 100,
-        }
-    },
     MEDIA_DATABASE: {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': False,

@@ -1,7 +1,7 @@
 from django.core.validators import FileExtensionValidator
 from django.conf import settings
 from rest_framework import serializers
-import users.models
+import auth.models
 
 
 class UserSerializer(serializers.Serializer):
@@ -16,16 +16,11 @@ class UpdateAvatarSerializer(serializers.Serializer):
 
 
 class SwitchFollowSerializer(serializers.Serializer):
-    user = serializers.CharField(max_length=36, required=True)
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=auth.models.User.objects.all(),
+        required=True
+    )
     follow = serializers.BooleanField(default=True)
-
-    def validate(self, data):
-        user = users.models.UserData.objects.filter(pk=data['user']).first()
-        if not user:
-            raise serializers.ValidationError({'user': 'User doesn\'t exist!'})
-
-        data['user'] = user
-        return data
 
 
 class ListFollowingSerializer(serializers.Serializer):

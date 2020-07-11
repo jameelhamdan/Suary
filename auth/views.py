@@ -23,12 +23,11 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
 
         user, auth_token, refresh_token = serializer.validated_data
 
-        user_data = user.get_data()
         result = {
-            'uuid': user.pk,
+            'id': user.pk,
             'username': user.username,
-            'full_name': user_data.full_name,
-            'avatar_uuid': user_data.avatar_uuid,
+            'full_name': user.full_name,
+            'avatar_uuid': user.avatar_uuid,
             'auth_token': auth_token,
             'refresh_token': refresh_token,
         }
@@ -47,7 +46,7 @@ class RegisterView(APIViewMixin, generics.CreateAPIView):
         access_log.log_action(request, access_log.LOG_ACTION_REGISTER)
 
         result = {
-            'uuid': user.pk,
+            'id': user.pk,
         }
         return self.get_response(message='Successfully Registered User', result=result)
 
@@ -63,7 +62,7 @@ class ResetPasswordView(APIViewMixin, generics.CreateAPIView):
         access_log.log_action(request, access_log.LOG_ACTION_LOGOUT_ALL)
 
         result = {
-            'uuid': user.pk,
+            'id': user.pk,
             'auth_token': auth_token,
             'refresh_token': refresh_token,
         }

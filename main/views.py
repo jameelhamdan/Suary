@@ -4,13 +4,13 @@ from . import serializers, models
 from auth.backend.decorators import view_authenticate
 from _common.mixins import APIViewMixin, PaginationMixin
 import media.models
-import users.models
+import auth.models
 
 
 @view_authenticate()
 class CreatePostView(APIViewMixin, generics.CreateAPIView):
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser, )
-    pagination_kwarg_message = 'Successfully listed my posts!'
+    pagination_kwarg_message = 'Successfully listed my posts'
     serializer_class = serializers.AddPostSerializer
 
     def create(self, request, *args, **kwargs):
@@ -23,8 +23,8 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
 
         # TODO: MOVE this logic to class
         post = models.Post(created_by_id=user_pk, **cleaned_data)
+        post.save()
 
-        media_document_list = []
         for uploaded_media in media_list:
             media_document = media.models.MediaDocument(
                 parent_id=post.pk,
@@ -33,13 +33,11 @@ class CreatePostView(APIViewMixin, generics.CreateAPIView):
 
             media_document.upload(uploaded_media)
 
-            media_document_list.append({
-                'hash': media_document.pk,
-                'content_type': media_document.content_type
-            })
-
-        post.media_list = media_document_list
-        post.save()
+            models.Media(
+                post_id=post.pk,
+                hash=media_document.pk,
+                content_type=media_document.content_type
+            ).save()
 
         serializer = serializers.PostSerializer(post, many=False)
         json_data = serializer.data
@@ -54,8 +52,8 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     def get_object(self, *args, **kwargs):
         username = self.kwargs.get('username')
         try:
-            return users.models.UserData.objects.only('id', 'username').get(username=username)
-        except users.models.UserData.DoesNotExist:
+            return auth.models.User.objects.only('id', 'username').get(username=username)
+        except auth.models.User.DoesNotExist:
             raise NotFound()
 
     def get_queryset(self):
@@ -66,7 +64,7 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
             user=current_user
         ).filter(
             created_by_id=user.pk
-        ).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        ).select_related('created_by').prefetch_related('media').only('id', 'content', 'created_by', 'created_on')
 
 
 @view_authenticate()
@@ -75,7 +73,7 @@ class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
         current_user = self.request.current_user
         return models.Post.objects.liked(
             user=current_user
-        ).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        ).select_related('created_by').only('id', 'content', 'created_by', 'created_on')
 
     serializer_class = serializers.PostSerializer
     lookup_field = 'pk'
@@ -84,7 +82,7 @@ class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return self.get_response(message='Post Details!', result=serializer.data)
+        return self.get_response(message='Post Details', result=serializer.data)
 
 
 @view_authenticate()
@@ -120,7 +118,7 @@ class ListCommentsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
     def get_queryset(self):
         post = self.get_object()
-        return models.Comment.objects.filter(post_id=post.pk).select_related('created_by').only('id', 'content', 'post_id', 'created_by', 'created_on')
+        return models.Comment.objects.filter(post_id=post.pk).select_related('created_by').prefetch_related('media').only('id', 'content', 'post_id', 'created_by', 'created_on')
 
 
 @view_authenticate()
@@ -149,7 +147,7 @@ class LikePostView(APIViewMixin, generics.CreateAPIView):
             raise Exception('Action Method Not Defined in LikePostView')
 
         result = {
-            'uuid': post.pk,
+            'id': post.pk,
             'state': is_liked
         }
 

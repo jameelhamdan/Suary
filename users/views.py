@@ -1,7 +1,8 @@
 from rest_framework import generics, parsers
-from . import serializers, models
 from auth.backend.decorators import view_authenticate
 from _common.mixins import APIViewMixin, PaginationMixin
+from . import serializers, models
+import auth.models
 
 
 @view_authenticate()
@@ -48,7 +49,7 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
             message = 'Successfully Unfollowed User'
 
         result = {
-            'uuid': user.pk,
+            'id': user.pk,
         }
 
         return self.get_response(message=message, result=result)
@@ -60,7 +61,7 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
 
 @view_authenticate()
 class DetailUserView(APIViewMixin, generics.RetrieveAPIView):
-    queryset = models.UserData.objects.all()
+    queryset = auth.models.User.objects.all()
     serializer_class = serializers.UserSerializer
     lookup_field = 'username'
     lookup_url_kwarg = 'username'

@@ -13,8 +13,8 @@ ALGORITHM = api_settings.ALGORITHM
 user_id_field = api_settings.USER_ID_FIELD
 
 
-def get_user_by_uuid(user_uuid):
-    return User.objects.get(uuid=user_uuid)
+def get_user_by_id(user_id):
+    return User.objects.get(**{user_id_field: user_id})
 
 
 def get_refresh_token_secret_key(user_secret_key):
@@ -47,19 +47,19 @@ def decode_refresh_token(token, secret_key='', verify=True):
         raise Exception('Token Expired')
 
 
-def create_auth_token(user_uuid):
+def create_auth_token(user_id):
     expire_date = datetime.utcnow() + AUTH_TOKEN_EXPIRATION_PERIOD
 
     # Create new auth token
-    token = jwt.encode({user_id_field: user_uuid, 'exp': expire_date}, get_secret_key(), algorithm=ALGORITHM, )
+    token = jwt.encode({user_id_field: user_id, 'exp': expire_date}, get_secret_key(), algorithm=ALGORITHM, )
     return token
 
 
-def create_refresh_token(user_uuid, user_secret_key):
+def create_refresh_token(user_id, user_secret_key):
     expire_date = datetime.utcnow() + REFRESH_TOKEN_EXPIRATION_PERIOD
 
     # Create new auth token
-    token = jwt.encode({user_id_field: user_uuid, 'exp': expire_date}, get_refresh_token_secret_key(user_secret_key), algorithm=ALGORITHM, )
+    token = jwt.encode({user_id_field: user_id, 'exp': expire_date}, get_refresh_token_secret_key(user_secret_key), algorithm=ALGORITHM, )
     return token
 
 
@@ -68,8 +68,8 @@ def verify_auth_token(token):
 
         # Validate and Decode Token
         decoded_token = decode_token(token)
-        user_uuid = decoded_token[user_id_field]
-        lazy_user = SimpleLazyObject(lambda: get_user_by_uuid(user_uuid))
+        user_id = decoded_token[user_id_field]
+        lazy_user = SimpleLazyObject(lambda: get_user_by_id(user_id))
         return lazy_user
 
     except User.DoesNotExist:
@@ -84,10 +84,10 @@ def verify_refresh_token(token):
 
         # Validate and Decode Token
         try:
-            user_uuid = decode_token(token, verify=False)[user_id_field]
+            user_id = decode_token(token, verify=False)[user_id_field]
         except KeyError:
             raise Exception('Invalid Token')
-        user = get_user_by_uuid(user_uuid)
+        user = get_user_by_id(user_id)
 
         decode_refresh_token(token, user.get_secret_key())
 
@@ -102,10 +102,10 @@ def verify_refresh_token(token):
 
 def renew_refresh_token(token, secret_key):
     token = decode_refresh_token(token, secret_key)
-    user_uuid = token[user_id_field]
+    user_id = token[user_id_field]
     expiration_date = token['exp']
     # Renew refresh token if is about to expire otherwise return same token
     if datetime.utcnow() - expiration_date > timedelta(hours=1):
-        return create_refresh_token(user_uuid, secret_key)
+        return create_refresh_token(user_id, secret_key)
     else:
         return token

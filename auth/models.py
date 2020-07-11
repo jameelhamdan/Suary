@@ -24,25 +24,23 @@ LOG_ACTIONS = (
 
 
 class User(models.Model):
-    uuid = models.CharField(max_length=36, primary_key=True, db_index=True, default=utils.generate_uuid, editable=False)
+    id = models.CharField(max_length=36, primary_key=True, db_index=True, default=utils.generate_uuid, editable=False)
     username = models.CharField(max_length=128, unique=True, db_index=True, null=False, editable=False, validators=[validators.UsernameValidator])
     email = models.EmailField(max_length=128, unique=True, db_index=True, null=False)
     avatar_uuid = models.CharField(max_length=36, null=True)
     password_hash = models.CharField(max_length=512)
     secret_key = models.CharField(max_length=108, db_index=True, default='')
-    last_login = models.DateTimeField(auto_now=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(null=True)
     updated_on = models.DateTimeField(auto_now=True)
-
-    def get_data(self):
-        return users.models.UserData.objects.get(pk=self.pk)
+    full_name = models.CharField(max_length=256, null=False)
+    birth_date = models.DateField(null=False)
 
     def get_secret_key(self):
         return utils.hash_password(self.secret_key)
 
     def set_password(self, new_password):
         self.password_hash = utils.hash_password(new_password)
-        self.save()
 
     def validate_password(self, password):
         return utils.verify_password(self.password_hash, password)
@@ -57,25 +55,20 @@ class User(models.Model):
 
     def update_last_login(self):
         self.last_login = timezone.now()
-        self.save()
+        self.save(update_fields=['last_login'])
 
     @staticmethod
     def create_user(username, email, password, **kwargs):
-        new_user = User(username=username, email=email)
-        # this is a postgre only transaction, it will *only* revert postgre changes.
+        new_user = User(
+            username=username,
+            email=email,
+            **kwargs
+        )
+
         with transaction.atomic():
             new_user.secret_key = utils.generate_uuid(3)
-            new_user.save()
             new_user.set_password(password)
-
-            user_data = users.models.UserData(
-                pk=new_user.pk,
-                username=new_user.username,
-                email=new_user.email,
-                **kwargs
-            )
-
-            user_data.save()
+            new_user.save()
         return new_user
 
     def update_avatar(self, new_avatar):
@@ -98,10 +91,6 @@ class User(models.Model):
 
         self.avatar_uuid = media_document.pk
         self.save()
-
-        user_data = self.get_data()
-        user_data.avatar_uuid = media_document.pk
-        user_data.save()
 
         return media_document.pk
 
@@ -154,7 +143,6 @@ class User(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.uuid = utils.generate_uuid()
             self.secret_key = utils.generate_uuid(3)
 
         return super(User, self).save(*args, **kwargs)

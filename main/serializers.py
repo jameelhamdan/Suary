@@ -16,23 +16,15 @@ class PostSerializer(serializers.Serializer):
     tags = serializers.ListField(
         child=serializers.CharField()
     )
-    media_list = serializers.ListField(
-        child=MediaSerializer()
+    media_list = MediaSerializer(
+        source='media',
+        many=True
     )
+
     created_by = users.serializers.UserSerializer()
     likes_count = serializers.IntegerField(default=None)
     comments_count = serializers.IntegerField(default=None)
-    is_liked = serializers.SerializerMethodField()
-
-    def get_is_liked(self, obj):
-        if not hasattr(obj, 'user_likes'):
-            return False
-        # TODO: Remove this after djongo fix
-        like_count = len(obj.user_likes)
-        if like_count > 0:
-            return True
-        else:
-            return False
+    is_liked = serializers.BooleanField(default=None)
 
 
 # Used for Adding a post
@@ -56,7 +48,7 @@ class CommentSerializer(serializers.Serializer):
 
 
 class AddCommentSerializer(serializers.Serializer):
-    content = serializers.CharField(required=False)
+    content = serializers.CharField(required=False, default='')
     media = serializers.FileField(validators=[FileExtensionValidator(settings.IMAGE_FORMATS)], allow_empty_file=False, use_url=False, required=False)
 
 

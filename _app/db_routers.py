@@ -1,14 +1,13 @@
 from django.conf import settings
 
 DEFAULT_DATABASE = 'default'
-MONGO_DATABASE = 'mongo'
 MEDIA_DATABASE = 'media'
 
 
 class Router:
     def get_database_name(self, model):
         db_name = model._meta.db
-        if db_name not in [DEFAULT_DATABASE, MONGO_DATABASE, MEDIA_DATABASE]:
+        if db_name not in [DEFAULT_DATABASE, MEDIA_DATABASE]:
             raise Exception('Database not defined properly')
 
         return db_name

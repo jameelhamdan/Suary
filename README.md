@@ -15,7 +15,6 @@ Photo sharing web app written in Django 3.0 and React
 <li>pip install -r requirements.txt</li>
 <li>npm install</li>
 <li>Set DEFAULT_DATABASE_URL in .env to postgres Database</li>
-<li>Set MONGO_DATABASE_URL in .env to mongo database</li>
 <li>Set MEDIA_DATABASE_URL in .env to same or other mongo database</li>
 <li>npm run dev (to build frontend)</li>
 <li>python manage.py runserver 0.0.0.0:80</li>
