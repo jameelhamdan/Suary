@@ -1,85 +1,70 @@
 from django.conf import settings
-from django import forms
 from rest_framework.exceptions import ValidationError
-import djongo.models as mongo
+from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from _common import utils
-import users.models
+import auth.models
 import media.models
 
 
-class AbstractDocument(mongo.Model):
-    id = mongo.CharField(max_length=36, db_column='_id', primary_key=True, default=utils.generate_uuid)
-    created_by = mongo.ForeignKey(users.models.UserData, on_delete=mongo.CASCADE, null=False)
-    created_on = mongo.DateTimeField(auto_now_add=True)
-    updated_on = mongo.DateTimeField(auto_now=True)
-
-    objects = mongo.DjongoManager()
+class AbstractModel(models.Model):
+    id = models.CharField(max_length=36, primary_key=True, default=utils.generate_uuid)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
 
 
-class Media(mongo.Model):
-    hash = mongo.TextField()
-    content_type = mongo.TextField()
+class Media(models.Model):
+    hash = models.TextField(db_index=True)
+    content_type = models.TextField(db_index=True)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='media', null=True)
+    comment = models.OneToOneField('Comment', on_delete=models.CASCADE, related_name='media', null=True)
 
     class Meta:
-        abstract = True
+        db_table = 'main_media'
+        db = settings.DEFAULT_DATABASE
 
 
-class MediaForm(forms.ModelForm):
-    class Meta:
-        model = Media
-        fields = ('hash', 'content_type',)
-
-
-class PostManager(mongo.Manager):
+class PostManager(models.Manager):
     def liked(self, user=None):
-        likes_prefetch = mongo.Prefetch(
-            'likes',
-            Like.objects.filter(created_by_id=user.pk).only('id'),
-            to_attr='user_likes'
+        return super().get_queryset().annotate(
+            likes_count=models.Count('likes', distinct=True),
+            comments_count=models.Count('comments', distinct=True),
+            is_liked=models.Exists(
+                Like.objects.filter(post_id=models.OuterRef('pk'), created_by_id=user.pk)
+            )
         )
 
-        qs = super().get_queryset()
-        # TODO: fix bug here for likes gets count of comments
-        qs = qs.annotate(
-            likes_count=mongo.Count('likes', distinct=True),
-            comments_count=mongo.Count('comments', distinct=True),
-        )
 
-        return qs.prefetch_related(likes_prefetch)
-
-
-class Post(AbstractDocument):
-    content = mongo.TextField(null=False)
-    tags = mongo.JSONField()
-
-    media_list = mongo.ArrayField(
-        model_container=Media,
-        model_form_class=MediaForm,
-    )
-
+class Post(AbstractModel):
+    content = models.TextField(null=False)
+    tags = ArrayField(base_field=models.TextField())
+    created_by = models.ForeignKey('auth.User', related_name='posts', on_delete=models.CASCADE)
     objects = PostManager()
 
     def add_comment(self, content, created_by, media_file=None):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)
+        comment.save()
+
         if media_file:
             media_document = media.models.MediaDocument(
                 parent_id=self.pk,
                 parent_type=media.models.MediaDocument.ParentTypes.COMMENT
             )
             media_document.upload(media_file)
-            comment.media = {
-                'hash': media_document.pk,
-                'content_type': media_document.content_type
-            }
 
-        comment.save()
+            Media(
+                comment_id=comment.pk,
+                hash=media_document.pk,
+                content_type=media_document.content_type
+            ).save()
+
         return comment
 
     def add_like(self, user_pk):
-        user_exists = users.models.UserData.objects.filter(pk=user_pk).exists()
+        user_exists = auth.models.User.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
             raise ValidationError(u'User doesn\'t exist')
@@ -99,7 +84,7 @@ class Post(AbstractDocument):
         return like
 
     def remove_like(self, user_pk):
-        user_exists = users.models.UserData.objects.filter(pk=user_pk).exists()
+        user_exists = auth.models.User.objects.filter(pk=user_pk).exists()
 
         if not user_exists:
             raise ValidationError(u'User doesn\'t exist')
@@ -128,28 +113,24 @@ class Post(AbstractDocument):
 
     class Meta:
         db_table = 'main_posts'
-        db = settings.MONGO_DATABASE
+        db = settings.DEFAULT_DATABASE
 
 
-class Comment(AbstractDocument):
-    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='comments', null=False)
-    content = mongo.TextField(null=False)
-
-    media = mongo.EmbeddedField(
-        model_container=Media,
-        model_form_class=MediaForm,
-        null=True
-    )
+class Comment(AbstractModel):
+    content = models.TextField(blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', null=False)
+    created_by = models.ForeignKey('auth.User', related_name='comments', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'main_comments'
-        db = settings.MONGO_DATABASE
+        db = settings.DEFAULT_DATABASE
 
 
-class Like(AbstractDocument):
-    post = mongo.ForeignKey(Post, on_delete=mongo.CASCADE, related_name='likes', null=True)
-    comment = mongo.ForeignKey(Comment, on_delete=mongo.CASCADE, related_name='likes', null=True)
+class Like(AbstractModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes', null=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes', null=True)
+    created_by = models.ForeignKey('auth.User', related_name='likes', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'main_likes'
-        db = settings.MONGO_DATABASE
+        db = settings.DEFAULT_DATABASE

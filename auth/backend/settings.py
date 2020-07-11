@@ -21,7 +21,7 @@ DEFAULTS = {
 
     'AUTH_HEADER_TYPES': ('Bearer', ),
     'META_TYPE': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'uuid',
+    'USER_ID_FIELD': 'pk',
     'USER_ID_CLAIM': 'user_uuid',
     'VERIFY_TYPES': VERIFY_TYPES,
     'VERIFY_TYPE_AUTH': VERIFY_TYPE_AUTH,

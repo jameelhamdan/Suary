@@ -26,7 +26,7 @@ export default class Post extends React.Component {
               <span className="d-none d-md-inline-block">{this.data.created_by.username}</span>
             </CardTitle>
 
-            <p>{this.data.content}</p>tags
+            <p>{this.data.content}</p>
           </CardBody>
 
           {this.data.media_list.length > 0 &&

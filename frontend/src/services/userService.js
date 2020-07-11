@@ -28,7 +28,7 @@ export const userService = {
       UserStorage.storeRefreshToken(data["refresh_token"]);
 
       const user_data = {
-        "uuid": data["uuid"],
+        "id": data["id"],
         "username": data["username"],
         "full_name": data["full_name"],
         "avatar_uuid": data["avatar_uuid"],
