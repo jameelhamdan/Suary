@@ -1,12 +1,10 @@
 /**
  * Simple script to render and serve the frontend alone using remote API_URL
  *
- *
  */
 
 const path = require("path");
 const express = require("express");
-const ejs = require('ejs');
 const app = express();
 app.engine('html', require('ejs').renderFile);
 

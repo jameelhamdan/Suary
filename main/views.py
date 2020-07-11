@@ -125,28 +125,32 @@ class ListCommentsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 
 @view_authenticate()
 class LikePostView(APIViewMixin, generics.CreateAPIView):
-    serializer_class = serializers.SwitchPostLikeSerializer
+    serializer_class = serializers.PostLikeSerializer
 
     def create(self, request, *args, **kwargs):
+        post = generics.get_object_or_404(models.Post.objects, pk=self.kwargs['pk'])
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        post = cleaned_data['post']
         action = cleaned_data['action']
         user_pk = self.request.current_user.pk
-
+        is_liked = None
         if action == self.serializer_class.ACTION_CHOICE_LIKE:
             like = post.add_like(user_pk)
             message = 'Successfully Liked Post'
+            is_liked = True
         elif action == self.serializer_class.ACTION_CHOICE_UNLIKE:
             like = post.remove_like(user_pk)
             message = 'Successfully Unliked Post'
+            is_liked = False
         else:
             raise Exception('Action Method Not Defined in LikePostView')
 
         result = {
             'uuid': post.pk,
+            'state': is_liked
         }
 
         return self.get_response(message=message, result=result)

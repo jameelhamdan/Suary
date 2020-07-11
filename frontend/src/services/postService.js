@@ -2,11 +2,11 @@ import FormData from 'form-data';
 import {ajax, apiRoutes} from "utils/ajax";
 
 const uploadConfig = {
-    'content-type': 'multipart/form-data'
+  'content-type': 'multipart/form-data'
 };
 
 const jsonConfig = {
-    'content-type': 'application/json'
+  'content-type': 'application/json'
 };
 
 export const postService = {
@@ -36,7 +36,7 @@ export const postService = {
   getPostComments: async (post_id, cursor = null) => {
     return ajax({
       method: 'get',
-      url: apiRoutes.ListComments(post_id, cursor),
+      url: apiRoutes.listComments(post_id, cursor),
       headers: jsonConfig,
     }).then(res => {
       return res.data['result'];
@@ -44,17 +44,43 @@ export const postService = {
   },
   addPostComment: async (post_id, content, imageFile) => {
     let payload = new FormData();
-    if(content){
+    if (content) {
       payload.set('content', content);
     }
-    if(imageFile){
+    if (imageFile) {
       payload.append('media', imageFile, imageFile.fileName);
     }
     return ajax({
       method: 'post',
-      url: apiRoutes.AddComment(post_id),
+      url: apiRoutes.addComment(post_id),
       data: payload,
       uploadConfig: uploadConfig,
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  likePost: async (post_id) => {
+    const payload = {
+      action: 'like'
+    };
+
+    return ajax({
+      method: 'post',
+      url: apiRoutes.likePost(post_id),
+      data: payload
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  unlikePost: async (post_id) => {
+    const payload = {
+      action: 'unlike'
+    };
+
+    return ajax({
+      method: 'post',
+      url: apiRoutes.likePost(post_id),
+      data: payload
     }).then(res => {
       return res.data['result'];
     });

@@ -1,8 +1,7 @@
 import React from "react";
 import {FormInput, InputGroup, InputGroupText, InputGroupAddon, Row, Col, ListGroupItem, Form, Button} from "shards-react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
-import {faPaperPlane, faImage} from '@fortawesome/free-solid-svg-icons'
+import {Image as ImageIcon, Send as SendIcon} from "@material-ui/icons";
 import {postService} from "services/postService";
 
 
@@ -55,10 +54,11 @@ export default class AddComment extends React.Component {
   }
 
   Submit() {
+    if (this.state.loading) return;
+
     const content = this.state.content;
     const file = this.state.file;
     if (!content && !file) return;
-    if (this.state.loading) return;
 
     this.setState((state) => {
       state.loading = true;
@@ -66,6 +66,8 @@ export default class AddComment extends React.Component {
     });
 
     postService.addPostComment(this.post_id, content, file).then((result) => {
+      this.inputRef.current.value = '';
+      this.fileRef.current.value = null;
       this.handler(result);
     }).catch(error => {
       if(!error.response){
@@ -78,6 +80,8 @@ export default class AddComment extends React.Component {
 
     this.setState((state) => {
       state.loading = false;
+      state.file = null;
+      state.content = null;
       return state
     });
   };
@@ -90,11 +94,11 @@ export default class AddComment extends React.Component {
             <InputGroup seamless>
               <InputGroupAddon type="append">
                 <InputGroupText>
-                  <Button theme="light" onClick={this.handleFileClick} style={{marginRight: 8}} disabled={this.state.loading}>
-                    <FontAwesomeIcon icon={faImage} size="lg"/>
+                  <Button theme="transparent" onClick={this.handleFileClick} style={{marginRight: 4}} disabled={this.state.loading}>
+                    <ImageIcon></ImageIcon>
                   </Button>
-                  <Button theme="light" onClick={this.Submit} disabled={this.state.loading}>
-                    <FontAwesomeIcon icon={faPaperPlane} size="lg"/>
+                  <Button theme="transparent" onClick={this.Submit} disabled={this.state.loading}>
+                    <SendIcon></SendIcon>
                   </Button>
                 </InputGroupText>
               </InputGroupAddon>
