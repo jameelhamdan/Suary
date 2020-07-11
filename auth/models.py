@@ -23,6 +23,16 @@ LOG_ACTIONS = (
 )
 
 
+class UserManager(models.Manager):
+    def following(self, user=None):
+        return super().get_queryset().annotate(
+            follow_count=models.Count('followers', distinct=True),
+            is_followed=models.Exists(
+                users.models.Follow.objects.filter(following_id=models.OuterRef('pk'), follower_id=user.pk)
+            )
+        )
+
+
 class User(models.Model):
     id = models.CharField(max_length=36, primary_key=True, db_index=True, default=utils.generate_uuid, editable=False)
     username = models.CharField(max_length=128, unique=True, db_index=True, null=False, editable=False, validators=[validators.UsernameValidator])
@@ -35,6 +45,7 @@ class User(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
     full_name = models.CharField(max_length=256, null=False)
     birth_date = models.DateField(null=False)
+    objects = UserManager()
 
     def get_secret_key(self):
         return utils.hash_password(self.secret_key)
@@ -70,6 +81,13 @@ class User(models.Model):
             new_user.set_password(password)
             new_user.save()
         return new_user
+
+    def follower_prefetch(self, relation_name):
+        return models.Prefetch(
+            relation_name,
+            queryset=User.objects.following(self),
+            to_attr=f'{relation_name}_rel'
+        )
 
     def update_avatar(self, new_avatar):
         import media.models

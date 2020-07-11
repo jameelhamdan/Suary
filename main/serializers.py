@@ -12,7 +12,6 @@ class MediaSerializer(serializers.Serializer):
 class PostSerializer(serializers.Serializer):
     id = serializers.CharField()
     content = serializers.CharField()
-    created_on = serializers.DateTimeField()
     tags = serializers.ListField(
         child=serializers.CharField()
     )
@@ -21,7 +20,8 @@ class PostSerializer(serializers.Serializer):
         many=True
     )
 
-    created_by = users.serializers.UserSerializer()
+    created_on = serializers.DateTimeField()
+    created_by = users.serializers.UserSerializer(source='created_by_rel')
     likes_count = serializers.IntegerField(default=None)
     comments_count = serializers.IntegerField(default=None)
     is_liked = serializers.BooleanField(default=None)
@@ -43,7 +43,7 @@ class CommentSerializer(serializers.Serializer):
     post_id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
-    created_by = users.serializers.UserSerializer()
+    created_by = users.serializers.UserSerializer(source='created_by_rel')
     media = MediaSerializer(default=None)
 
 

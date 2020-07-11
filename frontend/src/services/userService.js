@@ -14,7 +14,42 @@ export const userService = {
       return res.data['result'];
     });
   },
+  followUser: async (user_id) => {
+    const payload = {
+      user: user_id,
+      action: 'follow'
+    };
 
+    return ajax({
+      method: 'post',
+      url: apiRoutes.userFollow(),
+      data: payload
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  unfollowUser: async (user_id) => {
+    const payload = {
+      user: user_id,
+      action: 'unfollow'
+    };
+
+    return ajax({
+      method: 'post',
+      url: apiRoutes.userFollow(),
+      data: payload
+    }).then(res => {
+      return res.data['result'];
+    });
+  },
+  updateAvatar: async (imageFile) => {
+    let requestData = new FormData();
+
+    requestData.append('avatar', imageFile, imageFile.fileName);
+    return ajax.put(apiRoutes.userUpdateAvatar(), requestData, uploadConfig).then(res => {
+      return res;
+    });
+  },
   register: async (userData) => {
     return ajax.post(apiRoutes.Register(), userData).then(res => {
       return res.data['result'];
@@ -39,14 +74,6 @@ export const userService = {
 
       return user_data;
     })
-  },
-  updateAvatar: async (imageFile) => {
-    let requestData = new FormData();
-
-    requestData.append('avatar', imageFile, imageFile.fileName);
-    return ajax.put(apiRoutes.userUpdateAvatar(), requestData, uploadConfig).then(res => {
-      return res;
-    });
   },
   logout: () => {
     UserStorage.clear();

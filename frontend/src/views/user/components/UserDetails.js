@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import {
   Card,
   CardHeader,
-  Button,
 } from "shards-react";
 import {LargeAvatar} from "components/common/Image";
+import FollowButton from "components/users/Follow";
 
 
 const UserDetails = ({ userDetails }) => (
@@ -16,9 +16,7 @@ const UserDetails = ({ userDetails }) => (
       </div>
       <h4 className="mb-0">{userDetails.username}</h4>
       <span className="text-muted d-block mb-2"></span>
-      <Button pill outline size="sm" className="mb-2">
-        <i className="material-icons mr-1">person_add</i> Follow
-      </Button>
+      <FollowButton user_id={userDetails.id} follow_count={userDetails.follow_count} is_followed={userDetails.is_followed} />
     </CardHeader>
   </Card>
 );
@@ -31,8 +29,11 @@ UserDetails.propTypes = {
 };
 
 UserDetails.defaultProps = {
+  id: null,
   username: null,
   avatar_uuid: null,
+  follow_count: 0,
+  is_followed: false
 };
 
 export default UserDetails;
