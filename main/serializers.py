@@ -34,6 +34,7 @@ class PostSerializer(serializers.Serializer):
             created_by = obj.created_by
         return users.serializers.UserSerializer(created_by).data
 
+
 # Used for Adding a post
 class AddPostSerializer(serializers.Serializer):
     content = serializers.CharField(required=True)
@@ -50,8 +51,16 @@ class CommentSerializer(serializers.Serializer):
     post_id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
-    created_by = users.serializers.UserSerializer(source='created_by_rel')
+    created_by = serializers.SerializerMethodField()
     media = MediaSerializer(default=None)
+
+    def get_created_by(self, obj):
+        # TODO: do this a better way
+        if hasattr(obj, 'created_by_rel'):
+            created_by = obj.created_by_rel
+        else:
+            created_by = obj.created_by
+        return users.serializers.UserSerializer(created_by).data
 
 
 class AddCommentSerializer(serializers.Serializer):

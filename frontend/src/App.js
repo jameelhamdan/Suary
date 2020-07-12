@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  //Router,
-  Route,
-  Switch
+	Redirect,
+	Route,
+	Switch
 } from "react-router";
 import {BrowserRouter as Router} from "react-router-dom";
 import routes from "routes";
@@ -14,16 +14,22 @@ import NotFound from "components/common/pages/NotFound"
 
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.get_routes = this.get_routes.bind(this);
-  }
+	constructor(props) {
+		super(props);
+		this.get_routes = this.get_routes.bind(this);
+	}
 
-  get_routes() {
-    let route_list = [];
-    for (let i = 0; i < routes.length; i++) {
-      const route = routes[i];
-      if (!this.props.userState.logged_in && route.logged_in_only) continue;
+	get_routes() {
+		let route_list = [];
+		for (let i = 0; i < routes.length; i++) {
+			const route = routes[i];
+			if (!this.props.userState.logged_in && route.logged_in_only) {
+				// if not authenticated redirect to login page with next param
+				//TODO: do this redirect better
+				const url = `/login?next=/`;
+				route.component = () => <Redirect to={url} />;
+      }
+
       route_list.push(route);
     }
     return route_list;

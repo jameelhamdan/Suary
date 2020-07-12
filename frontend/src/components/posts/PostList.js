@@ -1,27 +1,30 @@
 import React from 'react'
 import PropTypes from "prop-types";
-import {postService} from "services/postService";
 import InfiniteScroll from 'react-infinite-scroller';
 import Post from "components/posts/Post"
 import Loading from "components/common/Loading"
 import {CardText} from "shards-react"
 
 
-export default class UserPosts extends React.Component {
+export default class PostList extends React.Component {
   constructor(props) {
     super(props);
-    this.username = this.props.username;
+    this.emptyMessage = this.props.emptyMessage;
+    this.loadMoreFunc = this.props.loadMoreFunc;
+    this.enableComments = this.props.enableComments;
+    this.enableFollowButton = this.props.enableFollowButton;
     this.state = {
       list: [],
       cursor: null,
     };
   }
+
   componentDidMount() {
     this.loadMore(0);
   }
 
   loadMore = (page) => {
-    postService.getUserPosts(this.username, this.state.cursor).then((data) => {
+    this.loadMoreFunc(this.state.cursor).then((data) => {
       this.setState(state => ({
         list: [...state.list, ...data.list],
         cursor: data.next
@@ -32,7 +35,7 @@ export default class UserPosts extends React.Component {
   };
 
   render() {
-    const EmptyMessage = <CardText>This user hasn't posted anything yet :(</CardText>;
+    const EmptyMessage = <CardText>{this.emptyMessage}</CardText>;
     if(this.state.list.length === 0){
       return EmptyMessage;
     }
@@ -45,7 +48,7 @@ export default class UserPosts extends React.Component {
           hasMore={!!this.state.cursor}
           loader={null}>
           {this.state.list.map((item, index) => (
-            <Post key={index} postDetails={item} enableComments={false} enableFollowButton={false}/>
+            <Post key={index} postDetails={item} enableComments={this.enableComments} enableFollowButton={this.enableFollowButton}/>
           ))}
         </InfiniteScroll>
       </div>
@@ -53,7 +56,16 @@ export default class UserPosts extends React.Component {
   }
 
   static propTypes = {
-    username: PropTypes.string.isRequired
+  	loadMoreFunc: PropTypes.func.isRequired,
+  	emptyMessage: PropTypes.string,
+		enableFollowButton: PropTypes.bool,
+		enableComments: PropTypes.bool,
   };
 
+  static defaultProps = {
+  	emptyMessage: 'Nothing has been posted anything yet :(',
+		loadMoreFunc: null,
+		enableFollowButton: false,
+		enableComments: false,
+	}
 }

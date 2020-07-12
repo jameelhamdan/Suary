@@ -10,6 +10,11 @@ const jsonConfig = {
 };
 
 export const postService = {
+  getFeedPosts: async (cursor) => {
+    return ajax.get(apiRoutes.feedList(cursor)).then(res => {
+      return res.data['result'];
+    });
+  },
   getUserPosts: async (username, cursor = null) => {
     return ajax.get(apiRoutes.userPostsList(username, cursor)).then(res => {
       return res.data['result'];

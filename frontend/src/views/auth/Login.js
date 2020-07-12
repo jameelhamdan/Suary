@@ -21,6 +21,11 @@ class Login extends React.Component {
       loading: false,
       errors: [],
     };
+    const params = new URLSearchParams(this.props.location.search);
+    const nextUrl = params.get('next') || null;
+    this.redirectUrl = nextUrl || '/';
+
+    this.registerUrl = nextUrl? `/register?next=${nextUrl}`: '/register';
     this.onSubmit = this.onSubmit.bind(this);
     this.LoginForm = this.LoginForm.bind(this);
   }
@@ -39,7 +44,7 @@ class Login extends React.Component {
 
     userService.login(submitData).then((user_data) => {
       this.props.loginAction(user_data);
-      this.props.history.push('/');
+      this.props.history.push(this.redirectUrl);
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;
@@ -75,7 +80,7 @@ class Login extends React.Component {
         {errors.password && errors.password.message}
 
         <ListGroupItem className="d-flex px-3 border-0">
-          <strong>Don't have an account ? <Link className="mr-auto" to="register">Register</Link> now!</strong>
+          <strong>Don't have an account ? <Link className="mr-auto" to={this.registerUrl}>Register</Link> now!</strong>
           <Button type="submit" theme="accent" size="sm" className="ml-auto" disabled={this.state.loading}>
             <i className="material-icons">lock</i> Login
           </Button>

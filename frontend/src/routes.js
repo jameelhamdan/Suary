@@ -16,11 +16,15 @@ import UserProfileRedirect from "views/user/ProfileRedirect";
 // Posts
 import PostDetail from "views/posts/Detail";
 
+/*
+  TODO: for now all views are logged in only,
+  later specify permissions for each view and permission for actions and such
+*/
 
 export default [
   {
     path: "/",
-    logged_in_only: false,
+    logged_in_only: true,
     exact: true,
     strict: false,
     layout: DefaultLayout,
@@ -68,7 +72,7 @@ export default [
   },
   {
     path: "/post/:id",
-    logged_in_only: false,
+    logged_in_only: true,
     exact: false,
     strict: false,
     layout: DefaultLayout,
