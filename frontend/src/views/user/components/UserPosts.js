@@ -45,7 +45,7 @@ export default class UserPosts extends React.Component {
           hasMore={!!this.state.cursor}
           loader={null}>
           {this.state.list.map((item, index) => (
-            <Post key={index} postDetails={item} enableComments={false}/>
+            <Post key={index} postDetails={item} enableComments={false} enableFollowButton={false}/>
           ))}
         </InfiniteScroll>
       </div>

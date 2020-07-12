@@ -34,6 +34,10 @@ class apiRoutes {
     return `users/detail/${username}`;
   }
 
+  static userFollow() {
+    return `users/follow`;
+  }
+
   static userUpdateAvatar() {
     return `users/avatar`;
   }

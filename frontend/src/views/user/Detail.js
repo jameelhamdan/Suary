@@ -37,7 +37,7 @@ class UserDetail extends React.Component {
         <Row className="mt-5">
           <Col lg="3" md="4">
             <Fade in={!this.state.isLoading}>
-              <UserDetails userDetails={this.state.data}/>
+              <UserDetails data={this.state.data}/>
             </Fade>
           </Col>
           <Col lg="9" md="8">

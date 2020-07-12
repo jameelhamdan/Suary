@@ -1,38 +1,45 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {
-  Card,
-  CardHeader,
-  Button,
+	Card,
+	CardHeader
 } from "shards-react";
 import {LargeAvatar} from "components/common/Image";
+import placeholderImage from "images/avatars/placeholder.png";
+import FollowButton from "components/users/Follow";
 
 
-const UserDetails = ({ userDetails }) => (
-  <Card small className="mb-4 pt-3">
-    <CardHeader className="border-bottom text-center">
-      <div className="mb-3 mx-auto">
-        <LargeAvatar image_uuid={userDetails.avatar_uuid} fallback={require("images/avatars/placeholder.png")} />
-      </div>
-      <h4 className="mb-0">{userDetails.username}</h4>
-      <span className="text-muted d-block mb-2"></span>
-      <Button pill outline size="sm" className="mb-2">
-        <i className="material-icons mr-1">person_add</i> Follow
-      </Button>
-    </CardHeader>
-  </Card>
-);
+export default class UserDetails extends React.Component {
+	constructor(props) {
+		super(props);
+		this.data = this.props.data;
+	}
 
-UserDetails.propTypes = {
-  /**
-   * The user details object.
-   */
-  userDetails: PropTypes.object
+	render() {
+		let followerText = `${this.data.follow_count} Followers`;
+		return (
+			<Card small className="mb-4 pt-3">
+				<CardHeader className="border-bottom text-center">
+					<div className="mb-3 mx-auto">
+						<LargeAvatar image_uuid={this.data.avatar_uuid} fallback={placeholderImage}/>
+					</div>
+					<h4 className="mb-0">{this.data.username}</h4>
+					<span className="text-muted d-block mb-2">{followerText}</span>
+					<FollowButton size="mb-2" user_id={this.data.id} follow_count={this.data.follow_count} is_followed={this.data.is_followed}/>
+				</CardHeader>
+			</Card>
+		)
+	}
+
+	static propTypes = {
+		userDetails: PropTypes.object
+	};
+
+	static defaultProps = {
+		id: null,
+		username: null,
+		avatar_uuid: null,
+		follow_count: 0,
+		is_followed: false
+	};
 };
-
-UserDetails.defaultProps = {
-  username: null,
-  avatar_uuid: null,
-};
-
-export default UserDetails;

@@ -32,7 +32,7 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
         if self.request.method == 'GET':
             return serializers.ListFollowingSerializer
         else:
-            return serializers.SwitchFollowSerializer
+            return serializers.FollowSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -40,16 +40,23 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
         cleaned_data = serializer.validated_data
 
         user = cleaned_data['user']
+        action = cleaned_data['action']
+        serializer_class = self.get_serializer_class()
 
-        if cleaned_data['follow']:
+        if action == serializer_class.ACTION_CHOICE_FOLLOW:
             follow = self.request.current_user.follow(user.pk)
+            new_state = True
             message = 'Successfully Followed User'
-        else:
+        elif action == serializer_class.ACTION_CHOICE_UNFOLLOW:
             follow = self.request.current_user.unfollow(user.pk)
+            new_state = False
             message = 'Successfully Unfollowed User'
+        else:
+            raise Exception('Action Method Not Defined in FollowView')
 
         result = {
             'id': user.pk,
+            'state': new_state
         }
 
         return self.get_response(message=message, result=result)
@@ -61,7 +68,6 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
 
 @view_authenticate()
 class DetailUserView(APIViewMixin, generics.RetrieveAPIView):
-    queryset = auth.models.User.objects.all()
     serializer_class = serializers.UserSerializer
     lookup_field = 'username'
     lookup_url_kwarg = 'username'
@@ -70,3 +76,6 @@ class DetailUserView(APIViewMixin, generics.RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return self.get_response(message='User Details!', result=serializer.data)
+
+    def get_queryset(self):
+        return auth.models.User.objects.related(self.request.current_user)

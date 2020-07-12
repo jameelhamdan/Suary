@@ -12,7 +12,6 @@ class MediaSerializer(serializers.Serializer):
 class PostSerializer(serializers.Serializer):
     id = serializers.CharField()
     content = serializers.CharField()
-    created_on = serializers.DateTimeField()
     tags = serializers.ListField(
         child=serializers.CharField()
     )
@@ -21,11 +20,19 @@ class PostSerializer(serializers.Serializer):
         many=True
     )
 
-    created_by = users.serializers.UserSerializer()
+    created_on = serializers.DateTimeField()
+    created_by = serializers.SerializerMethodField()
     likes_count = serializers.IntegerField(default=None)
     comments_count = serializers.IntegerField(default=None)
     is_liked = serializers.BooleanField(default=None)
 
+    def get_created_by(self, obj):
+        # TODO: do this a better way
+        if hasattr(obj, 'created_by_rel'):
+            created_by = obj.created_by_rel
+        else:
+            created_by = obj.created_by
+        return users.serializers.UserSerializer(created_by).data
 
 # Used for Adding a post
 class AddPostSerializer(serializers.Serializer):
@@ -43,7 +50,7 @@ class CommentSerializer(serializers.Serializer):
     post_id = serializers.CharField()
     content = serializers.CharField()
     created_on = serializers.DateTimeField()
-    created_by = users.serializers.UserSerializer()
+    created_by = users.serializers.UserSerializer(source='created_by_rel')
     media = MediaSerializer(default=None)
 
 
