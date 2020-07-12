@@ -59,7 +59,7 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     def get_queryset(self):
         user = self.get_object()
         current_user = self.request.current_user
-        created_by_prefetch = current_user.follower_prefetch('created_by')
+        created_by_prefetch = current_user.related_prefetch('created_by')
 
         return models.Post.objects.liked(
             user=current_user
@@ -72,7 +72,7 @@ class ListPostsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
 class DetailPostView(APIViewMixin, generics.RetrieveAPIView):
     def get_queryset(self):
         current_user = self.request.current_user
-        created_by_prefetch = current_user.follower_prefetch('created_by')
+        created_by_prefetch = current_user.related_prefetch('created_by')
 
         return models.Post.objects.liked(
             user=current_user
@@ -122,7 +122,7 @@ class ListCommentsView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     def get_queryset(self):
         post = self.get_object()
         current_user = self.request.current_user
-        created_by_prefetch = current_user.follower_prefetch('created_by')
+        created_by_prefetch = current_user.related_prefetch('created_by')
         return models.Comment.objects.filter(post_id=post.pk).prefetch_related(
             created_by_prefetch, 'media'
         ).only('id', 'content', 'post_id', 'created_by', 'created_on')

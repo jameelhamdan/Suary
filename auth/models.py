@@ -24,11 +24,20 @@ LOG_ACTIONS = (
 
 
 class UserManager(models.Manager):
-    def following(self, user=None):
-        return super().get_queryset().annotate(
-            follow_count=models.Count('followers', distinct=True),
+    def related(self, user=None):
+        """
+        Gets queryset related to user, handles getting follower count, is followed
+        and filters blocked users away
+        """
+        qs = super().get_queryset()
+        # TODO: find a way with better performance than this
+        qs = qs.exclude(following__is_blocked=True).exclude(followers__is_blocked=True)
+
+        # Annotate queryset with required values
+        return qs.annotate(
+            follow_count=models.Count('followers', filter=models.Q(followers__is_active=True), distinct=True),
             is_followed=models.Exists(
-                users.models.Follow.objects.filter(following_id=models.OuterRef('pk'), follower_id=user.pk)
+                users.models.Follow.objects.filter(is_active=True, following_id=models.OuterRef('pk'), follower_id=user.pk)
             )
         )
 
@@ -48,28 +57,65 @@ class User(models.Model):
     objects = UserManager()
 
     def get_secret_key(self):
+        """
+        Returns hashed user secret key
+        Note: the user secret key is used to encode the user jwt token
+        :return: str: hashed password
+        """
         return utils.hash_password(self.secret_key)
 
     def set_password(self, new_password):
+        """
+        Hashes raw password and sets it in object
+        :param new_password: str: plain text password
+        :return:
+        """
         self.password_hash = utils.hash_password(new_password)
 
     def validate_password(self, password):
+        """
+        Validates if given raw password is same as hashed
+        :param password: str: plain text password
+        :return: bool
+        """
         return utils.verify_password(self.password_hash, password)
 
     def reset_secret_key(self):
+        """
+        Resets user secret key effectively invalidating all their tokens
+        :return:
+        """
         self.secret_key = utils.generate_uuid(3)
         self.save()
 
     @staticmethod
     def exists(username, email):
+        """
+        checks if user with given username or email exist
+        :param username: str
+        :param email: str
+        :return:
+        """
         return User.objects.filter(Q(username=username) | Q(email=email)).exists()
 
     def update_last_login(self):
+        """
+        Updates last login date and saves model
+        :return:
+        """
         self.last_login = timezone.now()
         self.save(update_fields=['last_login'])
 
     @staticmethod
     def create_user(username, email, password, **kwargs):
+        """
+        Adds new user with given data
+        :param username: str
+        :param email: str
+        :param password: str: plain text password
+        :param kwargs:
+        :return:
+        """
         new_user = User(
             username=username,
             email=email,
@@ -82,14 +128,25 @@ class User(models.Model):
             new_user.save()
         return new_user
 
-    def follower_prefetch(self, relation_name):
+    def related_prefetch(self, relation_name):
+        """
+        Creates a new prefetch to be used in `prefetch_related` to get related data to users
+        instead of using `select_related`
+        :param relation_name: name of the relationship to prefetch
+        :return: models.Prefetch:
+        """
         return models.Prefetch(
             relation_name,
-            queryset=User.objects.following(self),
+            queryset=User.objects.related(self),
             to_attr=f'{relation_name}_rel'
         )
 
     def update_avatar(self, new_avatar):
+        """
+        Upload and save new avatar for user
+        :param new_avatar: TempFile
+        :return: str: avatar_uuid
+        """
         import media.models
 
         # Delete Old avatar
@@ -113,6 +170,11 @@ class User(models.Model):
         return media_document.pk
 
     def follow(self, user_pk):
+        """
+        Follow given user by pk
+        :param user_pk: str: user id
+        :return: Follow
+        """
         from users.models import Follow
         user_exists = User.objects.filter(pk=user_pk).exists()
 
@@ -139,6 +201,11 @@ class User(models.Model):
         return follow
 
     def unfollow(self, user_pk):
+        """
+         Remove Follow for given user by pk
+         :param user_pk: str: user id
+         :return: Follow
+         """
         from users.models import Follow
         user_exists = User.objects.filter(pk=user_pk).exists()
 
@@ -157,6 +224,10 @@ class User(models.Model):
         return follow
 
     def get_following_queryset(self):
+        """
+        Gets queryset for all follows by this user
+        :return:
+        """
         return users.models.Follow.objects.filter(follower_id=self.pk, is_active=True)
 
     def save(self, *args, **kwargs):

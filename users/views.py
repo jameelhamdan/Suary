@@ -45,15 +45,18 @@ class FollowView(APIViewMixin, PaginationMixin, generics.ListCreateAPIView):
 
         if action == serializer_class.ACTION_CHOICE_FOLLOW:
             follow = self.request.current_user.follow(user.pk)
+            new_state = True
             message = 'Successfully Followed User'
         elif action == serializer_class.ACTION_CHOICE_UNFOLLOW:
             follow = self.request.current_user.unfollow(user.pk)
+            new_state = False
             message = 'Successfully Unfollowed User'
         else:
             raise Exception('Action Method Not Defined in FollowView')
 
         result = {
             'id': user.pk,
+            'state': new_state
         }
 
         return self.get_response(message=message, result=result)
@@ -75,4 +78,4 @@ class DetailUserView(APIViewMixin, generics.RetrieveAPIView):
         return self.get_response(message='User Details!', result=serializer.data)
 
     def get_queryset(self):
-        return auth.models.User.objects.following(self.request.current_user)
+        return auth.models.User.objects.related(self.request.current_user)

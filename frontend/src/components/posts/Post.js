@@ -2,11 +2,11 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
 import PropTypes from "prop-types";
-import Avatar, {PostMedia} from "components/common/Image";
-import placeholderImage from "images/avatars/placeholder.png";
+import {PostMedia} from "components/common/Image";
 import {Comment as CommentIcon} from "@material-ui/icons";
 import PostComments from "./PostComments";
 import Like from "./Like";
+import UserBadge from "./UserBadge";
 
 
 export default class Post extends React.Component {
@@ -14,6 +14,7 @@ export default class Post extends React.Component {
     super(props);
     this.data = this.props.postDetails;
     this.enableComments = this.props.enableComments;
+    this.enableFollowButton = this.props.enableFollowButton;
   }
 
   render() {
@@ -22,10 +23,8 @@ export default class Post extends React.Component {
         <Card small className="mb-4">
           <CardBody>
             <CardTitle>
-              <Avatar image_uuid={this.data.created_by.avatar_uuid} fallback={placeholderImage}/>
-              <span className="d-none d-md-inline-block">{this.data.created_by.username}</span>
+              <UserBadge data={this.data.created_by} postCreatedOn={this.data.created_on} enableFollowButton={this.enableFollowButton}/>
             </CardTitle>
-
             <p>{this.data.content}</p>
           </CardBody>
 
@@ -58,6 +57,7 @@ export default class Post extends React.Component {
      */
     key: PropTypes.string,
     enableComments: PropTypes.bool,
+    enableFollowButton: PropTypes.bool,
     postDetails: PropTypes.shape({
       id: PropTypes.string.isRequired,
       is_liked: PropTypes.bool,
@@ -67,6 +67,8 @@ export default class Post extends React.Component {
         id: PropTypes.string,
         username: PropTypes.string,
         avatar_uuid: PropTypes.string,
+        follow_count: PropTypes.number,
+        is_followed: PropTypes.bool
       }),
       likes_count: PropTypes.number,
       comments_count: PropTypes.number,
@@ -76,6 +78,7 @@ export default class Post extends React.Component {
   static defaultProps = {
     key: '1',
     enableComments: false,
+    enableFollowButton: true,
     postDetails: {
       id: null,
       is_liked: false,
@@ -85,6 +88,8 @@ export default class Post extends React.Component {
         id: null,
         username: null,
         avatar_uuid: null,
+        follow_count: 0,
+        is_followed: false
       },
       likes_count: 0,
       comments_count: 0,
