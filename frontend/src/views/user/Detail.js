@@ -4,8 +4,9 @@ import {BaseWrapper} from "components/common/Wrapper";
 import {userService} from "services/userService";
 import NotFound from "components/common/pages/NotFound"
 import UserDetails from './components/UserDetails';
-import UserPosts from "./components/UserPosts";
+import PostList from "components/posts/PostList";
 import {connect} from "react-redux";
+import {postService} from "services/postService";
 
 
 class UserDetail extends React.Component {
@@ -28,6 +29,12 @@ class UserDetail extends React.Component {
     });
   }
 
+  loadPosts = (page, cursor) => {
+    return postService.getUserPosts(this.username, cursor).then((data) => {
+      return data;
+    });
+  };
+
   render() {
     if (this.state.isLoading) return null;
     if (this.state.error) return (<NotFound/>);
@@ -41,7 +48,7 @@ class UserDetail extends React.Component {
             </Fade>
           </Col>
           <Col lg="9" md="8">
-            <UserPosts username={this.username}/>
+            <PostList loadMoreFunc={this.loadPosts}/>
           </Col>
         </Row>
       </BaseWrapper>

@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  //Router,
+  Redirect,
   Route,
   Switch
 } from "react-router";
@@ -23,7 +23,13 @@ class App extends React.Component {
     let route_list = [];
     for (let i = 0; i < routes.length; i++) {
       const route = routes[i];
-      if (!this.props.userState.logged_in && route.logged_in_only) continue;
+      if (!this.props.userState.logged_in && route.logged_in_only) {
+        // if not authenticated redirect to login page with next param
+        //TODO: do this redirect better
+        const url = `/login?next=/`;
+        route.component = () => <Redirect to={url}/>;
+      }
+
       route_list.push(route);
     }
     return route_list;

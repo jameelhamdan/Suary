@@ -4,7 +4,7 @@ import {Card, CardBody, CardTitle, Nav, NavItem, NavLink} from "shards-react";
 import PropTypes from "prop-types";
 import {PostMedia} from "components/common/Image";
 import {Comment as CommentIcon} from "@material-ui/icons";
-import PostComments from "./PostComments";
+import PostComments from "./comments/PostComments";
 import Like from "./Like";
 import UserBadge from "./UserBadge";
 

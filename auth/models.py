@@ -56,14 +56,6 @@ class User(models.Model):
     birth_date = models.DateField(null=False)
     objects = UserManager()
 
-    def get_secret_key(self):
-        """
-        Returns hashed user secret key
-        Note: the user secret key is used to encode the user jwt token
-        :return: str: hashed password
-        """
-        return utils.hash_password(self.secret_key)
-
     def set_password(self, new_password):
         """
         Hashes raw password and sets it in object
@@ -79,6 +71,14 @@ class User(models.Model):
         :return: bool
         """
         return utils.verify_password(self.password_hash, password)
+
+    def get_secret_key(self):
+        """
+        Returns user secret key
+        Note: the user secret key is used to encode the user jwt refresh token
+        :return: str: secret key
+        """
+        return self.secret_key
 
     def reset_secret_key(self):
         """
@@ -246,9 +246,9 @@ class User(models.Model):
 class AccessLog(models.Model):
     action = models.CharField(max_length=16, choices=LOG_ACTIONS, default=LOG_ACTION_LOGIN)
     ip = models.GenericIPAddressField(db_index=True, null=True)
-    agent = models.CharField(max_length=128, null=True)
-    http_accept = models.CharField(max_length=1025)
-    path_info = models.CharField(max_length=255)
+    agent = models.TextField(max_length=128, null=True)
+    http_accept = models.TextField(default='')
+    path_info = models.TextField(default='')
     data = JSONField(null=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
