@@ -42,6 +42,14 @@ class apiRoutes {
     return `users/avatar`;
   }
 
+  // Feed Routes
+  static feedList(cursor = null) {
+    if (cursor !== null) {
+      return `feed/?cursor=${cursor}`;
+    }
+    return `feed/`
+  }
+
   // Post Routes
   static userPostsList(username, cursor = null) {
     if (cursor !== null) {
@@ -59,7 +67,7 @@ class apiRoutes {
   }
 
   static listComments(post_id, cursor = null) {
-      if (cursor !== null) {
+    if (cursor !== null) {
       return `main/post/${post_id}/comments?cursor=${cursor}`;
     }
     return `main/post/${post_id}/comments`;

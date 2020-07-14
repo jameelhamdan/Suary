@@ -10,6 +10,10 @@ class FeedView(APIViewMixin, PaginationMixin, generics.ListAPIView):
     serializer_class = serializers.PostSerializer
 
     def get_queryset(self):
-        user = self.request.current_user
-        following_ids = user.get_following_queryset().values_list('following_id', flat=True)
-        return models.Post.objects.liked(user=user).filter(created_by_id__in=following_ids).select_related('created_by').only('content', 'id', 'created_by', 'created_on')
+        current_user = self.request.current_user
+        created_by_prefetch = current_user.related_prefetch('created_by')
+
+        following_ids = current_user.get_following_queryset().values_list('following_id', flat=True)
+        return models.Post.objects.liked(user=current_user).filter(
+            created_by_id__in=following_ids
+        ).prefetch_related(created_by_prefetch).only('id', 'content', 'created_by', 'created_on')

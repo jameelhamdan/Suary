@@ -1,5 +1,5 @@
 import React from "react";
-import {FormInput, InputGroup, InputGroupText, InputGroupAddon, Row, Col, ListGroupItem, Form, Button} from "shards-react";
+import {FormInput, InputGroup, InputGroupText, InputGroupAddon, Row, Col, ListGroupItem, Button} from "shards-react";
 import PropTypes from "prop-types";
 import {Image as ImageIcon, Send as SendIcon} from "@material-ui/icons";
 import {postService} from "services/postService";
@@ -112,9 +112,6 @@ export default class AddComment extends React.Component {
   }
 
   static propTypes = {
-    /**
-     * The post details object.
-     */
     post_id: PropTypes.string.isRequired,
     handler: PropTypes.func.isRequired,
   };

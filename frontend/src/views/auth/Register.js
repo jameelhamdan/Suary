@@ -16,6 +16,10 @@ export default class Register extends React.Component {
       loading: false,
       errors: [],
     };
+    const params = new URLSearchParams(this.props.location.search);
+    const nextUrl = params.get('next') || null;
+    this.loginUrl = nextUrl? `/login?next=${nextUrl}`: '/login';
+
     this.onSubmit = this.onSubmit.bind(this);
     this.RegisterForm = this.RegisterForm.bind(this);
   }
@@ -37,7 +41,7 @@ export default class Register extends React.Component {
     };
 
     userService.register(submitData).then((userData) => {
-      this.props.history.push("/login");
+      this.props.history.push(this.loginUrl);
     }).catch(error => {
       if (error.response.status === 400) {
         const response_data = error.response.data;
@@ -101,7 +105,7 @@ export default class Register extends React.Component {
         {errors.password_confirm && errors.password_confirm.message}
 
         <ListGroupItem className="d-flex px-3 border-0">
-          <strong>Already have an account ? <Link className="mr-auto" to="login">Login</Link> now!</strong>
+          <strong>Already have an account ? <Link className="mr-auto" to={this.loginUrl}>Login</Link> now!</strong>
           <Button theme="accent" size="sm" className="ml-auto" disabled={this.state.loading}>
             <i className="material-icons">lock</i> Register
           </Button>

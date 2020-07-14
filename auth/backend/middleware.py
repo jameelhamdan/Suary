@@ -38,8 +38,7 @@ class AuthMiddleware(object):
         return view_func(request, *view_args, **view_kwargs)
 
     def __call__(self, request):
-        response = self.get_response(request)
-        return response
+        return self.get_response(request)
 
 
 def _http_auth_helper(request, auth_type):
@@ -47,7 +46,6 @@ def _http_auth_helper(request, auth_type):
         if auth_type == VERIFY_TYPE_ANY:
             return None
         else:
-
             token = get_auth_header(request)
             if auth_type == VERIFY_TYPE_AUTH:
                 return verify_auth_token(token)

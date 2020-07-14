@@ -1,21 +1,22 @@
 import React from "react";
-import {Card, CardBody} from "shards-react";
 import {Wrapper} from "components/common/Wrapper";
 import {connect} from "react-redux";
-import AddPostWidget from "components/posts/AddPost"
+import AddPostWidget from "components/posts/AddPost";
+import PostList from "components/posts/PostList";
+import {postService} from "services/postService";
 
 class Home extends React.Component {
+  loadPosts = (page, cursor) => {
+    return postService.getFeedPosts(cursor).then((data) => {
+      return data;
+    });
+  };
+
   render() {
     return (
       <Wrapper>
-        {this.props.userState.logged_in &&
-          <AddPostWidget history={this.props.history}/>
-        }
-        <Card small className="mb-4">
-          <CardBody>
-            <h5 className="card-title">Hello {this.props.userState.logged_in ? this.props.userState.userData.username : 'Stranger!'}</h5>
-          </CardBody>
-        </Card>
+        <AddPostWidget history={this.props.history}/>
+        <PostList loadMoreFunc={this.loadPosts}/>
       </Wrapper>
     )
   }
