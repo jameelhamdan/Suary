@@ -36,10 +36,10 @@ def decode_token(token, verify=True):
         raise Exception('Token Expired')
 
 
-def decode_refresh_token(token, secret_key='', verify=True):
+def decode_refresh_token(token, user_secret_key='', verify=True):
     try:
         # Decode Token
-        secret_key = get_refresh_token_secret_key(secret_key)
+        secret_key = get_refresh_token_secret_key(user_secret_key)
         token_data = jwt.decode(token, secret_key, verify=verify, algorithms=[ALGORITHM, ])
         return token_data
 
@@ -59,7 +59,8 @@ def create_refresh_token(user_id, user_secret_key):
     expire_date = datetime.utcnow() + REFRESH_TOKEN_EXPIRATION_PERIOD
 
     # Create new auth token
-    token = jwt.encode({user_id_field: user_id, 'exp': expire_date}, get_refresh_token_secret_key(user_secret_key), algorithm=ALGORITHM, )
+    secret_key = get_refresh_token_secret_key(user_secret_key)
+    token = jwt.encode({user_id_field: user_id, 'exp': expire_date}, secret_key, algorithm=ALGORITHM, )
     return token
 
 
@@ -100,12 +101,12 @@ def verify_refresh_token(token):
         raise Exception('This Token is expired!')
 
 
-def renew_refresh_token(token, secret_key):
-    token = decode_refresh_token(token, secret_key)
+def renew_refresh_token(token, user_secret_key):
+    token = decode_refresh_token(token, user_secret_key)
     user_id = token[user_id_field]
     expiration_date = token['exp']
     # Renew refresh token if is about to expire otherwise return same token
-    if datetime.utcnow() - expiration_date > timedelta(hours=1):
-        return create_refresh_token(user_id, secret_key)
+    if datetime.utcnow() - timedelta(microseconds=expiration_date) > datetime.utcnow() - timedelta(hours=1):
+        return create_refresh_token(user_id, user_secret_key)
     else:
         return token
