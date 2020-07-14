@@ -36,7 +36,7 @@ export default class PostList extends React.Component {
 
   render() {
     const EmptyMessage = <CardText>{this.emptyMessage}</CardText>;
-    if(this.state.list.length === 0){
+    if (this.state.list.length === 0) {
       return EmptyMessage;
     }
 
@@ -48,7 +48,8 @@ export default class PostList extends React.Component {
           hasMore={!!this.state.cursor}
           loader={null}>
           {this.state.list.map((item, index) => (
-            <Post key={index} postDetails={item} enableComments={this.enableComments} enableFollowButton={this.enableFollowButton}/>
+            <Post key={index} postDetails={item} enableComments={this.enableComments}
+                  enableFollowButton={this.enableFollowButton}/>
           ))}
         </InfiniteScroll>
       </div>
@@ -56,16 +57,16 @@ export default class PostList extends React.Component {
   }
 
   static propTypes = {
-  	loadMoreFunc: PropTypes.func.isRequired,
-  	emptyMessage: PropTypes.string,
-		enableFollowButton: PropTypes.bool,
-		enableComments: PropTypes.bool,
+    loadMoreFunc: PropTypes.func.isRequired,
+    emptyMessage: PropTypes.string,
+    enableFollowButton: PropTypes.bool,
+    enableComments: PropTypes.bool,
   };
 
   static defaultProps = {
-  	emptyMessage: 'Nothing has been posted anything yet :(',
-		loadMoreFunc: null,
-		enableFollowButton: false,
-		enableComments: false,
-	}
+    emptyMessage: 'Nothing has been posted anything yet :(',
+    loadMoreFunc: null,
+    enableFollowButton: false,
+    enableComments: false,
+  }
 }
