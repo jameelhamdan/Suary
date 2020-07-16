@@ -15,6 +15,11 @@ export const postService = {
       return res.data['result'];
     });
   },
+  searchPosts: async (query, cursor) => {
+    return ajax.get(apiRoutes.searchList(query, cursor)).then(res => {
+      return res.data['result'];
+    });
+  },
   getUserPosts: async (username, cursor = null) => {
     return ajax.get(apiRoutes.userPostsList(username, cursor)).then(res => {
       return res.data['result'];

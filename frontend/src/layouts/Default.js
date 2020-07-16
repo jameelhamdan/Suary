@@ -5,11 +5,11 @@ import { Container, Row, Col } from "shards-react";
 import MainNavbar from "components/layout/MainNavbar/MainNavbar";
 import MainFooter from "components/layout/MainFooter";
 
-const DefaultLayout = ({ children, noNavbar, noFooter }) => (
+const DefaultLayout = ({ children, history, noNavbar, noFooter }) => (
   <Container fluid>
     <Row>
       <Col className="main-content p-0" lg="12" md="12" sm="12" tag="main">
-        {!noNavbar && <MainNavbar />}
+        {!noNavbar && <MainNavbar history={history}/>}
         {children}
         {!noFooter && <MainFooter />}
       </Col>
@@ -18,14 +18,9 @@ const DefaultLayout = ({ children, noNavbar, noFooter }) => (
 );
 
 DefaultLayout.propTypes = {
-  /**
-   * Whether to display the navbar, or not.
-   */
   noNavbar: PropTypes.bool,
-  /**
-   * Whether to display the footer, or not.
-   */
-  noFooter: PropTypes.bool
+  noFooter: PropTypes.bool,
+  history: PropTypes.object
 };
 
 DefaultLayout.defaultProps = {

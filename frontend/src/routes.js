@@ -4,10 +4,15 @@ import React from "react";
 import { DefaultLayout } from "layouts";
 
 // Route Views
+
+// Auth
 import Login from "views/auth/Login";
 import Logout from "views/auth/Logout";
 import Register from "views/auth/Register";
+
+// Home
 import Home from "views/home/Home";
+import Search from "views/home/Search";
 
 //Users
 import UserDetail from "views/user/Detail";

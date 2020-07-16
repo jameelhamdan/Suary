@@ -1,24 +1,24 @@
 import React from "react";
-import {Wrapper} from "components/common/Wrapper";
 import {connect} from "react-redux";
-import AddPostWidget from "components/posts/AddPost";
-import PostList from "components/posts/PostList";
-import {postService} from "services/postService";
+import Feed from "./Feed";
+import Search from "./Search";
+
 
 class Home extends React.Component {
-  loadPosts = (page, cursor) => {
-    return postService.getFeedPosts(cursor).then((data) => {
-      return data;
-    });
-  };
+  constructor(props) {
+    super(props);
+    const params = new URLSearchParams(this.props.location.search);
+    this.state = {
+      search_query: params.get('search') || null
+    }
+  }
 
   render() {
-    return (
-      <Wrapper>
-        <AddPostWidget history={this.props.history}/>
-        <PostList loadMoreFunc={this.loadPosts}/>
-      </Wrapper>
-    )
+    if (this.state.search_query && this.state.search_query !== ''){
+      return <Search search={this.state.search_query} />
+    } else {
+      return <Feed />
+    }
   }
 }
 

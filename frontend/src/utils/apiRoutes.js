@@ -50,6 +50,13 @@ class apiRoutes {
     return `feed/`
   }
 
+  static searchList(query, cursor = null) {
+    if (cursor !== null) {
+      return `feed/search?q=${query}&cursor=${cursor}`;
+    }
+    return `feed/search?q=${query}`
+  }
+
   // Post Routes
   static userPostsList(username, cursor = null) {
     if (cursor !== null) {
