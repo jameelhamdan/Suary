@@ -4,7 +4,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  FormInput
 } from "shards-react";
 import {useForm} from "react-hook-form";
 
@@ -18,8 +17,7 @@ export default class NavbarSearch extends React.Component {
   onSubmit(data) {
     let search_query = data.search;
     if (search_query && search_query !== '' && search_query !== undefined) {
-      console.log(this.props.history);
-      this.props.history.push(`/?search=${search_query}`);
+      this.props.history.push(`/search/${search_query}`);
     }
   }
 

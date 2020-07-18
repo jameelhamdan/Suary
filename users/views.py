@@ -15,10 +15,11 @@ class UpdateAvatarView(APIViewMixin, generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         cleaned_data = serializer.validated_data
 
-        uploaded_avatar_uuid = self.request.current_user.update_avatar(cleaned_data['avatar'])
+        user = self.request.current_user
+        user.update_avatar(cleaned_data['avatar'])
 
         result = {
-            'avatar_uuid': uploaded_avatar_uuid,
+            'avatar_url': user.get_avatar_url(),
         }
 
         return self.get_response(message='Successfully Updated Avatar', result=result)

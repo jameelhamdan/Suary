@@ -66,7 +66,7 @@ export const userService = {
         "id": data["id"],
         "username": data["username"],
         "full_name": data["full_name"],
-        "avatar_uuid": data["avatar_uuid"],
+        "avatar_url": data["avatar_url"],
         "logged_in": true
       };
 

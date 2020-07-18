@@ -35,7 +35,7 @@ export default class PostList extends React.Component {
 
   render() {
     if (this.state.list.length === 0) {
-      if (this.emptyComponent){
+      if (this.emptyComponent) {
         return (
           <>
             {this.emptyComponent}
@@ -54,9 +54,10 @@ export default class PostList extends React.Component {
           hasMore={!!this.state.cursor}
           loader={null}>
           {this.state.list.map((item, index) => (
-            <Post key={index} postDetails={item}
-                  enableComments={this.enableComments}
-                  enableFollowButton={this.enableFollowButton}
+            <Post
+              key={index} postDetails={item}
+              enableComments={this.enableComments}
+              enableFollowButton={this.enableFollowButton}
             />
           ))}
         </InfiniteScroll>

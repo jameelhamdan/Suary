@@ -29,7 +29,7 @@ export default class Post extends React.Component {
           </CardBody>
 
           {this.data.media_list.length > 0 &&
-          <PostMedia media_uuid={this.data.media_list[0].hash} content_type={this.data.media_list[0].content_type}/>
+          <PostMedia media_url={this.data.media_list[0].url} content_type={this.data.media_list[0].content_type}/>
           }
           <CardBody>
             <Nav justified>
@@ -66,7 +66,7 @@ export default class Post extends React.Component {
       created_by: PropTypes.shape({
         id: PropTypes.string,
         username: PropTypes.string,
-        avatar_uuid: PropTypes.string,
+        avatar_url: PropTypes.string,
         follow_count: PropTypes.number,
         is_followed: PropTypes.bool
       }),
@@ -87,7 +87,7 @@ export default class Post extends React.Component {
       created_by: {
         id: null,
         username: null,
-        avatar_uuid: null,
+        avatar_url: null,
         follow_count: 0,
         is_followed: false
       },

@@ -5,8 +5,16 @@ import users.serializers
 
 
 class MediaSerializer(serializers.Serializer):
-    hash = serializers.CharField()
+    url = serializers.SerializerMethodField()
     content_type = serializers.CharField()
+
+    def get_url(self, obj):
+        if not obj.hash:
+            return None
+        return '%s/%s' % (
+            settings.MEDIA_SERVER_BASE_URL,
+            obj.hash
+        )
 
 
 class PostSerializer(serializers.Serializer):

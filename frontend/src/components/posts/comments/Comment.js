@@ -18,14 +18,14 @@ export default class Post extends React.Component {
       <ListGroupItem key={this.data.id}>
         <Row>
           <Col lg={12}>
-            <Avatar image_uuid={this.data.created_by.avatar_uuid} fallback={placeholderImage}/>
+            <Avatar image_url={this.data.created_by.avatar_url} fallback={placeholderImage}/>
             <Link tag={Link} to={"/profile/" + this.data.created_by.username} className="d-none d-md-inline-block">{this.data.created_by.username}</Link>
             <TimeAgo component={CardText} className={"float-right"} date={this.data.created_on}/>
           </Col>
           <Col lg={12}>{this.data.content}</Col>
           {this.data.media &&
           <Col sm={6} md={4} lg={3}>
-            <CommentMedia media_uuid={this.data.media.hash} content_type={this.data.media.content_type}/>
+            <CommentMedia media_url={this.data.media.url} content_type={this.data.media.content_type}/>
           </Col>
           }
         </Row>
@@ -44,13 +44,13 @@ export default class Post extends React.Component {
       content: PropTypes.string,
       media: PropTypes.shape({
         content_type: PropTypes.string,
-        hash: PropTypes.string,
+        url: PropTypes.string,
       }),
       created_on: PropTypes.string,
       created_by: PropTypes.shape({
         id: PropTypes.string,
         username: PropTypes.string,
-        avatar_uuid: PropTypes.string,
+        avatar_url: PropTypes.string,
       })
     })
   };
@@ -65,7 +65,7 @@ export default class Post extends React.Component {
       created_by: {
         id: null,
         username: null,
-        avatar_uuid: null,
+        avatar_url: null,
       }
     }
   };

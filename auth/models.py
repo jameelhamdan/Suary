@@ -230,6 +230,19 @@ class User(models.Model):
         """
         return users.models.Follow.objects.filter(follower_id=self.pk, is_active=True)
 
+    def get_avatar_url(self):
+        """
+        Parse avatar_uuid into viewable url string
+        :return: str url
+        """
+
+        if not self.avatar_uuid:
+            return None
+        return '%s/%s' % (
+            settings.MEDIA_SERVER_BASE_URL,
+            self.avatar_uuid
+        )
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.secret_key = utils.generate_uuid(3)

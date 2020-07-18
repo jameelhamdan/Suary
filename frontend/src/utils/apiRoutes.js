@@ -1,13 +1,6 @@
 const app = document.getElementById("app");
 
 class staticRoutes {
-  static Media(media_uuid) {
-    //TODO: find a better way to do this
-    let root_url = app.getAttribute("api-root-url");
-    let arr = root_url.split("/");
-    root_url = arr[0] + "//" + arr[2];
-    return `${root_url}/media/${media_uuid}`;
-  }
 }
 
 class apiRoutes {
