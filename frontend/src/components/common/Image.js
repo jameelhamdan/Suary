@@ -14,16 +14,10 @@ export default class Avatar extends React.Component {
     }
   }
 
-  get_image_url(){
-    const image_uuid = this.props.image_uuid;
+  get_image_url() {
+    const url = this.props.image_url;
     const fallback = this.props.fallback;
-    if(image_uuid !== undefined && image_uuid !== null && image_uuid !== ""){
-      return staticRoutes.Media(image_uuid);
-    } else if (fallback !== undefined && fallback !== null){
-      return fallback
-    } else {
-      return null;
-    }
+    return url ? url : (this.props.fallback ? fallback : null);
   }
 
   render() {
@@ -39,6 +33,12 @@ export default class Avatar extends React.Component {
       />
     )
   }
+
+  static propTypes = {
+    image_url: PropTypes.string,
+    fallback: PropTypes.string,
+    placeholder: PropTypes.node,
+  }
 }
 
 export class LargeAvatar extends Avatar {
@@ -46,7 +46,7 @@ export class LargeAvatar extends Avatar {
     if (this.props.placeholder != null) {
       return this.props.placeholder
     } else {
-      return <span className="rounded-circle vertical-align-middle" style={{width:110}}></span>;
+      return <span className="rounded-circle vertical-align-middle" style={{width: 110}}></span>;
     }
   }
 
@@ -58,7 +58,7 @@ export class LargeAvatar extends Avatar {
         className="rounded-circle"
         src={this.get_image_url()}
         alt={this.props.alt || "Large Avatar"}
-        style={{width:110}}
+        style={{width: 110}}
         loader={defaultComponent}
         unloader={defaultComponent}
       />
@@ -66,7 +66,7 @@ export class LargeAvatar extends Avatar {
   }
 }
 
-export class PostMedia extends React.Component  {
+export class PostMedia extends React.Component {
   imagePlaceholder() {
     if (this.props.placeholder != null) {
       return this.props.placeholder
@@ -75,13 +75,8 @@ export class PostMedia extends React.Component  {
     }
   }
 
-  get_media_url(){
-    const media_uuid = this.props.media_uuid;
-    if(media_uuid !== undefined && media_uuid !== null){
-      return staticRoutes.Media(media_uuid);
-    } else {
-      return null;
-    }
+  get_media_url() {
+    return this.props.media_url;
   }
 
   get_content_type() {
@@ -97,9 +92,9 @@ export class PostMedia extends React.Component  {
     const defaultComponent = this.imagePlaceholder();
     const content_type = this.get_content_type();
 
-    if(content_type.startsWith('video')){
+    if (content_type.startsWith('video')) {
       return (
-          <ReactPlayer
+        <ReactPlayer
           className="card-img-bottom card-video-bottom"
           url={this.get_media_url()}
           width="100%"
@@ -109,30 +104,29 @@ export class PostMedia extends React.Component  {
       )
     } else {
       return (
-      <Img
-        decode={false}
-        className="card-img-bottom"
-        src={this.get_media_url()}
-        alt={this.props.alt || "post image"}
-        loader={defaultComponent}
-        unloader={defaultComponent}
-      />
-    )
+        <Img
+          decode={false}
+          className="card-img-bottom"
+          src={this.get_media_url()}
+          alt={this.props.alt || "post image"}
+          loader={defaultComponent}
+          unloader={defaultComponent}
+        />
+      )
     }
-
   }
+
+  static propTypes = {
+    media_url: PropTypes.string.isRequired,
+    content_type: PropTypes.string,
+    placeholder: PropTypes.node,
+  };
 }
 
 
-
-export class CommentMedia extends React.Component  {
-  get_media_url(){
-    const media_uuid = this.props.media_uuid;
-    if(media_uuid !== undefined && media_uuid !== null){
-      return staticRoutes.Media(media_uuid);
-    } else {
-      return null;
-    }
+export class CommentMedia extends React.Component {
+  get_media_url() {
+    return this.props.media_url;
   }
 
   get_content_type() {
@@ -148,9 +142,9 @@ export class CommentMedia extends React.Component  {
     const defaultComponent = null;
     const content_type = this.get_content_type();
 
-    if(content_type.startsWith('video')){
+    if (content_type.startsWith('video')) {
       return (
-          <ReactPlayer
+        <ReactPlayer
           className="card-img-bottom card-video-bottom"
           url={this.get_media_url()}
           width="100%"
@@ -160,29 +154,16 @@ export class CommentMedia extends React.Component  {
       )
     } else {
       return (
-      <Img
-        decode={false}
-        className="img-responsive"
-        src={this.get_media_url()}
-        alt={this.props.alt || "comment image"}
-        loader={defaultComponent}
-        unloader={defaultComponent}
-      />
-    )
+        <Img
+          decode={false}
+          className="img-responsive"
+          src={this.get_media_url()}
+          alt={this.props.alt || "comment image"}
+          loader={defaultComponent}
+          unloader={defaultComponent}
+        />
+      )
     }
 
   }
 }
-
-
-Avatar.propTypes = {
-  image_uuid: PropTypes.string,
-  fallback: PropTypes.string,
-  placeholder: PropTypes.node,
-};
-
-PostMedia.propTypes = {
-  media_uuid: PropTypes.string.isRequired,
-  content_type: PropTypes.string,
-  placeholder: PropTypes.node,
-};

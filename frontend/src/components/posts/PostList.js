@@ -2,14 +2,13 @@ import React from 'react'
 import PropTypes from "prop-types";
 import InfiniteScroll from 'react-infinite-scroller';
 import Post from "components/posts/Post"
-import Loading from "components/common/Loading"
 import {CardText} from "shards-react"
 
 
 export default class PostList extends React.Component {
   constructor(props) {
     super(props);
-    this.emptyMessage = this.props.emptyMessage;
+    this.emptyComponent = this.props.children;
     this.loadMoreFunc = this.props.loadMoreFunc;
     this.enableComments = this.props.enableComments;
     this.enableFollowButton = this.props.enableFollowButton;
@@ -35,9 +34,16 @@ export default class PostList extends React.Component {
   };
 
   render() {
-    const EmptyMessage = <CardText>{this.emptyMessage}</CardText>;
     if (this.state.list.length === 0) {
-      return EmptyMessage;
+      if (this.emptyComponent) {
+        return (
+          <>
+            {this.emptyComponent}
+          </>
+        )
+      } else {
+        return <CardText>Nothing has been posted anything yet :(</CardText>;
+      }
     }
 
     return (
@@ -48,8 +54,11 @@ export default class PostList extends React.Component {
           hasMore={!!this.state.cursor}
           loader={null}>
           {this.state.list.map((item, index) => (
-            <Post key={index} postDetails={item} enableComments={this.enableComments}
-                  enableFollowButton={this.enableFollowButton}/>
+            <Post
+              key={index} postDetails={item}
+              enableComments={this.enableComments}
+              enableFollowButton={this.enableFollowButton}
+            />
           ))}
         </InfiniteScroll>
       </div>
@@ -58,13 +67,11 @@ export default class PostList extends React.Component {
 
   static propTypes = {
     loadMoreFunc: PropTypes.func.isRequired,
-    emptyMessage: PropTypes.string,
     enableFollowButton: PropTypes.bool,
     enableComments: PropTypes.bool,
   };
 
   static defaultProps = {
-    emptyMessage: 'Nothing has been posted anything yet :(',
     loadMoreFunc: null,
     enableFollowButton: false,
     enableComments: false,

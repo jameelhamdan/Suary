@@ -8,9 +8,17 @@ class UserSerializer(serializers.Serializer):
     id = serializers.CharField()
     username = serializers.CharField()
     full_name = serializers.CharField()
-    avatar_uuid = serializers.CharField()
+    avatar_url = serializers.SerializerMethodField()
     follow_count = serializers.IntegerField(default=None)
     is_followed = serializers.BooleanField(default=None)
+
+    def get_avatar_url(self, obj):
+        if not obj.avatar_uuid:
+            return None
+        return '%s/%s' % (
+            settings.MEDIA_SERVER_BASE_URL,
+            obj.avatar_uuid
+        )
 
 
 class UpdateAvatarSerializer(serializers.Serializer):

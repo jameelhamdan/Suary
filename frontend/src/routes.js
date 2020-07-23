@@ -4,10 +4,15 @@ import React from "react";
 import { DefaultLayout } from "layouts";
 
 // Route Views
+
+// Auth
 import Login from "views/auth/Login";
 import Logout from "views/auth/Logout";
 import Register from "views/auth/Register";
-import Home from "views/home/Home";
+
+// Home
+import Feed from "views/home/Feed";
+import Search from "views/home/Search";
 
 //Users
 import UserDetail from "views/user/Detail";
@@ -28,7 +33,15 @@ export default [
     exact: true,
     strict: false,
     layout: DefaultLayout,
-    component: Home
+    component: Feed
+  },
+  {
+    path: "/search/:q?",
+    logged_in_only: true,
+    exact: true,
+    strict: false,
+    layout: DefaultLayout,
+    component: Search
   },
   {
     path: "/login",

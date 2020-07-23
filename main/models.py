@@ -27,9 +27,9 @@ class Media(models.Model):
         db = settings.DEFAULT_DATABASE
 
 
-class PostManager(models.Manager):
+class PostQuerySet(models.QuerySet):
     def liked(self, user=None):
-        return super().get_queryset().annotate(
+        return self.annotate(
             likes_count=models.Count('likes', distinct=True),
             comments_count=models.Count('comments', distinct=True),
             is_liked=models.Exists(
@@ -37,12 +37,22 @@ class PostManager(models.Manager):
             )
         )
 
+    def search(self, search_query):
+        # TODO: use something similar to elasticsearch for this
+
+        return self.filter(
+            models.Q(content__icontains=search_query) |
+            models.Q(tags__icontains=[search_query]) |
+            models.Q(created_by__username__icontains=search_query) |
+            models.Q(created_by__full_name__icontains=search_query)
+        )
+
 
 class Post(AbstractModel):
     content = models.TextField(null=False)
     tags = ArrayField(base_field=models.TextField())
     created_by = models.ForeignKey('auth.User', related_name='posts', on_delete=models.CASCADE)
-    objects = PostManager()
+    objects = PostQuerySet.as_manager()
 
     def add_comment(self, content, created_by, media_file=None):
         comment = Comment(post_id=self.pk, content=content, created_by_id=created_by.pk)

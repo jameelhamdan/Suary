@@ -89,6 +89,7 @@ REST_FRAMEWORK = {
 }
 
 API_PREFIX = 'api'
+MEDIA_SERVER_BASE_URL = os.getenv('MEDIA_SERVER_BASE_URL', 'http://127.0.0.1:8000/media')
 # TODO: Setup proper cross origin policy for dev environment
 CORS_ORIGIN_ALLOW_ALL = True
 

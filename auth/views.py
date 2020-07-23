@@ -27,7 +27,7 @@ class LoginView(APIViewMixin, generics.CreateAPIView):
             'id': user.pk,
             'username': user.username,
             'full_name': user.full_name,
-            'avatar_uuid': user.avatar_uuid,
+            'avatar_url': user.get_avatar_url(),
             'auth_token': auth_token,
             'refresh_token': refresh_token,
         }

@@ -21,7 +21,7 @@ export default class UserDetails extends React.Component {
 			<Card small className="mb-4 pt-3">
 				<CardHeader className="border-bottom text-center">
 					<div className="mb-3 mx-auto">
-						<LargeAvatar image_uuid={this.data.avatar_uuid} fallback={placeholderImage}/>
+						<LargeAvatar image_url={this.data.avatar_url} fallback={placeholderImage}/>
 					</div>
 					<h4 className="mb-0">{this.data.username}</h4>
 					<span className="text-muted d-block mb-2">{followerText}</span>
@@ -38,7 +38,7 @@ export default class UserDetails extends React.Component {
 	static defaultProps = {
 		id: null,
 		username: null,
-		avatar_uuid: null,
+		avatar_url: null,
 		follow_count: 0,
 		is_followed: false
 	};

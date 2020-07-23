@@ -38,7 +38,7 @@ class UserActions extends React.Component {
       return (
         <NavItem tag={Dropdown} caret toggle={this.toggleUserActions}>
           <DropdownToggle caret tag={NavLink} className="text-nowrap px-3">
-            <Avatar image_uuid={this.props.userState.userData.avatar_uuid} fallback={placeholderImage}/>
+            <Avatar image_url={this.props.userState.userData.avatar_url} fallback={placeholderImage}/>
             <span className="d-none d-md-inline-block">{this.props.userState.userData.username}</span>
           </DropdownToggle>
           <Collapse tag={DropdownMenu} right small open={this.state.visible}>

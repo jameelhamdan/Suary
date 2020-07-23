@@ -18,14 +18,14 @@ export default class UserBadge extends React.Component {
 	render() {
 		return (
 			<Row>
-				<Col lg={9}>
-					<Avatar className="d-inline-block" image_uuid={this.data.avatar_uuid} fallback={placeholderImage}/>
+				<Col md={8} lg={9}>
+					<Avatar className="d-inline-block" image_url={this.data.avatar_url} fallback={placeholderImage}/>
 					<span className="d-inline-block">{this.data.username}</span>
 					{this.enableFollowButton &&
 						<FollowButton className="ml-2 d-inline-block" size="sm" user_id={this.data.id} follow_count={this.data.follow_count} is_followed={this.data.is_followed}/>
 					}
 				</Col>
-				<Col lg={3}>
+				<Col md={4} lg={3}>
 					<TimeAgo component={CardText} className={"float-right mb-0"} date={this.postCreatedOn}/>
 				</Col>
 			</Row>
@@ -36,7 +36,7 @@ export default class UserBadge extends React.Component {
 		data: PropTypes.shape({
 			id: PropTypes.string,
 			username: PropTypes.string,
-			avatar_uuid: PropTypes.string,
+			avatar_url: PropTypes.string,
 			follow_count: PropTypes.number,
 			is_followed: PropTypes.bool
 		}).isRequired,

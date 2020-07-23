@@ -1,5 +1,5 @@
 import React from "react";
-import {CardText, ListGroup} from "shards-react";
+import {ListGroup} from "shards-react";
 import PropTypes from "prop-types";
 import {postService} from "services/postService";
 import Comment from "./Comment";

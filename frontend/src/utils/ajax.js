@@ -54,7 +54,6 @@ Ajax.interceptors.response.use((response) => {
     return response
   }, function (error) {
     const originalRequest = error.config;
-    console.log(originalRequest);
     if (error.response.status === 401 && originalRequest.url === refresh_token_url) {
       UserStorage.clear();
       window.location = "/login";
